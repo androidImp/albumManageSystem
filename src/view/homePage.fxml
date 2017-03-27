@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.effect.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.control.TreeItem?>
+<?import javafx.scene.text.Text?>
+
+<GridPane alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity"
+	prefHeight="600.0" prefWidth="800.0" xmlns:fx="http://javafx.com/fxml/1"
+	xmlns="http://javafx.com/javafx/8">
+	<columnConstraints>
+		<ColumnConstraints hgrow="ALWAYS" minWidth="0.0"
+			prefWidth="0.0" />
+		<ColumnConstraints hgrow="ALWAYS" minWidth="0.0"
+			prefWidth="0.0" />
+		<ColumnConstraints hgrow="ALWAYS" minWidth="0.0"
+			prefWidth="0.0" />
+		<ColumnConstraints hgrow="ALWAYS" minWidth="0.0"
+			prefWidth="0.0" />
+	</columnConstraints>
+	<rowConstraints>
+		<RowConstraints minHeight="0.0" prefHeight="0.0" vgrow="ALWAYS" />
+		<RowConstraints minHeight="0.0" prefHeight="0.0" vgrow="ALWAYS" />
+		<RowConstraints minHeight="0.0" prefHeight="0.0" vgrow="ALWAYS" />
+		<RowConstraints minHeight="0.0" prefHeight="0.0" vgrow="ALWAYS" />
+		<RowConstraints minHeight="0.0" prefHeight="0.0" vgrow="ALWAYS" />
+		<RowConstraints minHeight="0.0" prefHeight="0.0" vgrow="ALWAYS" />
+	</rowConstraints>
+	<children>
+		<!-- 相册界面 -->
+		<ListView fx:id="ls_album" orientation="HORIZONTAL"
+			GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="1"
+			GridPane.rowSpan="5" />
+		<TextField id="tv_search" alignment="CENTER" promptText="输入搜索内容"
+			GridPane.columnIndex="2" GridPane.columnSpan="2">
+			<GridPane.margin>
+				<Insets right="10"></Insets>
+			</GridPane.margin>
+		</TextField>
+
+		<!-- 左侧的用户面板 -->
+		<VBox GridPane.rowIndex="1" GridPane.columnIndex="0" alignment="TOP_CENTER"
+			GridPane.columnSpan="1" GridPane.rowSpan="2">
+
+			<ImageView fx:id="img_usr_icon" preserveRatio="true"
+				fitHeight="100" fitWidth="100">
+				<image>
+					<Image url="Pic/pic.jpeg" />
+				</image>
+				<VBox.margin>
+					<Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+				</VBox.margin>
+			</ImageView>
+			<HBox alignment="TOP_LEFT">
+				<Label text="你好! ">
+					<HBox.margin>
+						<Insets bottom="10.0" left="10.0" right="10.0" top="5.0" />
+					</HBox.margin>
+				</Label>
+				<Label fx:id="ll_username">
+					<HBox.margin>
+						<Insets bottom="10.0" left="10.0" right="10.0" top="5.0" />
+					</HBox.margin>
+				</Label>
+			</HBox>
+
+		</VBox>
+		<VBox GridPane.rowIndex="3" GridPane.rowSpan="3"
+			GridPane.columnIndex="0" GridPane.columnSpan="1">
+			<TreeView fx:id="tv_menu">
+				<TreeItem value="用户菜单" expanded="true">
+					<children>
+						<TreeItem value="清除缓存" />
+						<TreeItem value="清除缓存" />
+						<TreeItem value="清除缓存" />
+					</children>
+				</TreeItem>
+			</TreeView>
+			<ProgressBar></ProgressBar>
+			<Label></Label>
+		</VBox>
+	</children>
+</GridPane>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.ProgressBar?>
+
+<GridPane maxHeight="-Infinity" maxWidth="-Infinity"
+	prefHeight="400.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/8"
+	xmlns:fx="http://javafx.com/fxml/1">
+	<columnConstraints>
+		<ColumnConstraints hgrow="SOMETIMES" minWidth="0.0"
+			prefWidth="200.0" />
+		<ColumnConstraints hgrow="ALWAYS" minWidth="0.0"
+			prefWidth="100.0" />
+		<ColumnConstraints hgrow="ALWAYS" minWidth="0.0"
+			prefWidth="100.0" />
+
+	</columnConstraints>
+	<rowConstraints>
+		<RowConstraints minHeight="0.0" prefHeight="0.0" vgrow="ALWAYS" />
+		<RowConstraints minHeight="0.0" prefHeight="0.0" vgrow="ALWAYS" />
+		<RowConstraints minHeight="0.0" prefHeight="0.0" vgrow="ALWAYS" />
+		<RowConstraints minHeight="0.0" prefHeight="0.0" vgrow="ALWAYS" />
+	</rowConstraints>
+	<children>
+		<Pagination prefHeight="0" prefWidth="0"
+			GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowSpan="3"
+			fx:id="pg_photo" />
+		<ListView prefHeight="0" prefWidth="0" GridPane.rowSpan="4"
+			fx:id="lv_photo" />
+		<HBox prefHeight="0.0" prefWidth="0.0" GridPane.columnSpan="2"
+			alignment="CENTER" GridPane.columnIndex="1" GridPane.rowIndex="3"
+			spacing="10">
+			<Button text="缩小" />
+			<Button text="放大" />
+			<Button text="上一张" />
+			<Button text="下一张" />
+			<Button text="左旋90°" />
+			<Button text="右旋90°" />
+			<Button fx:id="btn_add" text="添加相片"></Button>
+
+		</HBox>
+	</children>
+</GridPane>
