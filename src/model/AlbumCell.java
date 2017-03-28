@@ -1,6 +1,7 @@
 package model;
 
-import java.io.IOException;import javafx.beans.value.ChangeListener;
+import java.io.IOException;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -21,6 +22,7 @@ public class AlbumCell extends ListCell<Album> {
 	private Label ll_created_date;
 	@FXML
 	private Label ll_space_usage;
+
 	@Override
 	protected void updateItem(Album item, boolean empty) {
 		// TODO Auto-generated method stub
@@ -45,7 +47,7 @@ public class AlbumCell extends ListCell<Album> {
 				item.setAlbumName(newValue);
 			}
 		});
-		if(!empty){
+		if (!empty) {
 			img_cover.setImage(new Image(item.getCoverUri()));
 			tf_name.setText(item.getAlbumName());
 			ll_space_usage.setText(DataUtil.convertSizeToString(item.getSize()));

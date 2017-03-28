@@ -8,6 +8,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javafx.beans.binding.DoubleBinding;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
@@ -39,15 +41,29 @@ import util.FileChooserUtil;
 
 public class PhotoStage extends Stage {
 	public int EMPTY = 2147483647;
+	public int DEFAULT_HEIGHT = 200;
+	public int DEFAULT_WIDTH = 250;
+	public int MAX_HEIGHT = 300;
+	public int MAX_WIDTH = 375;
+	public int MIN_HEIGHT = 100;
+	public int MIN_WIDTH = 125;
+	public int HEIGHT_INCREAMENT = 20;
+	public int WIDTH_INCREAMENT = 25;
 	private Album album;
 	@FXML
 	Pagination pg_photo;
 	@FXML
 	ListView<String> lv_photo;
 	@FXML
+	Button btn_add;
+	@FXML
 	Button btn_shrink;
 	@FXML
-	Button btn_add;
+	Button btn_enlarge;
+	@FXML
+	Button btn_set_cover;
+	IntegerProperty default_height = new SimpleIntegerProperty(DEFAULT_HEIGHT);
+	IntegerProperty default_width = new SimpleIntegerProperty(DEFAULT_WIDTH);
 	FileChooser fileChooser;
 
 	public PhotoStage(Album album) {
@@ -60,9 +76,11 @@ public class PhotoStage extends Stage {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		this.album = album;
 		pg_photo = (Pagination) parent.lookup("#pg_photo");
 		lv_photo = (ListView<String>) parent.lookup("#lv_photo");
 		Scene scene = new Scene(parent);
+		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		setScene(scene);
 		// 初始化 listview
 		lv_photo.setItems(album.getPhotosUri());
@@ -91,8 +109,10 @@ public class PhotoStage extends Stage {
 				VBox vBox = new VBox();
 				vBox.setAlignment(Pos.CENTER);
 				ImageView imageView = new ImageView();
-				imageView.setFitHeight(200);
-				imageView.setFitWidth(300);
+				// imageView.setFitHeight(200);
+				// imageView.setFitWidth(250);
+				imageView.fitWidthProperty().bind(default_width);
+				imageView.fitHeightProperty().bind(default_width);
 				if (album.getPhotosUri().size() > index) {
 					Image image = null;
 					try {
@@ -135,6 +155,8 @@ public class PhotoStage extends Stage {
 			}
 		});
 		btn_add = (Button) parent.lookup("#btn_add");
+		btn_enlarge = (Button) parent.lookup("#btn_enlarge");
+		btn_shrink = (Button) parent.lookup("#btn_shrink");
 		fileChooser = new FileChooser();
 		btn_add.setOnAction((final ActionEvent e) -> {
 			FileChooserUtil.configureFileChooser(fileChooser);
@@ -146,7 +168,50 @@ public class PhotoStage extends Stage {
 				}
 			}
 		});
+		btn_enlarge.setOnAction(new EventHandler<ActionEvent>() {
 
+			@Override
+			public void handle(ActionEvent event) {
+				// TODO Auto-generated method stub
+				int height = default_height.get();
+				int width = default_width.get();
+				height += HEIGHT_INCREAMENT;
+				width += WIDTH_INCREAMENT;
+				if (height > MAX_HEIGHT)
+					height = MAX_HEIGHT;
+				if (width > MAX_WIDTH)
+					width = MAX_WIDTH;
+				default_height.set(height);
+				default_width.set(width);
+			}
+		});
+		btn_shrink.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent event) {
+				// TODO Auto-generated method stub
+				int height = default_height.get();
+				int width = default_width.get();
+				height -= HEIGHT_INCREAMENT;
+				width -= WIDTH_INCREAMENT;
+				if (height < MIN_HEIGHT)
+					height = MIN_HEIGHT;
+				if (width < MIN_WIDTH)
+					width = MIN_WIDTH;
+				default_height.set(height);
+				default_width.set(width);
+			}
+		});
+		btn_set_cover = (Button) parent.lookup("#btn_set_cover");
+		btn_set_cover.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent event) {
+				// TODO Auto-generated method stub
+				String url = lv_photo.getSelectionModel().getSelectedItem();
+				album.setCoverUri(url);
+			}
+		});
 	}
 
 	public Album getAlbum() {

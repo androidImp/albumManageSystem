@@ -1,10 +1,14 @@
 package model;
 
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 
 public class Photo {
-
+	/**
+	 * 相册索引号
+	 */
+	private SimpleIntegerProperty id = new SimpleIntegerProperty(this, "id");
 	/**
 	 * 相册地址
 	 */
@@ -30,9 +34,17 @@ public class Photo {
 	 */
 	private SimpleStringProperty profile = new SimpleStringProperty(this, "profile");
 
-	/**
-	 * SIFT 特征值;
-	 */
+	// /**
+	// * SIFT 特征值;
+	// */
+	public Integer getId() {
+		return id.get();
+	}
+
+	public void setId(Integer id) {
+		this.id.set(id);
+	}
+
 	public String getUri() {
 		return uri.get();
 	}

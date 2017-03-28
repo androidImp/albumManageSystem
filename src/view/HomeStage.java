@@ -2,18 +2,33 @@ package view;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.prefs.Preferences;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
+import javafx.util.Pair;
 import model.Album;
 import model.AlbumCell;
 import util.DBUtil;
@@ -24,10 +39,10 @@ public class HomeStage extends Application {
 	ObservableList<Album> albumsList;
 	List<Album> albums;
 	Parent root = null;
+	private static int index;
 
 	@Override
 	public void start(Stage primaryStage) {
-		
 		try {
 			root = FXMLLoader.load(getClass().getResource("homePage.fxml"));
 		} catch (Exception e) {
@@ -36,10 +51,24 @@ public class HomeStage extends Application {
 		Scene scene = new Scene(root, 800, 600);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setScene(scene);
+		Preferences preferences = Preferences.userNodeForPackage(getClass());
+		index = preferences.getInt("index", 0);
 		initView(primaryStage);
 		initAlbumList();
 		DBUtil.getConnection();
 		DBUtil.createTable();
+		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+
+			@Override
+			public void handle(WindowEvent event) {
+				// TODO Auto-generated method stub
+				// 可以使用 JAXB
+				Preferences preferences = Preferences.userNodeForPackage(getClass());
+				preferences.putInt("index", index);
+				DBUtil.saveData(albums);
+				Platform.exit();
+			}
+		});
 	}
 
 	@SuppressWarnings("unchecked")
@@ -50,18 +79,6 @@ public class HomeStage extends Application {
 	}
 
 	public void initAlbumList() {
-		for (int i = 0; i < 10; i++) {
-			Album album = new Album();
-			album.setCoverUri("Pic/emptyCover.png");
-			album.setAlbumName("album " + i);
-			album.setPhotosUri(FXCollections.observableArrayList());
-			// album.setPhotosUri(FXCollections.observableArrayList(album.getCoverUri()));
-			album.setCreateDate(DateUtil.getFormatDate());
-			albums.add(album);
-		}
-		albumsList = FXCollections.observableArrayList(albums);
-		ls_album.setItems(albumsList);
-		// java 8 lambda
 		ls_album.setCellFactory((ListView<Album> l) -> new AlbumCell());
 		ls_album.setOnMouseClicked(new EventHandler<Event>() {
 
@@ -70,7 +87,9 @@ public class HomeStage extends Application {
 				// TODO Auto-generated method stub
 				if (((MouseEvent) event).getClickCount() >= 2) {
 					Album album = ls_album.getSelectionModel().getSelectedItem();
-					new PhotoStage(album).show();
+					if (album != null) {
+						new PhotoStage(album).show();
+					}
 
 				}
 			}

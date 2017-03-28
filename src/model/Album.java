@@ -23,7 +23,7 @@ public class Album {
 	/**
 	 * 记录相片的外存地址
 	 */
-	private ListProperty<String> photosUri = new SimpleListProperty<>(this, "phorosUri");
+	private ListProperty<String> photosUri = new SimpleListProperty<>(this, "photosUri");
 	/**
 	 * 记录相册封面相册的地址
 	 */
