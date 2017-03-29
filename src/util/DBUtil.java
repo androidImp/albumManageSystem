@@ -78,7 +78,6 @@ public class DBUtil {
 				select.setInt(1, album.getId());
 				ResultSet resultSet = select.executeQuery();
 				if (resultSet.getRow() < 1) {
-					// System.out.println("insert");
 					insert.setInt(1, album.getId());
 					insert.setString(2, album.getAlbumName());
 					insert.setString(3, album.getAlbumProfile());
@@ -89,7 +88,7 @@ public class DBUtil {
 					insert.setString(8, DataUtil.parseListToString(album.getPhotosUri()));
 					insert.executeUpdate();
 				} else {
-					// System.out.println("update");
+					System.out.println("update");
 					update.setString(1, album.getAlbumName());
 					update.setString(2, album.getAlbumProfile());
 					update.setString(3, album.getCoverUri());

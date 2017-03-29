@@ -32,8 +32,8 @@
 	<children>
 		<Label alignment="CENTER" contentDisplay="CENTER" prefHeight="17.0"
 			prefWidth="300.0" text="相册名" GridPane.rowIndex="3" />
-		<TextField fx:id="tf_name" alignment="CENTER"
-			GridPane.columnIndex="1" GridPane.rowIndex="3" />
+		<Label fx:id="ll_name" alignment="CENTER" GridPane.columnIndex="1"
+			GridPane.rowIndex="3" />
 		<Label alignment="CENTER" contentDisplay="CENTER" prefHeight="17.0"
 			prefWidth="314.0" text="创建日期" GridPane.rowIndex="4" />
 		<Label alignment="CENTER" contentDisplay="CENTER" prefHeight="17.0"

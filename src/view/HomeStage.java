@@ -1,45 +1,31 @@
 package view;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import java.util.prefs.Preferences;
 
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
-import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.MenuItem;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import javafx.util.Pair;
 import model.Album;
 import model.AlbumCell;
 import util.DBUtil;
-import util.DateUtil;
 
 public class HomeStage extends Application {
 	ListView<Album> ls_album;
 	ObservableList<Album> albumsList;
-	List<Album> albums;
 	Parent root = null;
-	private static int index;
+	public static int index;
 
 	@Override
 	public void start(Stage primaryStage) {
@@ -48,6 +34,7 @@ public class HomeStage extends Application {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
 		Scene scene = new Scene(root, 800, 600);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		primaryStage.setScene(scene);
@@ -65,16 +52,16 @@ public class HomeStage extends Application {
 				// 可以使用 JAXB
 				Preferences preferences = Preferences.userNodeForPackage(getClass());
 				preferences.putInt("index", index);
-				DBUtil.saveData(albums);
+				DBUtil.saveData(ls_album.getItems());
 				Platform.exit();
 			}
 		});
+		addContextMenu();
 	}
 
 	@SuppressWarnings("unchecked")
 	private void initView(Stage primaryStage) {
 		ls_album = (ListView<Album>) root.lookup("#ls_album");
-		albums = new ArrayList<>();
 		primaryStage.show();
 	}
 
@@ -94,6 +81,41 @@ public class HomeStage extends Application {
 				}
 			}
 		});
+	}
+
+	public void addContextMenu() {
+		ContextMenu menu = new ContextMenu();
+		MenuItem delete_item = new MenuItem("删除");
+		MenuItem scan_item = new MenuItem("浏览信息");
+		MenuItem open_item = new MenuItem("打开");
+		delete_item.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent event) {
+				// TODO Auto-generated method stub
+				int index = ls_album.getSelectionModel().getSelectedIndex();
+				ls_album.getItems().remove(index);
+			}
+		});
+		scan_item.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent event) {
+				// TODO Auto-generated method stub
+				new PhotoInfoStage(ls_album.getSelectionModel().getSelectedItem());
+			}
+		});
+		open_item.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent event) {
+				// TODO Auto-generated method stub
+				new PhotoStage(ls_album.getSelectionModel().getSelectedItem()).show();
+
+			}
+		});
+		menu.getItems().addAll(open_item, scan_item, delete_item);
+		ls_album.setContextMenu(menu);
 	}
 
 	public static void main(String[] args) {

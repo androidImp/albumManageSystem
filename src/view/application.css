@@ -12,3 +12,9 @@
 .button:hover {
    -fx-background-color: linear-gradient(#2A5058, #61a2b1);
 }
+.list-cell:empty{
+	-fx-background-color: white;
+}
+.list-cell:empty .list-cell {
+    -fx-border-width: 0px;
+}

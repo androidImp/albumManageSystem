@@ -43,7 +43,9 @@
 		<!-- 相册界面 -->
 		<ListView fx:id="ls_album" orientation="HORIZONTAL"
 			GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="1"
-			GridPane.rowSpan="5" />
+			GridPane.rowSpan="5">
+		</ListView>
+
 		<VBox GridPane.columnIndex="1" alignment="CENTER_RIGHT">
 			<Button fx:id="btn_add" GridPane.columnIndex="1" text="添加相册"
 				onAction="#addAlbum">

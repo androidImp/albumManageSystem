@@ -7,6 +7,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javafx.application.Application;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -161,12 +162,16 @@ public class PhotoStage extends Stage {
 		btn_add.setOnAction((final ActionEvent e) -> {
 			FileChooserUtil.configureFileChooser(fileChooser);
 			List<File> filesList = fileChooser.showOpenMultipleDialog(PhotoStage.this);
+			double size = album.getSize();
 			if (filesList != null) {
 				for (int i = 0; i < filesList.size(); i++) {
 					File file = filesList.get(i);
-					album.getPhotosUri().add(file.getAbsoluteFile().toURI().toString());
+					String path = file.getAbsoluteFile().toURI().toString();
+					album.getPhotosUri().add(path);
+					size += file.length();
 				}
 			}
+			album.setSize(size);
 		});
 		btn_enlarge.setOnAction(new EventHandler<ActionEvent>() {
 
@@ -209,9 +214,12 @@ public class PhotoStage extends Stage {
 			public void handle(ActionEvent event) {
 				// TODO Auto-generated method stub
 				String url = lv_photo.getSelectionModel().getSelectedItem();
-				album.setCoverUri(url);
+				if (url != null) {
+					album.setCoverUri(url);
+				}
 			}
 		});
+
 	}
 
 	public Album getAlbum() {

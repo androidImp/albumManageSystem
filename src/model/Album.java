@@ -1,10 +1,12 @@
 package model;
 
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
 
 public class Album {
@@ -105,5 +107,13 @@ public class Album {
 	public void setSize(Double size) {
 		this.size.set(size);
 	}
-
+	public StringProperty coverUriProperty(){
+		return coverUri;
+	}
+	public StringProperty nameProperty(){
+		return albumName;
+	}
+	public DoubleProperty sizeProperty(){
+		return size;
+	}
 }

@@ -11,15 +11,14 @@ public class DataUtil {
 
 	public static String convertSizeToString(double size) {
 		int level = 0;
-		double cur, tmp;
-		cur = tmp = size;
-		while (cur > 0) {
-			tmp = cur;
+		double cur;
+		cur = size;
+		while (cur > 1024) {
 			cur /= 1024;
 			level++;
 		}
 		StringBuilder builder = new StringBuilder();
-		builder.append(String.format("%.2f", tmp));
+		builder.append(String.format("%.2f", cur));
 		if (level == 0) {
 			builder.append("B");
 		} else if (level == 1) {
