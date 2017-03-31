@@ -205,7 +205,7 @@ public class DBUtil {
 
 	public static ObservableList<Photo> queryPhotoByName(String photoName) {
 		getConnection();
-		String sql_select = "select * from photos where name like %" + photoName + "%";
+		String sql_select = "select * from photos where name like '%" + photoName + "%'";
 		ResultSet rs = null;
 		List<Photo> photos = new ArrayList<>();
 		try {
