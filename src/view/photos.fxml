@@ -35,7 +35,7 @@
 			<Button text="左旋90°" />
 			<Button text="右旋90°" />
 			<Button fx:id="btn_add" text="添加相片" />
-			<Button fx:id="btn_delete" text="删除相片" onAction="#deletePhoto" />
+			<Button fx:id="btn_delete" text="删除相片" />
 			<Button text="设为封面" fx:id="btn_set_cover"/>
 		</HBox>
 	</children>

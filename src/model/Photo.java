@@ -6,7 +6,7 @@ import javafx.beans.property.SimpleStringProperty;
 
 public class Photo {
 	/**
-	 * 相册索引号
+	 * 所属相册的索引号
 	 */
 	private SimpleIntegerProperty id = new SimpleIntegerProperty(this, "id");
 	/**
@@ -91,5 +91,26 @@ public class Photo {
 
 	public void setProfile(String profile) {
 		this.profile.set(profile);
+	}
+
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		StringBuilder builder = new StringBuilder();
+		builder.append("MD5: ");
+		builder.append(md5.get());
+		builder.append(" ID: ");
+		builder.append(id.get());
+		return builder.toString();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		// TODO Auto-generated method stub
+		if(obj == null){
+			return false;
+		}
+		Photo photo = (Photo) obj;
+		return getId().equals(photo.getId()) && getMd5().equals(photo.getMd5());
 	}
 }

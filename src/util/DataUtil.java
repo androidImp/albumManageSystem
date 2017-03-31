@@ -1,5 +1,12 @@
 package util;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,23 +42,54 @@ public class DataUtil {
 
 	public static ObservableList<String> parseUrlToList(String uris) {
 		String[] strings = uris.split(STRING_SEPARATOR);
-		ObservableList<String> list = FXCollections.observableArrayList();
+		List<String> list = new ArrayList<>();
 		for (String string : strings) {
 			list.add(string);
 		}
-		return list;
+		if(list.size() == 1 && list.get(0).equals("")){
+			list.remove(0);
+		}
+		return FXCollections.observableArrayList(list);
 	}
 
 	public static String parseListToString(List<String> list) {
 		StringBuilder builder = new StringBuilder();
 		for (String string : list) {
+			builder.append(string);
 			builder.append(STRING_SEPARATOR);
 		}
 		// 删除最后一个分隔符
 		if (builder.length() > 0) {
 			builder.deleteCharAt(builder.length() - 1);
 		}
-
+//		System.out.println("还原 uri 列表: " + builder.toString() + " 长度: " + builder.length());
 		return builder.toString();
+	}
+
+	public static String getMD5(File file) {
+		if (!file.exists() || !file.isFile()) {
+			LogUtil.e(DataUtil.class.getName(), "当前地址的文件已经移动或者删除,无法获取!");
+			return null;
+		}
+
+		MessageDigest digest = null;
+		FileInputStream in = null;
+		byte buffer[] = new byte[1024];
+		int len;
+		try {
+			digest = MessageDigest.getInstance("MD5");
+			in = new FileInputStream(file);
+			while ((len = in.read(buffer, 0, 1024)) != -1) {
+				digest.update(buffer, 0, len);
+			}
+			in.close();
+		} catch (NoSuchAlgorithmException e) {
+			LogUtil.e(DataUtil.class.getName(), "使用的错误的加密算法名称");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			LogUtil.e(DataUtil.class.getName(), "文件读取错误!");
+		}
+		BigInteger bigInt = new BigInteger(1, digest.digest());
+		return bigInt.toString(16);
 	}
 }

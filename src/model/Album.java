@@ -107,13 +107,32 @@ public class Album {
 	public void setSize(Double size) {
 		this.size.set(size);
 	}
-	public StringProperty coverUriProperty(){
+
+	public StringProperty coverUriProperty() {
 		return coverUri;
 	}
-	public StringProperty nameProperty(){
+
+	public StringProperty nameProperty() {
 		return albumName;
 	}
-	public DoubleProperty sizeProperty(){
+
+	public DoubleProperty sizeProperty() {
 		return size;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		// TODO Auto-generated method stub
+		if (obj == null) {
+			return false;
+		}
+		Album album = (Album) obj;
+		return getId().equals(album.getId());
+	}
+
+	@Override
+	public int hashCode() {
+		// TODO Auto-generated method stub
+		return super.hashCode();
 	}
 }

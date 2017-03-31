@@ -55,9 +55,7 @@
 			</Button>
 
 		</VBox>
-
-
-		<TextField id="tv_search" alignment="CENTER" promptText="输入搜索内容"
+		<TextField id="tf_search" alignment="CENTER" promptText="输入搜索内容"
 			GridPane.columnIndex="2" GridPane.columnSpan="2">
 			<GridPane.margin>
 				<Insets right="10"></Insets>

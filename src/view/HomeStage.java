@@ -1,6 +1,11 @@
 package view;
 
+import java.util.Collection;
 import java.util.prefs.Preferences;
+
+import org.controlsfx.control.textfield.AutoCompletionBinding;
+import org.controlsfx.control.textfield.AutoCompletionBinding.ISuggestionRequest;
+import org.controlsfx.control.textfield.TextFields;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -14,18 +19,20 @@ import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import javafx.util.Callback;
 import model.Album;
 import model.AlbumCell;
 import util.DBUtil;
 
 public class HomeStage extends Application {
 	ListView<Album> ls_album;
-	ObservableList<Album> albumsList;
 	Parent root = null;
 	public static int index;
+	TextField tf_search;
 
 	@Override
 	public void start(Stage primaryStage) {
@@ -42,8 +49,18 @@ public class HomeStage extends Application {
 		index = preferences.getInt("index", 0);
 		initView(primaryStage);
 		initAlbumList();
-		DBUtil.getConnection();
-		DBUtil.createTable();
+		configureData();
+		tf_search = (TextField) root.lookup("#tf_search");
+		TextFields.bindAutoCompletion(tf_search,
+				new Callback<AutoCompletionBinding.ISuggestionRequest, Collection<String>>() {
+
+					@Override
+					public Collection<String> call(ISuggestionRequest param) {
+						// TODO Auto-generated method stub
+						param.getUserText();
+						return null;
+					}
+				});
 		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 
 			@Override
@@ -52,11 +69,18 @@ public class HomeStage extends Application {
 				// 可以使用 JAXB
 				Preferences preferences = Preferences.userNodeForPackage(getClass());
 				preferences.putInt("index", index);
-				DBUtil.saveData(ls_album.getItems());
+				DBUtil.saveAlbums(ls_album.getItems());
 				Platform.exit();
 			}
 		});
 		addContextMenu();
+	}
+
+	private void configureData() {
+		DBUtil.getConnection();
+		DBUtil.createTable();
+		DBUtil.createPhotosTable();
+		ls_album.setItems(DBUtil.getAlbums());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -81,6 +105,7 @@ public class HomeStage extends Application {
 				}
 			}
 		});
+
 	}
 
 	public void addContextMenu() {
@@ -89,12 +114,16 @@ public class HomeStage extends Application {
 		MenuItem scan_item = new MenuItem("浏览信息");
 		MenuItem open_item = new MenuItem("打开");
 		delete_item.setOnAction(new EventHandler<ActionEvent>() {
-
 			@Override
 			public void handle(ActionEvent event) {
 				// TODO Auto-generated method stub
 				int index = ls_album.getSelectionModel().getSelectedIndex();
-				ls_album.getItems().remove(index);
+				if (index != -1) {
+					int id = ls_album.getSelectionModel().getSelectedItem().getId();
+					ls_album.getItems().remove(index);
+					DBUtil.deleteAlbum(id);
+					DBUtil.deletePhotoByAlbum(id);
+				}
 			}
 		});
 		scan_item.setOnAction(new EventHandler<ActionEvent>() {

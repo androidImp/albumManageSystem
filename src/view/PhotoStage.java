@@ -25,6 +25,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -35,10 +36,18 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import javafx.stage.WindowEvent;
 import javafx.util.Callback;
 import model.Album;
+import model.AlbumCell;
 import model.ImageCell;
+import model.Photo;
+import util.DBUtil;
+import util.DataUtil;
+import util.DateUtil;
 import util.FileChooserUtil;
+import util.LogUtil;
 
 public class PhotoStage extends Stage {
 	public int EMPTY = 2147483647;
@@ -54,7 +63,7 @@ public class PhotoStage extends Stage {
 	@FXML
 	Pagination pg_photo;
 	@FXML
-	ListView<String> lv_photo;
+	ListView<Photo> lv_photo;
 	@FXML
 	Button btn_add;
 	@FXML
@@ -63,36 +72,82 @@ public class PhotoStage extends Stage {
 	Button btn_enlarge;
 	@FXML
 	Button btn_set_cover;
+	@FXML
+	Button btn_delete;
 	IntegerProperty default_height = new SimpleIntegerProperty(DEFAULT_HEIGHT);
 	IntegerProperty default_width = new SimpleIntegerProperty(DEFAULT_WIDTH);
 	FileChooser fileChooser;
+	Parent parent = null;
 
-	public PhotoStage(Album album) {
-		// TODO Auto-generated constructor stub
-
-		Parent parent = null;
+	public void initView() {
 		try {
 			parent = FXMLLoader.load(getClass().getResource("photos.fxml"));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		this.album = album;
 		pg_photo = (Pagination) parent.lookup("#pg_photo");
-		lv_photo = (ListView<String>) parent.lookup("#lv_photo");
+		lv_photo = (ListView<Photo>) parent.lookup("#lv_photo");
+		btn_add = (Button) parent.lookup("#btn_add");
+		btn_enlarge = (Button) parent.lookup("#btn_enlarge");
+		btn_shrink = (Button) parent.lookup("#btn_shrink");
+		btn_set_cover = (Button) parent.lookup("#btn_set_cover");
+		btn_delete = (Button) parent.lookup("#btn_delete");
+		fileChooser = new FileChooser();
+		setOnCloseRequest(new EventHandler<WindowEvent>() {
+
+			@Override
+			public void handle(WindowEvent event) {
+				// TODO Auto-generated method stub
+				DBUtil.savePhotos(lv_photo.getItems());
+			}
+		});
+	}
+
+	public PhotoStage(Album album) {
+		// TODO Auto-generated constructor stub
+		this.album = album;
+		initView();
 		Scene scene = new Scene(parent);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		setScene(scene);
-		// 初始化 listview
-		lv_photo.setItems(album.getPhotosUri());
-		lv_photo.setCellFactory(new Callback<ListView<String>, ListCell<String>>() {
+		configureListView();
+		configurePagination();
+		// 绑定相册地址集合的大小和 pagination 的 count 属性.
+		configurePaginationCount();
+		configureButtonAdd();
+		configureButtonEnlarge();
+		configureButtonShrink();
+		configureButtonSetCover();
+		configureButtonDelete();
+	}
+
+	private void configurePaginationCount() {
+		pg_photo.pageCountProperty().addListener(new ChangeListener<Number>() {
 
 			@Override
-			public ListCell<String> call(ListView<String> param) {
+			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
 				// TODO Auto-generated method stub
-				return new ImageCell();
+				if (oldValue.intValue() == EMPTY && newValue.intValue() != EMPTY) {
+					pg_photo.setVisible(true);
+				} else if (newValue.intValue() == EMPTY || newValue.intValue() == 0) {
+					pg_photo.setVisible(false);
+				}
 			}
 		});
+		pg_photo.currentPageIndexProperty().addListener(new ChangeListener<Number>() {
+
+			@Override
+			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+				// TODO Auto-generated method stub
+				lv_photo.getSelectionModel().select(newValue.intValue());
+			}
+		});
+	}
+
+	public void configureListView() {
+		lv_photo.setItems(DBUtil.getPhotosByAlbum(album.getId()));
+		lv_photo.setCellFactory((ListView<Photo> l) -> new ImageCell());
 		lv_photo.setOnMouseClicked(new EventHandler<Event>() {
 
 			@Override
@@ -102,6 +157,9 @@ public class PhotoStage extends Stage {
 				pg_photo.setCurrentPageIndex(index);
 			}
 		});
+	}
+
+	public void configurePagination() {
 		// 设置 pagination 的内容;
 		pg_photo.setPageFactory(new Callback<Integer, Node>() {
 			@Override
@@ -110,20 +168,15 @@ public class PhotoStage extends Stage {
 				VBox vBox = new VBox();
 				vBox.setAlignment(Pos.CENTER);
 				ImageView imageView = new ImageView();
-				// imageView.setFitHeight(200);
-				// imageView.setFitWidth(250);
 				imageView.fitWidthProperty().bind(default_width);
 				imageView.fitHeightProperty().bind(default_width);
 				if (album.getPhotosUri().size() > index) {
-					Image image = null;
-					try {
-						image = new Image(album.getPhotosUri().get(index));
-						imageView.setImage(image);
-					} catch (Exception e) {
-						// TODO: handle exception
-						Logger.getLogger(PhotoStage.class.getName()).log(Level.SEVERE, "该图片可能已被删除或者移动到新位置", e);
+					if (index != -1) {
+						String url = album.getPhotosUri().get(index);
+						if (url.length() > 0) {
+							imageView.setImage(new Image(url));
+						}
 					}
-
 				}
 				vBox.getChildren().add(imageView);
 				return vBox;
@@ -132,64 +185,39 @@ public class PhotoStage extends Stage {
 		if (album.getPhotosUri().size() <= 0) {
 			pg_photo.setVisible(false);
 		}
-		pg_photo.setPageCount(album.getPhotosUri().size());
-		// 当 pagination 的 pagecount 为0时不显示.
-		pg_photo.pageCountProperty().addListener(new ChangeListener<Number>() {
 
-			@Override
-			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-				// TODO Auto-generated method stub
-				if (oldValue.intValue() == EMPTY && newValue.intValue() != EMPTY) {
-					pg_photo.setVisible(true);
-				} else if (newValue.intValue() == EMPTY) {
-					pg_photo.setVisible(false);
-				}
-			}
-		});
-		// 绑定相册地址集合的大小和 pagination 的 count 属性.
+		pg_photo.setPageCount(album.getPhotosUri().size());
 		album.getPhotosUri().addListener(new ListChangeListener<String>() {
 
 			@Override
 			public void onChanged(javafx.collections.ListChangeListener.Change<? extends String> c) {
 				// TODO Auto-generated method stub
-				pg_photo.setPageCount(album.getPhotosUri().size());
-			}
-		});
-		btn_add = (Button) parent.lookup("#btn_add");
-		btn_enlarge = (Button) parent.lookup("#btn_enlarge");
-		btn_shrink = (Button) parent.lookup("#btn_shrink");
-		fileChooser = new FileChooser();
-		btn_add.setOnAction((final ActionEvent e) -> {
-			FileChooserUtil.configureFileChooser(fileChooser);
-			List<File> filesList = fileChooser.showOpenMultipleDialog(PhotoStage.this);
-			double size = album.getSize();
-			if (filesList != null) {
-				for (int i = 0; i < filesList.size(); i++) {
-					File file = filesList.get(i);
-					String path = file.getAbsoluteFile().toURI().toString();
-					album.getPhotosUri().add(path);
-					size += file.length();
+				int size = c.getList().size();
+				if (size > 0) {
+					pg_photo.setPageCount(size);
+				} else {
+					pg_photo.setPageCount(EMPTY);
 				}
 			}
-			album.setSize(size);
 		});
-		btn_enlarge.setOnAction(new EventHandler<ActionEvent>() {
+
+	}
+
+	private void configureButtonSetCover() {
+		btn_set_cover.setOnAction(new EventHandler<ActionEvent>() {
 
 			@Override
 			public void handle(ActionEvent event) {
 				// TODO Auto-generated method stub
-				int height = default_height.get();
-				int width = default_width.get();
-				height += HEIGHT_INCREAMENT;
-				width += WIDTH_INCREAMENT;
-				if (height > MAX_HEIGHT)
-					height = MAX_HEIGHT;
-				if (width > MAX_WIDTH)
-					width = MAX_WIDTH;
-				default_height.set(height);
-				default_width.set(width);
+				Photo photo = lv_photo.getSelectionModel().getSelectedItem();
+				if (photo != null) {
+					album.setCoverUri(photo.getUri());
+				}
 			}
 		});
+	}
+
+	private void configureButtonShrink() {
 		btn_shrink.setOnAction(new EventHandler<ActionEvent>() {
 
 			@Override
@@ -207,15 +235,84 @@ public class PhotoStage extends Stage {
 				default_width.set(width);
 			}
 		});
-		btn_set_cover = (Button) parent.lookup("#btn_set_cover");
-		btn_set_cover.setOnAction(new EventHandler<ActionEvent>() {
+	}
+
+	private void configureButtonEnlarge() {
+		btn_enlarge.setOnAction(new EventHandler<ActionEvent>() {
 
 			@Override
 			public void handle(ActionEvent event) {
 				// TODO Auto-generated method stub
-				String url = lv_photo.getSelectionModel().getSelectedItem();
-				if (url != null) {
-					album.setCoverUri(url);
+				int height = default_height.get();
+				int width = default_width.get();
+				height += HEIGHT_INCREAMENT;
+				width += WIDTH_INCREAMENT;
+				if (height > MAX_HEIGHT)
+					height = MAX_HEIGHT;
+				if (width > MAX_WIDTH)
+					width = MAX_WIDTH;
+				default_height.set(height);
+				default_width.set(width);
+			}
+		});
+	}
+
+	private void configureButtonAdd() {
+		btn_add.setOnAction((final ActionEvent e) -> {
+			FileChooserUtil.configureFileChooser(fileChooser);
+			List<File> filesList = fileChooser.showOpenMultipleDialog(PhotoStage.this);
+			if (filesList != null) {
+				double size = album.getSize();
+				for (int i = 0; i < filesList.size(); i++) {
+					File file = filesList.get(i);
+					String path = file.getAbsoluteFile().toURI().toString();
+					size += file.length();
+					Photo photo = new Photo();
+					photo.setMd5(DataUtil.getMD5(file));
+					photo.setId(album.getId());
+					photo.setName(file.getName());
+					photo.setUri(path);
+					photo.setCreateDate(DateUtil.getFormatDate(file.lastModified()));
+					photo.setSize(file.length());
+					album.getPhotosUri().add(path);
+					lv_photo.getItems().add(photo);
+
+				}
+				DBUtil.savePhotos(lv_photo.getItems());
+				album.setSize(size);
+			}
+
+		});
+	}
+
+	private void configureButtonDelete() {
+		// TODO Auto-generated method stub
+		btn_delete.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent event) {
+				// TODO Auto-generated method stub
+				int index = lv_photo.getSelectionModel().getSelectedIndex();
+				if (index == -1) {
+					Alert alert = new Alert(Alert.AlertType.WARNING);
+					alert.initStyle(StageStyle.UTILITY);
+					alert.setTitle("Warning");
+					alert.setHeaderText("删除相片");
+					alert.setContentText("没有选中相片可以被删除");
+					alert.showAndWait();
+					LogUtil.i(getClass().getName(), "没有选中相片可以被删除");
+				} else {
+					if (index < lv_photo.getItems().size()) {
+						Photo photo = lv_photo.getSelectionModel().getSelectedItem();
+						if (photo != null) {
+							album.getPhotosUri().remove(index);
+							lv_photo.getItems().remove(index);
+
+							DBUtil.deletePhoto(photo.getMd5(), photo.getId());
+							File file = new File(photo.getUri());
+							album.setSize(album.getSize() - file.length());
+						}
+					}
 				}
 			}
 		});
