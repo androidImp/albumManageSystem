@@ -3,19 +3,13 @@ package view;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import javafx.application.Application;
-import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
-import javafx.concurrent.Task;
-import javafx.concurrent.Worker;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -27,10 +21,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Pagination;
-import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
@@ -40,7 +32,6 @@ import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
 import javafx.util.Callback;
 import model.Album;
-import model.AlbumCell;
 import model.ImageCell;
 import model.Photo;
 import util.DBUtil;
@@ -59,6 +50,7 @@ public class PhotoStage extends Stage {
 	public int MIN_WIDTH = 125;
 	public int HEIGHT_INCREAMENT = 20;
 	public int WIDTH_INCREAMENT = 25;
+	SimpleStringProperty username = new SimpleStringProperty("name");
 	private Album album;
 	@FXML
 	Pagination pg_photo;
@@ -99,14 +91,15 @@ public class PhotoStage extends Stage {
 			@Override
 			public void handle(WindowEvent event) {
 				// TODO Auto-generated method stub
-				DBUtil.savePhotos(lv_photo.getItems());
+				DBUtil.savePhotos(lv_photo.getItems(), username.get());
 			}
 		});
 	}
 
-	public PhotoStage(Album album) {
+	public PhotoStage(Album album, String name) {
 		// TODO Auto-generated constructor stub
 		this.album = album;
+		setName(name);
 		initView();
 		Scene scene = new Scene(parent);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
@@ -146,7 +139,7 @@ public class PhotoStage extends Stage {
 	}
 
 	public void configureListView() {
-		lv_photo.setItems(DBUtil.getPhotosByAlbum(album.getId()));
+		lv_photo.setItems(DBUtil.getPhotosByAlbum(album.getId(), username.get()));
 		lv_photo.setCellFactory((ListView<Photo> l) -> new ImageCell());
 		lv_photo.setOnMouseClicked(new EventHandler<Event>() {
 
@@ -278,7 +271,7 @@ public class PhotoStage extends Stage {
 					lv_photo.getItems().add(photo);
 
 				}
-				DBUtil.savePhotos(lv_photo.getItems());
+				DBUtil.savePhotos(lv_photo.getItems(), getName());
 				album.setSize(size);
 			}
 
@@ -308,7 +301,7 @@ public class PhotoStage extends Stage {
 							album.getPhotosUri().remove(index);
 							lv_photo.getItems().remove(index);
 
-							DBUtil.deletePhoto(photo.getMd5(), photo.getId());
+							DBUtil.deletePhoto(photo.getMd5(), photo.getId(), username.get());
 							File file = new File(photo.getUri());
 							album.setSize(album.getSize() - file.length());
 						}
@@ -325,5 +318,13 @@ public class PhotoStage extends Stage {
 
 	public void setAlbum(Album album) {
 		this.album = album;
+	}
+
+	public void setName(String name) {
+		username.set(name);
+	}
+
+	public String getName() {
+		return username.get();
 	}
 }

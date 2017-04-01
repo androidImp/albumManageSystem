@@ -1,10 +1,10 @@
 package view;
 
-import java.util.concurrent.FutureTask;
 import java.util.prefs.Preferences;
 
-import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -15,6 +15,7 @@ import javafx.geometry.Side;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
@@ -28,18 +29,20 @@ import model.SearchItemCell;
 import util.DBUtil;
 
 public class HomeStage extends Stage {
+	public static int index;
 	ListView<Album> ls_album;
 	Parent root = null;
-	public static int index;
+	Label ll_name;
 	TextField tf_search;
-
-	public HomeStage() {
+	SimpleStringProperty username = new SimpleStringProperty("name");
+	public HomeStage(String name) {
 		// TODO Auto-generated constructor stub
 		try {
 			root = FXMLLoader.load(getClass().getResource("homePage.fxml"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		setName(name);
 		Scene scene = new Scene(root, 800, 600);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		setScene(scene);
@@ -66,7 +69,7 @@ public class HomeStage extends Stage {
 				// 可以使用 JAXB
 				Preferences preferences = Preferences.userNodeForPackage(getClass());
 				preferences.putInt("index", index);
-				DBUtil.saveAlbums(ls_album.getItems());
+				DBUtil.saveAlbums(ls_album.getItems(),username.get());
 				Platform.exit();
 			}
 		});
@@ -92,7 +95,7 @@ public class HomeStage extends Stage {
 					@Override
 					protected Void call() throws Exception {
 						// TODO Auto-generated method stub
-						ObservableList<Photo> photos = DBUtil.queryPhotoByName(tf_search.getText());
+						ObservableList<Photo> photos = DBUtil.queryPhotoByName(tf_search.getText(),username.get());
 						Platform.runLater(new Runnable() {
 							@Override
 							public void run() {
@@ -109,7 +112,7 @@ public class HomeStage extends Stage {
 			}
 		});
 	}
-
+	//todo 处理单击 item 之后的跳转
 	private void configureSearchItem(ListView<Photo> lv) {
 		lv.setCellFactory(param -> new SearchItemCell());
 		lv.setOnMouseClicked(new EventHandler<Event>() {
@@ -124,16 +127,16 @@ public class HomeStage extends Stage {
 	}
 
 	private void configureData() {
-		DBUtil.getConnection();
-		DBUtil.createTable();
-		DBUtil.createPhotosTable();
-		ls_album.setItems(DBUtil.getAlbums());
+		DBUtil.createPhotosTable(username.get());
+		ls_album.setItems(DBUtil.getAlbums(username.get()));
 	}
 
 	@SuppressWarnings("unchecked")
 	private void initView() {
 		ls_album = (ListView<Album>) root.lookup("#ls_album");
 		tf_search = (TextField) root.lookup("#tf_search");
+		ll_name = (Label) root.lookup("#ll_name");
+		ll_name.setText(username.get());
 		show();
 	}
 
@@ -147,7 +150,7 @@ public class HomeStage extends Stage {
 				if (((MouseEvent) event).getClickCount() >= 2) {
 					Album album = ls_album.getSelectionModel().getSelectedItem();
 					if (album != null) {
-						new PhotoStage(album).show();
+						new PhotoStage(album,getName()).show();
 					}
 
 				}
@@ -169,8 +172,8 @@ public class HomeStage extends Stage {
 				if (index != -1) {
 					int id = ls_album.getSelectionModel().getSelectedItem().getId();
 					ls_album.getItems().remove(index);
-					DBUtil.deleteAlbum(id);
-					DBUtil.deletePhotoByAlbum(id);
+					DBUtil.deleteAlbum(id,username.get());
+					DBUtil.deletePhotoByAlbum(id,username.get());
 				}
 			}
 		});
@@ -187,12 +190,17 @@ public class HomeStage extends Stage {
 			@Override
 			public void handle(ActionEvent event) {
 				// TODO Auto-generated method stub
-				new PhotoStage(ls_album.getSelectionModel().getSelectedItem()).show();
+				new PhotoStage(ls_album.getSelectionModel().getSelectedItem(),getName()).show();
 
 			}
 		});
 		menu.getItems().addAll(open_item, scan_item, delete_item);
 		ls_album.setContextMenu(menu);
 	}
-
+	public void setName(String name){
+		username.set(name);
+	}
+	public String getName(){
+		return username.get();
+	}
 }

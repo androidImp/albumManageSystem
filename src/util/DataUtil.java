@@ -46,7 +46,7 @@ public class DataUtil {
 		for (String string : strings) {
 			list.add(string);
 		}
-		if(list.size() == 1 && list.get(0).equals("")){
+		if (list.size() == 1 && list.get(0).equals("")) {
 			list.remove(0);
 		}
 		return FXCollections.observableArrayList(list);
@@ -62,8 +62,22 @@ public class DataUtil {
 		if (builder.length() > 0) {
 			builder.deleteCharAt(builder.length() - 1);
 		}
-//		System.out.println("还原 uri 列表: " + builder.toString() + " 长度: " + builder.length());
+		// System.out.println("还原 uri 列表: " + builder.toString() + " 长度: " +
+		// builder.length());
 		return builder.toString();
+	}
+
+	public static String getMD5(String password) {
+		MessageDigest digest = null;
+		try {
+			digest = MessageDigest.getInstance("MD5");
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		digest.update(password.getBytes());
+		BigInteger bigInt = new BigInteger(1, digest.digest());
+		return bigInt.toString(16);
 	}
 
 	public static String getMD5(File file) {

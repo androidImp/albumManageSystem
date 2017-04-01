@@ -1,5 +1,6 @@
 package util;
 
+import java.security.MessageDigest;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -39,50 +40,46 @@ public class DBUtil {
 			Class.forName("org.sqlite.JDBC");
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
-			LogUtil.e(DBUtil.class.getName(), "无法打开数据库");
+			String methodName = getCurrentMethod();
+			LogUtil.e(methodName, "无法打开数据库");
 			e.printStackTrace();
 		}
 		try {
 			connection = DriverManager.getConnection("jdbc:sqlite:album.db");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			LogUtil.e(DBUtil.class.getName(), "无法创建数据库连接");
+			String methodName = getCurrentMethod();
+			LogUtil.e(methodName, "无法创建数据库连接");
 			e.printStackTrace();
 		}
 	}
 
-	public static void createTable() {
-		String sql = "create table if not exists albums " + "(id integer primary key," + "name text not null,"
-				+ "profile text,coverUri text,createDate text," + "photoNumber integer,size real," + "photosUri text)";
+	public static void createAlbumsTable(String ownerName) {
+		String sql_create = "create table if not exists albums_" + ownerName + "(id integer primary key,"
+				+ "name text not null," + "profile text,coverUri text,createDate text,"
+				+ "photoNumber integer,size real," + "photosUri text)";
+		getConnection();
 		try {
-			statement = connection.prepareStatement(sql);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			LogUtil.e(DBUtil.class.getName(), "无法创建数据库查询");
-			e.printStackTrace();
-		}
-		try {
+			statement = connection.prepareStatement(sql_create);
 			statement.executeUpdate();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			LogUtil.e(DBUtil.class.getName(), "无法执行对数据库的查询");
+			String methodName = getCurrentMethod();
+			LogUtil.e(methodName, "无法创建数据库查询");
 			e.printStackTrace();
+		} finally {
+			releaseConnection(getCurrentMethod());
 		}
-		try {
-			statement.close();
-			connection.close();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			LogUtil.e(DBUtil.class.getName(), "在关闭数据库资源时出错");
-			e.printStackTrace();
-		}
+
 	}
 
-	public static void saveAlbums(List<Album> albums) {
+	public static void saveAlbums(List<Album> albums, String username) {
 		getConnection();
-		String sql_select = "select id from albums where id=?";
-		String sql_update = "update albums set name=?,profile=?,coverUri=?,createDate=?,photoNumber=?,size=?,photosUri=? where id=?";
-		String sql_insert = "insert into albums(id,name,profile,coverUri,createDate,photoNumber,size,photosUri) values(?,?,?,?,?,?,?,?)";
+		String sql_select = "select id from albums_" + username + " where id=?";
+		String sql_update = "update albums_" + username
+				+ " set name=?,profile=?,coverUri=?,createDate=?,photoNumber=?,size=?,photosUri=? where id=?";
+		String sql_insert = "insert into albums_" + username
+				+ "(id,name,profile,coverUri,createDate,photoNumber,size,photosUri) values(?,?,?,?,?,?,?,?)";
 		try {
 			PreparedStatement update = connection.prepareStatement(sql_update);
 			PreparedStatement insert = connection.prepareStatement(sql_insert);
@@ -114,23 +111,27 @@ public class DBUtil {
 					select.close();
 					update.executeUpdate();
 				}
-
 			}
 			insert.close();
-
 			update.close();
 			connection.close();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
+			String methodName = getCurrentMethod();
+			LogUtil.e(methodName, "保存相册信息出错");
 			e.printStackTrace();
+		} finally {
+			// releaseConnection(getCurrentMethod());
 		}
 	}
 
-	public static void savePhotos(List<Photo> photos) {
+	public static void savePhotos(List<Photo> photos, String username) {
 		getConnection();
-		String sql_select = "select md5,id from photos where md5 = ? and id = ?";
-		String sql_insert = "insert into photos(md5,id,name,uri,createDate,profile,size) values(?,?,?,?,?,?,?)";
-		String sql_update = "update photos set name=?,uri=?,createDate=?,profile=?,size=? where md5=? and id = ?";
+		String sql_select = "select md5,id from photos_" + username + " where md5 = ? and id = ?";
+		String sql_insert = "insert into photos_" + username
+				+ "(md5,id,name,uri,createDate,profile,size) values(?,?,?,?,?,?,?)";
+		String sql_update = "update photos_" + username
+				+ " set name=?,uri=?,createDate=?,profile=?,size=? where md5=? and id = ?";
 		try {
 			PreparedStatement insert = connection.prepareStatement(sql_insert);
 			PreparedStatement update = connection.prepareStatement(sql_update);
@@ -170,13 +171,15 @@ public class DBUtil {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			String methodName = getCurrentMethod();
+			LogUtil.e(methodName, "无法保存相册信息");
 		}
 	}
 
-	public static ObservableList<Album> getAlbums() {
+	public static ObservableList<Album> getAlbums(String username) {
 		getConnection();
 		List<Album> albums = new ArrayList<>();
-		String sql_select = "select * from albums";
+		String sql_select = "select * from albums_" + username;
 		ResultSet rs = null;
 		try {
 			statement = connection.prepareStatement(sql_select);
@@ -193,19 +196,20 @@ public class DBUtil {
 				album.setPhotosUri(photosUri);
 				albums.add(album);
 			}
-
-			statement.close();
-			connection.close();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			String methodName = getCurrentMethod();
+			LogUtil.e(methodName, "获取相册时出错");
+		} finally {
+			releaseConnection(getCurrentMethod());
 		}
 		return FXCollections.observableArrayList(albums);
 	}
 
-	public static ObservableList<Photo> queryPhotoByName(String photoName) {
+	public static ObservableList<Photo> queryPhotoByName(String photoName, String username) {
 		getConnection();
-		String sql_select = "select * from photos where name like '%" + photoName + "%'";
+		String sql_select = "select * from photos_" + username + "where name like '%" + photoName + "%'";
 		ResultSet rs = null;
 		List<Photo> photos = new ArrayList<>();
 		try {
@@ -229,46 +233,36 @@ public class DBUtil {
 				photo.setSize(size);
 				photos.add(photo);
 			}
-
-			statement.close();
-			connection.close();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			String methodName = getCurrentMethod();
+			LogUtil.e(methodName, "查询相册时出错");
+		} finally {
+			releaseConnection(getCurrentMethod());
 		}
 		return FXCollections.observableArrayList(photos);
 	}
 
-	public static void createPhotosTable() {
-		String sql = "create table if not exists photos " + "(md5 text," + "id integer not null,"
+	public static void createPhotosTable(String username) {
+		String sql = "create table if not exists photos_" + username + "(md5 text," + "id integer not null,"
 				+ "name text not null," + "uri text,createDate text,profile text," + "size real,primary key(md5,id))";
 		getConnection();
 		try {
 			statement = connection.prepareStatement(sql);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			LogUtil.e(DBUtil.class.getName(), "无法创建数据库查询");
-			e.printStackTrace();
-		}
-		try {
 			statement.executeUpdate();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			LogUtil.e(DBUtil.class.getName(), "无法执行对数据库的查询");
+			String methodName = getCurrentMethod();
+			LogUtil.e(methodName, "无法创建数据库查询");
 			e.printStackTrace();
-		}
-		try {
-			statement.close();
-			connection.close();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			LogUtil.e(DBUtil.class.getName(), "在关闭数据库资源时出错");
-			e.printStackTrace();
+		} finally {
+			releaseConnection(getCurrentMethod());
 		}
 	}
 
-	public static ObservableList<Photo> getPhotosByAlbum(int index) {
-		String sql_select = "select * from photos where id = " + index;
+	public static ObservableList<Photo> getPhotosByAlbum(int index, String username) {
+		String sql_select = "select * from photos_" + username + " where id = " + index;
 		List<Photo> photos = new ArrayList<>();
 		ResultSet rs;
 		getConnection();
@@ -288,66 +282,150 @@ public class DBUtil {
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
+			String methodName = getCurrentMethod();
+			LogUtil.e(methodName, "无法获取相册信息");
 			e.printStackTrace();
+
+		} finally {
+			releaseConnection(getCurrentMethod());
 		}
 		return FXCollections.observableArrayList(photos);
 	}
 
-	public static void deleteAlbum(int id) {
-		String sql_delete = "delete from albums where id = ?";
+	public static void deleteAlbum(int id, String username) {
+		String sql_delete = "delete from albums_" + username + " where id = ?";
 		getConnection();
 		try {
 			statement = connection.prepareStatement(sql_delete);
 			statement.setInt(1, id);
 			statement.executeUpdate();
-			statement.close();
-			connection.close();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
+			String methodName = getCurrentMethod();
+			LogUtil.e(methodName, "无法删除相册");
 			e.printStackTrace();
+		} finally {
+			releaseConnection(getCurrentMethod());
 		}
 	}
 
-	public static void deletePhoto(String md5, int id) {
-		String sql_delete = "delete from photos where md5 = ? and id = ?";
+	public static void deletePhoto(String md5, int id, String username) {
+		String sql_delete = "delete from photos_" + username + " where md5 = ? and id = ?";
 		getConnection();
 		try {
 			statement = connection.prepareStatement(sql_delete);
 			statement.setString(1, md5);
 			statement.setInt(2, id);
 			statement.executeUpdate();
-			statement.close();
-			connection.close();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
+			String methodName = getCurrentMethod();
+			LogUtil.e(methodName, "无法删除相片");
 			e.printStackTrace();
+		} finally {
+			releaseConnection(getCurrentMethod());
 		}
-
 	}
 
-	public static void deletePhotoByAlbum(int id) {
+	public static void deletePhotoByAlbum(int id, String username) {
 		getConnection();
-		String sql_delete = "delete from photos where id = ?";
+		String sql_delete = "delete from photos_" + username + " where id = ?";
 		try {
 			statement = connection.prepareStatement(sql_delete);
 			statement.setInt(1, id);
 			statement.executeUpdate();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
+			String methodName = getCurrentMethod();
+			LogUtil.e(methodName, "无法删除相片");
 			e.printStackTrace();
 		} finally {
-			try {
-				if (statement != null)
-					statement.close();
-				if (connection != null)
-					connection.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			releaseConnection(getCurrentMethod());
 		}
 	}
-	public static void commit(){
-		
+
+	/**
+	 * 验证用户的账户和密码
+	 * 
+	 * @param name
+	 *            用户账户
+	 * @param password
+	 *            用户密码使用 MD5 {@link MessageDigest} 算法编码过的字符串
+	 * @return
+	 */
+	public static boolean verifyUser(String name, String password) {
+		String sql_query = "select id from users where name = ? and password = ?";
+		getConnection();
+		try {
+			statement = connection.prepareStatement(sql_query);
+			statement.setString(1, name);
+			statement.setString(2, password);
+			ResultSet rs = statement.executeQuery();
+			rs.next();
+			if (rs.getRow() == 0)
+				return false;
+			else
+				return true;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+
+		} finally {
+			releaseConnection(getCurrentMethod());
+		}
+		return false;
+	}
+
+	/**
+	 * 创建用户数据表用于验证用户信息
+	 */
+	public static void createUsersTable() {
+		String sql_create = "create table if not exists users(id integer primary key autoincrement,"
+				+ "name text unique not null,password text not null,nickname text not null)";
+		getConnection();
+		try {
+			statement = connection.prepareStatement(sql_create);
+			statement.executeUpdate();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			releaseConnection(getCurrentMethod());
+		}
+	}
+
+	public static void addUser(String name, String password, String nickname) {
+		String sql_insert = "insert into users(name,password,nickname) values(?,?,?)";
+		getConnection();
+		try {
+			statement = connection.prepareStatement(sql_insert);
+			statement.setString(1, name);
+			statement.setString(2, password);
+			statement.setString(3, nickname);
+			statement.executeUpdate();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			String methodName = getCurrentMethod();
+			LogUtil.e(methodName, "无法添加新用户");
+		} finally {
+			releaseConnection(getCurrentMethod());
+		}
+	}
+
+	private static void releaseConnection(String curPos) {
+		try {
+			if (statement != null)
+				statement.close();
+			if (connection != null)
+				connection.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			LogUtil.e(curPos, "无法关闭数据库连接");
+		}
+	}
+
+	public static String getCurrentMethod() {
+		return Thread.currentThread().getStackTrace()[1].getMethodName();
 	}
 }
