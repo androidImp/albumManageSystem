@@ -1,15 +1,24 @@
 package view;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import javax.imageio.ImageIO;
+
+import com.alibaba.simpleimage.analyze.sift.SIFT;
+import com.alibaba.simpleimage.analyze.sift.render.RenderImage;
+
+import cluster.ClusterUtils;
+import cluster.ImagePoint;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -269,10 +278,33 @@ public class PhotoStage extends Stage {
 					photo.setSize(file.length());
 					album.getPhotosUri().add(path);
 					lv_photo.getItems().add(photo);
+					DBUtil.savePhotos(lv_photo.getItems(), getName());
+					album.setSize(size);
+					// sift 特征直方图存储;
+					new Thread(new Task<Void>() {
+
+						@Override
+						protected Void call() throws Exception {
+							// TODO Auto-generated method stub
+							SIFT sift = new SIFT();
+							BufferedImage image = null;
+							image = ImageIO.read(file);
+							RenderImage ri = new RenderImage(image);
+							sift.detectFeatures(ri.toPixelFloatArray(null));
+							ImagePoint imagePoint = new ImagePoint(sift.getGlobalFeaturePoints());
+							try {
+								DBUtil.addExpression(username.get(), photo,
+										DataUtil.doubleArrayToExpression(ClusterUtils.distribute(imagePoint)));
+							} catch (Exception e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+							return null;
+						}
+					}).start();
 
 				}
-				DBUtil.savePhotos(lv_photo.getItems(), getName());
-				album.setSize(size);
+
 			}
 
 		});

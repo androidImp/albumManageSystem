@@ -9,6 +9,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.sun.javafx.binding.StringFormatter;
+
+import cluster.Point;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import model.Album;
@@ -209,7 +212,7 @@ public class DBUtil {
 
 	public static ObservableList<Photo> queryPhotoByName(String photoName, String username) {
 		getConnection();
-		String sql_select = "select * from photos_" + username + "where name like '%" + photoName + "%'";
+		String sql_select = "select * from photos_" + username + " where name like '%" + photoName + "%'";
 		ResultSet rs = null;
 		List<Photo> photos = new ArrayList<>();
 		try {
@@ -427,5 +430,112 @@ public class DBUtil {
 
 	public static String getCurrentMethod() {
 		return Thread.currentThread().getStackTrace()[1].getMethodName();
+	}
+	/**
+	 * 创建属于当前用户的直方图存储.
+	 * @param name 当前用户姓名
+	 */
+	public static void createExpressionsTable(String name) {
+		String sql_create = "create table if not exists expressions_" + name
+				+ " (id integer,md5 text,uri text,expression text,primary key(id,md5))";
+		getConnection();
+		try {
+			statement = connection.prepareStatement(sql_create);
+			statement.executeUpdate();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			releaseConnection(getCurrentMethod());
+		}
+	}
+	public static void deleteExpression(String name,int id){
+		String sql_delete = "delete from expressions_" + name + " where id = ?";
+		getConnection();
+		try {
+			statement = connection.prepareStatement(sql_delete);
+			statement.setInt(1, id);
+			statement.executeUpdate();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}finally {
+			releaseConnection(getCurrentMethod());
+		}
+		
+	}
+	/**
+	 * 查询当前用户数据库中的所有直方图表示的集合并返回
+	 * @param name 当前用户姓名
+	 * @param dimension 直方图表示的维度
+	 * @return
+	 */
+	public static List<Point> getExpressions(String name, int dimension) {
+		String sql_query = "select uri,expression from expressions_" + name;
+		getConnection();
+		List<Point> points = new ArrayList<>();
+		try {
+			statement = connection.prepareStatement(sql_query);
+			ResultSet rs = statement.executeQuery();
+			while (rs.next()) {
+				Point point = new Point(DataUtil.expressionTodoubleArray(rs.getString(2), dimension));
+				point.setUrl(rs.getString(1));
+				points.add(point);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			releaseConnection(getCurrentMethod());
+		}
+
+		return points;
+	}
+	/**
+	 * 通过给定的相册 id 和 图片的 md5 查询该图片的直方图表示并返回
+	 * @param name 当前用户姓名
+	 * @param dimension 直方图表示的维度
+	 * @param id 相片所属的相册 id
+	 * @param md5 相片的 md5
+	 * @return
+	 */
+	public static double[] queryExpression(String name, int dimension, int id, String md5) {
+		String sql_query = "select expression from expressions_" + name + " where id = ? and md5 = ?";
+		getConnection();
+		try {
+			statement = connection.prepareStatement(sql_query);
+			statement.setInt(1, id);
+			statement.setString(2, md5);
+			ResultSet rs = statement.executeQuery();
+			rs.next();
+			return DataUtil.expressionTodoubleArray(rs.getString(1), dimension);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			releaseConnection(getCurrentMethod());
+		}
+		return null;
+	}
+	/**
+	 * 向数据库中添加当前图像的直方图表示
+	 * @param name 当前用户姓名
+	 * @param photo 存储的图片对象
+	 * @param expression 需要存储的直方图表示
+	 */
+	public static void addExpression(String name, Photo photo, String expression) {
+		String sql_insert = "insert into expressions_" + name + "(id,md5,uri,expression) values(?,?,?,?)";
+		getConnection();
+		try {
+			statement = connection.prepareStatement(sql_insert);
+			statement.setInt(1, photo.getId());
+			statement.setString(2, photo.getMd5());
+			statement.setString(3, photo.getUri());
+			statement.setString(4, expression);
+			statement.executeUpdate();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			releaseConnection(getCurrentMethod());
+		}
 	}
 }

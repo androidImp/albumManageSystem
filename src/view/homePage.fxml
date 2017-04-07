@@ -81,7 +81,7 @@
 						<Insets bottom="10.0" left="10.0" right="10.0" top="5.0" />
 					</HBox.margin>
 				</Label>
-				<Label fx:id="ll_name" >
+				<Label fx:id="ll_name">
 					<HBox.margin>
 						<Insets bottom="10.0" left="10.0" right="10.0" top="5.0" />
 					</HBox.margin>
@@ -92,13 +92,6 @@
 		<VBox GridPane.rowIndex="3" GridPane.rowSpan="3"
 			GridPane.columnIndex="0" GridPane.columnSpan="1">
 			<TreeView fx:id="tv_menu">
-				<TreeItem value="用户菜单" expanded="true">
-					<children>
-						<TreeItem value="清除缓存" />
-						<TreeItem value="清除缓存" />
-						<TreeItem value="清除缓存" />
-					</children>
-				</TreeItem>
 			</TreeView>
 			<ProgressBar></ProgressBar>
 			<Label></Label>

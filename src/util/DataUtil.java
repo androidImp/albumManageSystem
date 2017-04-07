@@ -106,4 +106,26 @@ public class DataUtil {
 		BigInteger bigInt = new BigInteger(1, digest.digest());
 		return bigInt.toString(16);
 	}
+
+	public static double[] expressionTodoubleArray(String expression, int dimension) {
+		double[] ex = new double[dimension];
+		
+		String[] array = expression.split(",");
+		for (int i = 0; i < array.length; i++) {
+			ex[i] = Double.parseDouble(array[i]);
+		}
+		return ex;
+	}
+
+	public static String doubleArrayToExpression(double[] expression) {
+		StringBuilder builder = new StringBuilder();
+		for (int i = 0; i < expression.length; i++) {
+			builder.append(String.valueOf(expression[i]));
+			builder.append(",");
+		}
+		if (builder.length() > 0) {
+			builder.deleteCharAt(builder.length() - 1);
+		}
+		return builder.toString();
+	}
 }
