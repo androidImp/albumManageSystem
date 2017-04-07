@@ -447,7 +447,7 @@ public class DBUtil {
 			releaseConnection(getCurrentMethod());
 		}
 	}
-	public static void deleteExpression(String name,int id){
+	public static void deleteExpressionsOfAlbum(String name,int id){
 		String sql_delete = "delete from expressions_" + name + " where id = ?";
 		getConnection();
 		try {
@@ -461,6 +461,21 @@ public class DBUtil {
 			releaseConnection(getCurrentMethod());
 		}
 		
+	}
+	public static void deleteExpressionOfPhoto(String name,int id,String md5){
+		String sql_delete = "delete from expressions_" + name + " where id = ? and md5 = ?";
+		getConnection();
+		try {
+			statement = connection.prepareStatement(sql_delete);
+			statement.setInt(1, id);
+			statement.setString(2, md5);
+			statement.executeUpdate();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}finally {
+			releaseConnection(getCurrentMethod());
+		}
 	}
 	/**
 	 * 查询当前用户数据库中的所有直方图表示的集合并返回
@@ -506,7 +521,11 @@ public class DBUtil {
 			statement.setString(2, md5);
 			ResultSet rs = statement.executeQuery();
 			rs.next();
-			return DataUtil.expressionTodoubleArray(rs.getString(1), dimension);
+			if(rs.getRow() != 0){
+				String string = rs.getString(1);
+				return DataUtil.expressionTodoubleArray(string, dimension);
+			}
+			return null;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -521,14 +540,14 @@ public class DBUtil {
 	 * @param photo 存储的图片对象
 	 * @param expression 需要存储的直方图表示
 	 */
-	public static void addExpression(String name, Photo photo, String expression) {
-		String sql_insert = "insert into expressions_" + name + "(id,md5,uri,expression) values(?,?,?,?)";
+	public static void addExpression(String name, int id,String md5,String uri, String expression) {
+		String sql_insert = "insert into expressions_" + name + " (id,md5,uri,expression) values(?,?,?,?)";
 		getConnection();
 		try {
 			statement = connection.prepareStatement(sql_insert);
-			statement.setInt(1, photo.getId());
-			statement.setString(2, photo.getMd5());
-			statement.setString(3, photo.getUri());
+			statement.setInt(1, id);
+			statement.setString(2, md5);
+			statement.setString(3, uri);
 			statement.setString(4, expression);
 			statement.executeUpdate();
 		} catch (SQLException e) {

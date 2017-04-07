@@ -278,34 +278,36 @@ public class PhotoStage extends Stage {
 					photo.setSize(file.length());
 					album.getPhotosUri().add(path);
 					lv_photo.getItems().add(photo);
-					DBUtil.savePhotos(lv_photo.getItems(), getName());
-					album.setSize(size);
-					// sift 特征直方图存储;
-					new Thread(new Task<Void>() {
-
-						@Override
-						protected Void call() throws Exception {
-							// TODO Auto-generated method stub
-							SIFT sift = new SIFT();
-							BufferedImage image = null;
-							image = ImageIO.read(file);
-							RenderImage ri = new RenderImage(image);
-							sift.detectFeatures(ri.toPixelFloatArray(null));
-							ImagePoint imagePoint = new ImagePoint(sift.getGlobalFeaturePoints());
-							try {
-								DBUtil.addExpression(username.get(), photo,
-										DataUtil.doubleArrayToExpression(ClusterUtils.distribute(imagePoint)));
-							} catch (Exception e1) {
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
-							}
-							return null;
-						}
-					}).start();
-
 				}
-
+				DBUtil.savePhotos(lv_photo.getItems(), getName());
+				album.setSize(size);
 			}
+
+			// sift 特征直方图存储;
+			new Thread(new Task<Void>() {
+
+				@Override
+				protected Void call() throws Exception {
+					// TODO Auto-generated method stub
+					SIFT sift = new SIFT();
+					for (File file : filesList) {
+						BufferedImage image = null;
+						image = ImageIO.read(file);
+						RenderImage ri = new RenderImage(image);
+						sift.detectFeatures(ri.toPixelFloatArray(null));
+						ImagePoint imagePoint = new ImagePoint(sift.getGlobalFeaturePoints());
+						try {
+							DBUtil.addExpression(username.get(), album.getId(), DataUtil.getMD5(file),
+									file.getAbsoluteFile().toURI().toString(),
+									DataUtil.doubleArrayToExpression(ClusterUtils.distribute(imagePoint)));
+						} catch (Exception e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+					}
+					return null;
+				}
+			}).start();
 
 		});
 	}
@@ -332,8 +334,8 @@ public class PhotoStage extends Stage {
 						if (photo != null) {
 							album.getPhotosUri().remove(index);
 							lv_photo.getItems().remove(index);
-
 							DBUtil.deletePhoto(photo.getMd5(), photo.getId(), username.get());
+							DBUtil.deleteExpressionOfPhoto(username.get(), photo.getId(), photo.getMd5());
 							File file = new File(photo.getUri());
 							album.setSize(album.getSize() - file.length());
 						}

@@ -1,5 +1,7 @@
 package view;
 
+import java.awt.Desktop;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -221,11 +223,13 @@ public class HomeStage extends Stage {
 						VBox root = new VBox();
 						Scene scene = new Scene(root, 400, 400);
 						stage.setScene(scene);
+						ListView<ImageView> listView = new ListView<ImageView>();
+						root.getChildren().add(listView);
+						listView.getItems().add(new ImageView(photo.getUri()));
 						for (String string : uris) {
 							ImageView imageView = new ImageView(string);
-							root.getChildren().add(imageView);
+							listView.getItems().add(imageView);
 						}
-						System.out.println(uris.size());
 						stage.show();
 					} catch (KeySizeException e) {
 						// TODO Auto-generated catch block
@@ -323,6 +327,7 @@ public class HomeStage extends Stage {
 					ls_album.getItems().remove(index);
 					DBUtil.deleteAlbum(id, username.get());
 					DBUtil.deletePhotoByAlbum(id, username.get());
+					DBUtil.deleteExpressionsOfAlbum(username.get(),id);
 				}
 			}
 		});

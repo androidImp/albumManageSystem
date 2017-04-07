@@ -1,0 +1,15 @@
+/*
+ * .root 给所有的元素设置样式;
+ */
+.root{
+	-fx-background-image: url("/Pic/login_background.jpeg");
+}
+.button{
+	
+}
+.VBox{
+	
+}
+.HBox{
+	
+}
