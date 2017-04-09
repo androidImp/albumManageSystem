@@ -32,7 +32,7 @@ public class changePwdController {
 			if (DBUtil.verifyUser(username, DataUtil.getMD5(originalPwd))) {
 				DBUtil.updateUserInfo(username, DataUtil.getMD5(newPwd), "");
 			} else {
-
+				showPrompt(AlertType.ERROR, "输入的原始密码错误");
 			}
 		} else {
 			showPrompt(AlertType.ERROR, "你输入的两次密码不一致");
@@ -41,7 +41,8 @@ public class changePwdController {
 
 	@FXML
 	public void cancelOperation() {
-
+		 ChangePwdStage stage = (ChangePwdStage) btn_cancel.getScene().getWindow();
+		 stage.close();
 	}
 
 	public void showPrompt(AlertType type, String message) {

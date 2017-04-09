@@ -8,7 +8,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-public class ChangePwdStage extends Stage{
+public class ChangePwdStage extends BaseStage{
 	public SimpleStringProperty username = new SimpleStringProperty("name");
 	public ChangePwdStage(String name){
 		Parent parent = null;

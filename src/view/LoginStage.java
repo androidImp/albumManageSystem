@@ -17,6 +17,7 @@ public class LoginStage extends Application {
 		primaryStage.setScene(scene);
 		scene.getStylesheets().add(getClass().getResource("login.css").toExternalForm());
 		DBUtil.createUsersTable();
+		primaryStage.setResizable(false);
 		primaryStage.show();
 	}
 

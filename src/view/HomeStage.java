@@ -45,7 +45,7 @@ import model.Photo;
 import model.SearchItemCell;
 import util.DBUtil;
 
-public class HomeStage extends Stage {
+public class HomeStage extends BaseStage {
 	public static int index;
 	private static final int DIMENSIONS_OF_KDTREE = 100;
 	ListView<Album> ls_album;
@@ -363,9 +363,19 @@ public class HomeStage extends Stage {
 
 	private void configureLinkClear(Hyperlink link) {
 		// TODO Auto-generated method stub
-		DBUtil.deleteAlbum(username.get());
-		DBUtil.deletePhoto(username.get());
-		DBUtil.deleteExpressions(username.get());
+		link.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent event) {
+				// TODO Auto-generated method stub
+				ls_album.getItems().clear();
+				DBUtil.deleteAlbum(username.get());
+				DBUtil.deletePhoto(username.get());
+				DBUtil.deleteExpressions(username.get());
+			}
+		});
+		
+
 	}
 
 	private void configureLinkSetting(Hyperlink link) {
@@ -400,7 +410,7 @@ public class HomeStage extends Stage {
 			@Override
 			public void handle(ActionEvent event) {
 				// TODO Auto-generated method stub
-				new ChangePwdStage(username.get());
+				new DeclerationStage();
 			}
 		});
 

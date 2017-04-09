@@ -49,7 +49,7 @@ import util.DateUtil;
 import util.FileChooserUtil;
 import util.LogUtil;
 
-public class PhotoStage extends Stage {
+public class PhotoStage extends BaseStage {
 	public int EMPTY = 2147483647;
 	public int DEFAULT_HEIGHT = 200;
 	public int DEFAULT_WIDTH = 250;

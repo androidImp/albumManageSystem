@@ -13,5 +13,6 @@
 	-fx-background-color: white;
 }
 .list-cell:empty .list-cell {
-    -fx-border-width: 0px;
+    -fx-border-width: 0.0px;
 }
+

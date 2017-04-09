@@ -13,7 +13,7 @@ import javafx.stage.Stage;
 import model.Album;
 import util.DataUtil;
 
-public class PhotoInfoStage extends Stage {
+public class PhotoInfoStage extends BaseStage {
 	private Album album;
 	Label ll_date;
 	Label ll_count;
