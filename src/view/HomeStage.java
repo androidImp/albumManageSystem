@@ -1,7 +1,5 @@
 package view;
 
-import java.awt.Desktop;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -11,7 +9,6 @@ import java.util.List;
 import java.util.prefs.Preferences;
 
 import org.apache.commons.math3.ml.clustering.CentroidCluster;
-import org.apache.commons.math3.ml.clustering.DoublePoint;
 
 import cluster.ClusterUtils;
 import cluster.Point;
@@ -267,30 +264,34 @@ public class HomeStage extends Stage {
 	 */
 	private void configureUserMenu() {
 		// 根节点
-		TreeItem<String> items = new TreeItem<>("用户菜单");
-		items.setExpanded(true);
+		TreeItem<String> rootItem = new TreeItem<>("用户菜单");
+		rootItem.setExpanded(true);
 		//
-		TreeItem<String> item_scan = new TreeItem<String>("");
-		Hyperlink link_scan = new Hyperlink("查看用户信息");
-		item_scan.setGraphic(link_scan);
+		// TreeItem<String> item_scan = new TreeItem<String>("");
+		// Hyperlink link_scan = new Hyperlink("查看用户信息");
+		// item_scan.setGraphic(link_scan);
 		// 2
 		TreeItem<String> item_clear = new TreeItem<String>("");
 		Hyperlink link_clear = new Hyperlink("清除信息");
+		configureLinkClear(link_clear);
 		item_clear.setGraphic(link_clear);
 		// 3
 		TreeItem<String> item_setting = new TreeItem<String>("");
 		Hyperlink link_setting = new Hyperlink("系统设置");
+		configureLinkSetting(link_setting);
 		item_setting.setGraphic(link_setting);
 		// 4
 		TreeItem<String> item_modify = new TreeItem<String>("");
 		Hyperlink link_modify = new Hyperlink("修改密码");
+		configureLinkChangePwd(link_modify);
 		item_modify.setGraphic(link_modify);
 		// 5
 		TreeItem<String> item_info = new TreeItem<String>("");
 		Hyperlink link_info = new Hyperlink("关于");
+		configureLinkInfo(link_info);
 		item_info.setGraphic(link_info);
-		items.getChildren().addAll(item_scan, item_clear, item_setting, item_modify, item_info);
-		tv_menu.setRoot(items);
+		rootItem.getChildren().addAll(item_clear, item_setting, item_modify, item_info);
+		tv_menu.setRoot(rootItem);
 	}
 
 	public void initAlbumList() {
@@ -327,7 +328,7 @@ public class HomeStage extends Stage {
 					ls_album.getItems().remove(index);
 					DBUtil.deleteAlbum(id, username.get());
 					DBUtil.deletePhotoByAlbum(id, username.get());
-					DBUtil.deleteExpressionsOfAlbum(username.get(),id);
+					DBUtil.deleteExpressionsOfAlbum(username.get(), id);
 				}
 			}
 		});
@@ -358,5 +359,50 @@ public class HomeStage extends Stage {
 
 	public String getName() {
 		return username.get();
+	}
+
+	private void configureLinkClear(Hyperlink link) {
+		// TODO Auto-generated method stub
+		DBUtil.deleteAlbum(username.get());
+		DBUtil.deletePhoto(username.get());
+		DBUtil.deleteExpressions(username.get());
+	}
+
+	private void configureLinkSetting(Hyperlink link) {
+		// TODO Auto-generated method stub
+		link.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent event) {
+				// TODO Auto-generated method stub
+				new ChangePwdStage(username.get());
+			}
+		});
+	}
+
+	private void configureLinkChangePwd(Hyperlink link) {
+		// TODO Auto-generated method stub
+		link.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent event) {
+				// TODO Auto-generated method stub
+				new ChangePwdStage(username.get());
+			}
+		});
+
+	}
+
+	private void configureLinkInfo(Hyperlink link) {
+		// TODO Auto-generated method stub
+		link.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent event) {
+				// TODO Auto-generated method stub
+				new ChangePwdStage(username.get());
+			}
+		});
+
 	}
 }

@@ -295,6 +295,22 @@ public class DBUtil {
 		return FXCollections.observableArrayList(photos);
 	}
 
+	public static void deleteAlbum(String name) {
+		String sql_delete = "delete from albums_" + name;
+		getConnection();
+		try {
+			statement = connection.prepareStatement(sql_delete);
+			statement.executeUpdate();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			String methodName = getCurrentMethod();
+			LogUtil.e(methodName, "无法删除相册");
+			e.printStackTrace();
+		} finally {
+			releaseConnection(getCurrentMethod());
+		}
+	}
+
 	public static void deleteAlbum(int id, String username) {
 		String sql_delete = "delete from albums_" + username + " where id = ?";
 		getConnection();
@@ -310,6 +326,23 @@ public class DBUtil {
 		} finally {
 			releaseConnection(getCurrentMethod());
 		}
+	}
+
+	public static void deletePhoto(String username) {
+		String sql_delete = "delete from photos_" + username;
+		getConnection();
+		try {
+			statement = connection.prepareStatement(sql_delete);
+			statement.executeUpdate();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			String methodName = getCurrentMethod();
+			LogUtil.e(methodName, "无法删除相片");
+			e.printStackTrace();
+		} finally {
+			releaseConnection(getCurrentMethod());
+		}
+
 	}
 
 	public static void deletePhoto(String md5, int id, String username) {
@@ -378,6 +411,43 @@ public class DBUtil {
 		return false;
 	}
 
+	public static void updateUserInfo(String username, String password, String nickname) {
+		getConnection();
+		String sql_update = "update users set password = ? and nickname = ? where name = ?";
+		try {
+			statement = connection.prepareStatement(sql_update);
+			statement.setString(1, password);
+			statement.setString(2, nickname);
+			statement.setString(3, username);
+			statement.executeUpdate();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			releaseConnection(getCurrentMethod());
+		}
+	}
+
+	public static boolean queryUser(String username) {
+		getConnection();
+		String sql_query = "select username from users where username = ?";
+		try {
+			statement = connection.prepareStatement(sql_query);
+			statement.setString(1, username);
+			ResultSet rs = statement.executeQuery();
+			rs.next();
+			if (rs.getRow() == 0) {
+				return true;
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			releaseConnection(getCurrentMethod());
+		}
+		return false;
+	}
+
 	/**
 	 * 创建用户数据表用于验证用户信息
 	 */
@@ -431,9 +501,12 @@ public class DBUtil {
 	public static String getCurrentMethod() {
 		return Thread.currentThread().getStackTrace()[1].getMethodName();
 	}
+
 	/**
 	 * 创建属于当前用户的直方图存储.
-	 * @param name 当前用户姓名
+	 * 
+	 * @param name
+	 *            当前用户姓名
 	 */
 	public static void createExpressionsTable(String name) {
 		String sql_create = "create table if not exists expressions_" + name
@@ -447,7 +520,23 @@ public class DBUtil {
 			releaseConnection(getCurrentMethod());
 		}
 	}
-	public static void deleteExpressionsOfAlbum(String name,int id){
+
+	public static void deleteExpressions(String username) {
+		String sql_delete = "delete from expressions_" + username;
+		getConnection();
+		try {
+			statement = connection.prepareStatement(sql_delete);
+
+			statement.executeUpdate();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			releaseConnection(getCurrentMethod());
+		}
+	}
+
+	public static void deleteExpressionsOfAlbum(String name, int id) {
 		String sql_delete = "delete from expressions_" + name + " where id = ?";
 		getConnection();
 		try {
@@ -457,12 +546,13 @@ public class DBUtil {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}finally {
+		} finally {
 			releaseConnection(getCurrentMethod());
 		}
-		
+
 	}
-	public static void deleteExpressionOfPhoto(String name,int id,String md5){
+
+	public static void deleteExpressionOfPhoto(String name, int id, String md5) {
 		String sql_delete = "delete from expressions_" + name + " where id = ? and md5 = ?";
 		getConnection();
 		try {
@@ -473,14 +563,18 @@ public class DBUtil {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}finally {
+		} finally {
 			releaseConnection(getCurrentMethod());
 		}
 	}
+
 	/**
 	 * 查询当前用户数据库中的所有直方图表示的集合并返回
-	 * @param name 当前用户姓名
-	 * @param dimension 直方图表示的维度
+	 * 
+	 * @param name
+	 *            当前用户姓名
+	 * @param dimension
+	 *            直方图表示的维度
 	 * @return
 	 */
 	public static List<Point> getExpressions(String name, int dimension) {
@@ -504,12 +598,18 @@ public class DBUtil {
 
 		return points;
 	}
+
 	/**
 	 * 通过给定的相册 id 和 图片的 md5 查询该图片的直方图表示并返回
-	 * @param name 当前用户姓名
-	 * @param dimension 直方图表示的维度
-	 * @param id 相片所属的相册 id
-	 * @param md5 相片的 md5
+	 * 
+	 * @param name
+	 *            当前用户姓名
+	 * @param dimension
+	 *            直方图表示的维度
+	 * @param id
+	 *            相片所属的相册 id
+	 * @param md5
+	 *            相片的 md5
 	 * @return
 	 */
 	public static double[] queryExpression(String name, int dimension, int id, String md5) {
@@ -521,7 +621,7 @@ public class DBUtil {
 			statement.setString(2, md5);
 			ResultSet rs = statement.executeQuery();
 			rs.next();
-			if(rs.getRow() != 0){
+			if (rs.getRow() != 0) {
 				String string = rs.getString(1);
 				return DataUtil.expressionTodoubleArray(string, dimension);
 			}
@@ -534,13 +634,18 @@ public class DBUtil {
 		}
 		return null;
 	}
+
 	/**
 	 * 向数据库中添加当前图像的直方图表示
-	 * @param name 当前用户姓名
-	 * @param photo 存储的图片对象
-	 * @param expression 需要存储的直方图表示
+	 * 
+	 * @param name
+	 *            当前用户姓名
+	 * @param photo
+	 *            存储的图片对象
+	 * @param expression
+	 *            需要存储的直方图表示
 	 */
-	public static void addExpression(String name, int id,String md5,String uri, String expression) {
+	public static void addExpression(String name, int id, String md5, String uri, String expression) {
 		String sql_insert = "insert into expressions_" + name + " (id,md5,uri,expression) values(?,?,?,?)";
 		getConnection();
 		try {
