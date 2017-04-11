@@ -1,5 +1,6 @@
 package view;
 
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -31,10 +32,15 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.Pagination;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.SelectionModel;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Paint;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -167,8 +173,6 @@ public class PhotoStage extends BaseStage {
 			@Override
 			public Node call(Integer index) {
 				// TODO Auto-generated method stub
-				VBox vBox = new VBox();
-				vBox.setAlignment(Pos.CENTER);
 				ImageView imageView = new ImageView();
 				imageView.fitWidthProperty().bind(default_width);
 				imageView.fitHeightProperty().bind(default_width);
@@ -180,8 +184,7 @@ public class PhotoStage extends BaseStage {
 						}
 					}
 				}
-				vBox.getChildren().add(imageView);
-				return vBox;
+				return imageView;
 			}
 		});
 		if (album.getPhotosUri().size() <= 0) {
@@ -264,6 +267,7 @@ public class PhotoStage extends BaseStage {
 			FileChooserUtil.configureFileChooser(fileChooser);
 			List<File> filesList = fileChooser.showOpenMultipleDialog(PhotoStage.this);
 			if (filesList != null) {
+				fileChooser.setInitialFileName(filesList.get(0).getAbsolutePath());
 				double size = album.getSize();
 				for (int i = 0; i < filesList.size(); i++) {
 					File file = filesList.get(i);

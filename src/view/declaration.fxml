@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Separator?>
+
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+	minWidth="-Infinity" prefHeight="200.0" prefWidth="300.0"
+	xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+	<children>
+		<VBox spacing="10.0">
+			<children>
+				<Label alignment="CENTER" text="联系方式 : 15659558029@163.com" />
+				<Separator>
+					<VBox.margin>
+						<Insets left="10.0" right="10.0" />
+					</VBox.margin>
+				</Separator>
+				<Label alignment="CENTER" text="作者 : niuniumei" />
+				<Separator>
+					<VBox.margin>
+						<Insets left="10.0" right="10.0" />
+					</VBox.margin>
+				</Separator>
+				<Label text="声明 : 有问题欢迎发邮件询问 ! 不接受任何形式的吐槽, 我知道写的很烂~没有版权,想用随便用~"
+					wrapText="true" />
+
+			</children>
+			<VBox.margin>
+				<Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+			</VBox.margin>
+		</VBox>
+	</children>
+</VBox>

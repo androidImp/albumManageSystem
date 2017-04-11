@@ -34,6 +34,7 @@ public class homePageController {
 	private Label ll_albumName;
 	@FXML
 	private TreeView<String> tv_menu;
+	@FXML Label ll_name;
 
 	@FXML
 	public void addAlbum() {

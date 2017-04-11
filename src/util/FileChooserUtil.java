@@ -19,12 +19,10 @@ public class FileChooserUtil {
 	}
 
 	public static void configureFileChooser(FileChooser fileChooser) {
-		fileChooser.setTitle("View Pictures");
-		// 这里应当修改成上次访问过的路径;
-		fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+		fileChooser.setTitle("添加图片");
 		// 这里添加了三个选项,分别是名为All images ,其后缀要求是. ,其他类似;
-		fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("All Images", "*.*"),
-				new FileChooser.ExtensionFilter("JPG", "*.jpg"), new FileChooser.ExtensionFilter("PNG", "*.png"));
+		fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("所有图片", "*.png","*.jpg","*.jpeg","*.bmp","*.gif","*.svg"));
+				
 	}
 
 	public static void openFile(File file) {
