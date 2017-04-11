@@ -304,7 +304,8 @@ public class HomeStage extends BaseStage {
 				if (((MouseEvent) event).getClickCount() >= 2) {
 					Album album = ls_album.getSelectionModel().getSelectedItem();
 					if (album != null) {
-						new PhotoStage(album, getName()).show();
+//						new PhotoStage(album, getName()).show();
+						new ShowPhotosStage(album, getName());
 					}
 
 				}
@@ -337,7 +338,7 @@ public class HomeStage extends BaseStage {
 			@Override
 			public void handle(ActionEvent event) {
 				// TODO Auto-generated method stub
-				new PhotoInfoStage(ls_album.getSelectionModel().getSelectedItem());
+				new AlbumInfoStage(ls_album.getSelectionModel().getSelectedItem());
 			}
 		});
 		open_item.setOnAction(new EventHandler<ActionEvent>() {

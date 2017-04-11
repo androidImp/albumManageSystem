@@ -13,7 +13,7 @@ import javafx.stage.Stage;
 import model.Album;
 import util.DataUtil;
 
-public class PhotoInfoStage extends BaseStage {
+public class AlbumInfoStage extends BaseStage {
 	private Album album;
 	Label ll_date;
 	Label ll_count;
@@ -22,7 +22,7 @@ public class PhotoInfoStage extends BaseStage {
 	TextField tf_profile;
 	Parent root;
 
-	public PhotoInfoStage(Album album) {
+	public AlbumInfoStage(Album album) {
 		// TODO Auto-generated constructor stub
 		this.album = album;
 
