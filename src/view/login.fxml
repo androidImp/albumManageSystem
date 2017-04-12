@@ -1,73 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
+<?import javafx.scene.effect.*?>
 <?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<GridPane fx:controller="controller.loginController" maxHeight="-Infinity"
-	maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-	prefHeight="350.0" prefWidth="500.0" xmlns:fx="http://javafx.com/fxml/1"
-	xmlns="http://javafx.com/javafx/8">
-	<columnConstraints>
-		<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"
-			prefWidth="0.0" />
-		<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"
-			prefWidth="0.0" />
-	</columnConstraints>
-	<rowConstraints>
-		<RowConstraints minHeight="10.0" prefHeight="0.0"
-			vgrow="SOMETIMES" />
-		<RowConstraints minHeight="10.0" prefHeight="0.0"
-			vgrow="SOMETIMES" />
 
-	</rowConstraints>
+<VBox fx:controller="controller.loginController" alignment="BASELINE_LEFT"
+	maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+	minWidth="-Infinity" prefHeight="300.0" prefWidth="300.0" spacing="10.0"
+	xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
 	<children>
-		<HBox alignment="CENTER" GridPane.columnSpan="2">
+		<Label text="登录界面">
+			<font>
+				<Font size="20.0" />
+			</font>
+		</Label>
+		<Separator prefWidth="200.0" />
+		<Label text="用户名 :" />
+		<TextField fx:id="tf_username" promptText="输入你的账号" />
+		<Label text="密码 :" />
+		<PasswordField fx:id="tf_passsword" promptText="输入你的密码" />
+		<HBox alignment="BASELINE_LEFT" spacing="50.0">
 			<children>
-				<ImageView fitHeight="150.0" fitWidth="200.0"
-					pickOnBounds="true" preserveRatio="true" />
+				<RadioButton fx:id="rb_login_free" mnemonicParsing="false"
+					text="自动登录" />
+				<Hyperlink fx:id="link_signUp" alignment="BASELINE_RIGHT"
+					onAction="#signUp" contentDisplay="RIGHT" text="注册一个新的账号"
+					textOverrun="CLIP" />
 			</children>
+			<VBox.margin>
+				<Insets />
+			</VBox.margin>
 		</HBox>
-		<VBox spacing="5.0" GridPane.rowIndex="1">
-			<children>
-				<Label text="邮箱地址">
-					<font>
-						<Font size="12.0" />
-					</font>
-				</Label>
-				<TextField fx:id="tf_username" />
-				<Label text="密码">
-					<font>
-						<Font size="12.0" />
-					</font>
-				</Label>
-				<PasswordField fx:id="tf_passsword" />
-				<Button mnemonicParsing="false" text="登录" onAction="#login">
-					<VBox.margin>
-						<Insets top="5.0" />
-					</VBox.margin>
-				</Button>
-			</children>
-			<GridPane.margin>
-				<Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-			</GridPane.margin>
-		</VBox>
-		<VBox spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
-			<children>
-				<Label alignment="CENTER" contentDisplay="CENTER" text="需要一个账户?">
-					<font>
-						<Font size="19.0" />
-					</font>
-				</Label>
-				<Label text="获取你的相册账户" />
-				<Button mnemonicParsing="false" text="注册" onAction="#signUp"/>
-			</children>
-			<GridPane.margin>
-				<Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-			</GridPane.margin>
-		</VBox>
+		<Button fx:id="btn_login" mnemonicParsing="false" prefHeight="27.0"
+			prefWidth="191.0" text=" 登录" HBox.hgrow="ALWAYS" onAction="#login">
+			<HBox.margin>
+				<Insets />
+			</HBox.margin>
+		</Button>
 	</children>
-</GridPane>
+	<padding>
+		<Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+	</padding>
+</VBox>

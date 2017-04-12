@@ -1,6 +1,7 @@
 package controller;
 
 import java.util.Optional;
+import java.util.prefs.Preferences;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -19,12 +20,19 @@ import javafx.util.Pair;
 import util.DBUtil;
 import util.DataUtil;
 import view.HomeStage;
+import view.LoginStage;
+import javafx.scene.control.Hyperlink;
+import javafx.scene.control.RadioButton;
 
 public class loginController {
 	@FXML
 	private TextField tf_username;
 	@FXML
 	private PasswordField tf_passsword;
+	@FXML
+	Hyperlink link_signUp;
+	@FXML
+	RadioButton rb_login_free;
 
 	@FXML
 	public void login() {
@@ -38,6 +46,12 @@ public class loginController {
 				@Override
 				public void run() {
 					// TODO Auto-generated method stub
+					Preferences preferences = Preferences.userNodeForPackage(LoginStage.class);
+					preferences.put("lastUser", username);
+					preferences.put(username, username);
+					preferences.put(username + "pwd", encodedPassword);
+					preferences.putBoolean("loginFree", rb_login_free.isSelected());
+					preferences.put("origin","");
 					DBUtil.createAlbumsTable(username);
 					tf_username.getScene().getWindow().hide();
 					new HomeStage(username).show();
@@ -72,7 +86,7 @@ public class loginController {
 		TextField username = new TextField();
 		username.setPromptText("用户名");
 		TextField password = new TextField();
-		username.setPromptText("密码");
+		password.setPromptText("密码");
 		TextField nickname = new TextField();
 		nickname.setPromptText("用户昵称");
 		grid.add(new Label("用户名:"), 0, 0);
@@ -90,7 +104,9 @@ public class loginController {
 		username.textProperty().addListener((observable, oldValue, newValue) -> {
 			confirmButton.setDisable(newValue.trim().isEmpty());
 		});
-
+		password.textProperty().addListener((observable, oldValue, newValue) -> {
+			confirmButton.setDisable(newValue.trim().isEmpty());
+		});
 		dialog.getDialogPane().setContent(grid);
 
 		// Request focus on the albumName field by default.

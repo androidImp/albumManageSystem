@@ -15,6 +15,7 @@ import cluster.Point;
 import edu.wlu.cs.levy.CG.KDTree;
 import edu.wlu.cs.levy.CG.KeyDuplicateException;
 import edu.wlu.cs.levy.CG.KeySizeException;
+import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ObservableList;
@@ -290,10 +291,16 @@ public class HomeStage extends BaseStage {
 		Hyperlink link_info = new Hyperlink("关于");
 		configureLinkInfo(link_info);
 		item_info.setGraphic(link_info);
-		rootItem.getChildren().addAll(item_clear, item_setting, item_modify, item_info);
+		// 6
+		TreeItem<String> item_out = new TreeItem<String>("");
+		Hyperlink link_out = new Hyperlink("退出登录");
+		configureLinkOut(link_out);
+		item_out.setGraphic(link_out);
+		rootItem.getChildren().addAll(item_clear, item_setting, item_modify, item_info,item_out);
 		tv_menu.setRoot(rootItem);
 	}
 
+	
 	public void initAlbumList() {
 		ls_album.setCellFactory((ListView<Album> l) -> new AlbumCell());
 		ls_album.setOnMouseClicked(new EventHandler<Event>() {
@@ -416,4 +423,19 @@ public class HomeStage extends BaseStage {
 		});
 
 	}
+	private void configureLinkOut(Hyperlink link) {
+		// TODO Auto-generated method stub
+		link.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent event) {
+				// TODO Auto-generated method stub
+				Preferences preferences = Preferences.userNodeForPackage(LoginStage.class);
+				preferences.put("origin", "HomeStage");
+				hide();
+				new LoginStage();
+			}
+		});
+	}
+
 }

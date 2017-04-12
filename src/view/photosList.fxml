@@ -12,7 +12,7 @@
 
 
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-	minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0"
+	minWidth="-Infinity" prefHeight="600.0" prefWidth="600.0"
 	xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
 	<children>
 		<MenuBar>
@@ -38,9 +38,6 @@
 			<children>
 				<GridView fx:id="gv_photo" prefHeight="200.0" prefWidth="200.0"
 					VBox.vgrow="ALWAYS" />
-				<ProgressIndicator maxWidth="50" maxHeight="50" 
-					fx:id="indicator" visible="false"></ProgressIndicator>
-
 			</children>
 		</StackPane>
 

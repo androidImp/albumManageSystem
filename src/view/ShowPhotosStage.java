@@ -6,15 +6,12 @@ import org.controlsfx.control.GridView;
 
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.ProgressIndicator;
 import model.Album;
 import model.Photo;
 import util.DBUtil;
@@ -24,7 +21,7 @@ public class ShowPhotosStage extends BaseStage {
 	private Album album;
 	GridView<Photo> gv_photo;
 	Parent root = null;
-	ProgressIndicator indicator;
+	
 
 	public ShowPhotosStage(Album album, String name) {
 		// TODO Auto-generated constructor stub
@@ -40,7 +37,7 @@ public class ShowPhotosStage extends BaseStage {
 		if (root != null) {
 			Scene scene = new Scene(root);
 			setScene(scene);
-			initViews();
+			initViewsId();
 			configurePhotoList();
 			show();
 		}
@@ -49,9 +46,9 @@ public class ShowPhotosStage extends BaseStage {
 
 	// To do background;
 	@SuppressWarnings("unchecked")
-	public void initViews() {
+	public void initViewsId() {
 		gv_photo = (GridView<Photo>) root.lookup("#gv_photo");
-		indicator = (ProgressIndicator) root.lookup("#indicator");
+		
 	}
 
 	public void configurePhotoList() {
@@ -64,30 +61,12 @@ public class ShowPhotosStage extends BaseStage {
 		return this.username;
 	}
 
-	public final java.lang.String getUsername() {
+	public final String getUsername() {
 		return this.usernameProperty().get();
 	}
 
-	public final void setUsername(final java.lang.String username) {
+	public final void setUsername(final String username) {
 		this.usernameProperty().set(username);
-	}
-
-	public void configurePhotosDisPlaying() {
-		gv_photo.setCellFactory(param -> new ImageCell());
-		gv_photo.itemsProperty().addListener(new ChangeListener<ObservableList<Photo>>() {
-
-			@Override
-			public void changed(ObservableValue<? extends ObservableList<Photo>> observable,
-					ObservableList<Photo> oldValue, ObservableList<Photo> newValue) {
-				// TODO Auto-generated method stub
-				System.out.println(oldValue.size() + " " + "new size: " + newValue.size());
-				if (oldValue.size() == 0 && newValue.size() != 0) {
-					if (indicator != null) {
-						indicator.setVisible(false);
-					}
-				}
-			}
-		});
 	}
 
 	
@@ -106,29 +85,6 @@ public class ShowPhotosStage extends BaseStage {
 			});
 			return null;
 		}
-
-		@Override
-		protected void scheduled() {
-			// TODO Auto-generated method stub
-			super.scheduled();
-			showProgressDialog();
-
-		}
-
-		private void showProgressDialog() {
-			Platform.runLater(new Runnable() {
-
-				@Override
-				public void run() {
-					// TODO Auto-generated method stub
-					indicator.setVisible(true);
-				}
-			});
-
-		}
 	}
 
-	public int getPhotoIndexOfGridByPosition() {
-		return 1;
-	}
 }

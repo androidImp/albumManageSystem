@@ -10,6 +10,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import model.Photo;
+import util.DBUtil;
 
 public class ImageCell extends GridCell<Photo> {
 	public ImageCell() {
@@ -50,6 +51,9 @@ public class ImageCell extends GridCell<Photo> {
 			public void handle(ActionEvent event) {
 				// TODO Auto-generated method stub
 				getGridView().getItems().remove(getIndex());
+				Photo photo = getItem();
+				
+				DBUtil.deletePhoto(photo.getMd5(), photo.getId(),"");
 			}
 		});
 	}
@@ -72,7 +76,7 @@ public class ImageCell extends GridCell<Photo> {
 		super.updateItem(item, empty);
 		if (!empty) {
 			VBox vBox = new VBox();
-			Image image = new Image(item.getUri(), true);
+			Image image = new Image(item.getUri(),true);
 			ImageView imageView = new ImageView(image);
 			imageView.setFitHeight(80);
 			imageView.setFitWidth(80);

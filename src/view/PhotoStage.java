@@ -7,6 +7,8 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
+import org.controlsfx.control.GridView;
+
 import com.alibaba.simpleimage.analyze.sift.SIFT;
 import com.alibaba.simpleimage.analyze.sift.render.RenderImage;
 
@@ -45,7 +47,12 @@ import util.DataUtil;
 import util.DateUtil;
 import util.FileChooserUtil;
 import util.LogUtil;
-
+/**
+ * 旧版相册的浏览界面,新版为{@link ShowPhotosStage}
+ * 旧版是因为当初没有解决 {@link GridView} 
+ * @author niuniumei 
+ *
+ */
 public class PhotoStage extends BaseStage {
 	public int EMPTY = 2147483647;
 	public int DEFAULT_HEIGHT = 200;
