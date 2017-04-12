@@ -50,10 +50,8 @@ public class ImageCell extends GridCell<Photo> {
 			@Override
 			public void handle(ActionEvent event) {
 				// TODO Auto-generated method stub
-				getGridView().getItems().remove(getIndex());
-				Photo photo = getItem();
-				DBUtil.deletePhoto(photo.getMd5(), photo.getId(),
-						((ShowPhotosStage) getGridView().getScene().getWindow()).getUsername());
+				ShowPhotosStage showPhotosStage = (ShowPhotosStage) getGridView().getScene().getWindow();
+				showPhotosStage.deletePhoto(getIndex());
 			}
 		});
 	}

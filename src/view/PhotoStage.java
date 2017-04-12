@@ -84,6 +84,7 @@ public class PhotoStage extends BaseStage {
 	FileChooser fileChooser;
 	Parent parent = null;
 
+	@SuppressWarnings("unchecked")
 	public void initView() {
 		try {
 			parent = FXMLLoader.load(getClass().getResource("photos.fxml"));
@@ -256,6 +257,7 @@ public class PhotoStage extends BaseStage {
 					width = MAX_WIDTH;
 				default_height.set(height);
 				default_width.set(width);
+				
 			}
 		});
 	}

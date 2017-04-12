@@ -9,31 +9,50 @@
 <?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.layout.VBox?>
 
 
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
 	minWidth="-Infinity" prefHeight="600.0" prefWidth="600.0"
 	xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
 	<children>
-		<MenuBar>
-			<menus>
-				<Menu mnemonicParsing="false" text="File">
-					<items>
-						<MenuItem mnemonicParsing="false" text="Close" />
-					</items>
-				</Menu>
-				<Menu mnemonicParsing="false" text="Edit">
-					<items>
-						<MenuItem mnemonicParsing="false" text="Delete" />
-					</items>
-				</Menu>
-				<Menu mnemonicParsing="false" text="Help">
-					<items>
-						<MenuItem mnemonicParsing="false" text="About" />
-					</items>
-				</Menu>
-			</menus>
-		</MenuBar>
+		<GridPane>
+			<columnConstraints>
+				<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+				<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+			</columnConstraints>
+			<rowConstraints>
+				<RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+			</rowConstraints>
+			<children>
+				<HBox alignment="CENTER_LEFT" spacing="20.0">
+					<children>
+						<Label fx:id="ll_title" text="Label">
+							<font>
+								<Font name="System Bold" size="20.0" />
+							</font>
+						</Label>
+						<Label fx:id="ll_date" text="Label" />
+					</children>
+					<GridPane.margin>
+						<Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+					</GridPane.margin>
+				</HBox>
+				<HBox spacing="20.0" GridPane.columnIndex="1">
+					<children>
+						<Button fx:id="btn_add" mnemonicParsing="false" text="添加" />
+						<TextField fx:id="tf_search" promptText="输入查询内容"
+							GridPane.columnIndex="1" HBox.hgrow="ALWAYS" />
+					</children>
+					<GridPane.margin>
+						<Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+					</GridPane.margin>
+				</HBox>
+			</children>
+		</GridPane>
+
 		<StackPane VBox.vgrow="ALWAYS">
 			<children>
 				<GridView fx:id="gv_photo" prefHeight="200.0" prefWidth="200.0"
