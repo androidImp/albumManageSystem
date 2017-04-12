@@ -52,8 +52,8 @@ public class ImageCell extends GridCell<Photo> {
 				// TODO Auto-generated method stub
 				getGridView().getItems().remove(getIndex());
 				Photo photo = getItem();
-				
-				DBUtil.deletePhoto(photo.getMd5(), photo.getId(),"");
+				DBUtil.deletePhoto(photo.getMd5(), photo.getId(),
+						((ShowPhotosStage) getGridView().getScene().getWindow()).getUsername());
 			}
 		});
 	}
@@ -76,7 +76,7 @@ public class ImageCell extends GridCell<Photo> {
 		super.updateItem(item, empty);
 		if (!empty) {
 			VBox vBox = new VBox();
-			Image image = new Image(item.getUri(),true);
+			Image image = new Image(item.getUri(), true);
 			ImageView imageView = new ImageView(image);
 			imageView.setFitHeight(80);
 			imageView.setFitWidth(80);
