@@ -3,29 +3,40 @@ package controller;
 import java.util.Optional;
 
 import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.TableColumn.CellDataFeatures;
+import javafx.scene.control.TableColumn.SortType;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.util.Callback;
 import javafx.util.Pair;
 import model.Album;
 import util.DBUtil;
+import util.DataUtil;
 import util.DateUtil;
 import view.HomeStage;
+import view.ImageTableCell;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TableColumn;
 
 public class homePageController {
-	@FXML
-	private ListView<Album> ls_album;
+	// @FXML
+	// private ListView<Album> ls_album;
 	@FXML
 	private Button btn_add;
 	@FXML
@@ -34,7 +45,48 @@ public class homePageController {
 	private Label ll_albumName;
 	@FXML
 	private TreeView<String> tv_menu;
-	@FXML Label ll_name;
+	@FXML
+	Label ll_name;
+	@FXML
+	TableView<Album> tv_album;
+	@FXML
+	TableColumn<Album, String> columnCover;
+	@FXML
+	TableColumn<Album, String> columnName;
+	@FXML
+	TableColumn<Album, String> columnDate;
+	@FXML
+	TableColumn<Album, String> columnSize;
+	@FXML
+	TableColumn<Album, String> columnProfile;
+	private HomeStage homeStage;
+	@FXML
+	private void initialize() {
+		columnCover.setCellValueFactory(new PropertyValueFactory<>("coverUri"));
+		columnCover.setCellFactory(new Callback<TableColumn<Album, String>, TableCell<Album, String>>() {
+
+			@Override
+			public TableCell<Album, String> call(TableColumn<Album, String> param) {
+				// TODO Auto-generated method stub
+				return new ImageTableCell();
+			}
+		});
+		columnName.setCellValueFactory(new PropertyValueFactory<>("albumName"));
+		
+		columnDate.setCellValueFactory(new PropertyValueFactory<>("createDate"));
+		columnSize.setCellValueFactory(new PropertyValueFactory<>("size"));
+		columnSize.setCellValueFactory(
+				new Callback<TableColumn.CellDataFeatures<Album, String>, ObservableValue<String>>() {
+
+					@Override
+					public ObservableValue<String> call(CellDataFeatures<Album, String> param) {
+						// TODO Auto-generated method stub
+						return new SimpleStringProperty(DataUtil.convertSizeToString(param.getValue().getSize()));
+					}
+				});
+
+		columnProfile.setCellValueFactory(new PropertyValueFactory<>(" profile"));
+	}
 
 	@FXML
 	public void addAlbum() {
@@ -97,10 +149,18 @@ public class homePageController {
 			album.setSize(0.0);
 			album.setCoverUri("Pic/emptyCover.png");
 			album.setPhotosUri(FXCollections.observableArrayList());
-			ls_album.getItems().add(album);
-			String name = ((HomeStage) ls_album.getScene().getWindow()).getName();
-			DBUtil.saveAlbums(ls_album.getItems(), name);
+			// ls_album.getItems().add(album);
+			// String name = ((HomeStage)
+			// ls_album.getScene().getWindow()).getName();
+			// DBUtil.saveAlbums(ls_album.getItems(), name);
+			tv_album.getItems().add(album);
+			String name = ((HomeStage) tv_album.getScene().getWindow()).getName();
+			DBUtil.saveAlbums(tv_album.getItems(), name);
 		});
 	}
-	
+	 public void setMainApp(HomeStage homeStage) {
+	        this.homeStage = homeStage;
+	        // Add observable list data to the table
+	        tv_album.setItems(homeStage.getAlbumData());
+	    }
 }

@@ -12,6 +12,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.image.ImageView?>
 
 
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
@@ -57,6 +58,11 @@
 			<children>
 				<GridView fx:id="gv_photo" prefHeight="200.0" prefWidth="200.0"
 					VBox.vgrow="ALWAYS" />
+				<HBox alignment="CENTER" fx:id="hb_scan">
+					<children>
+						<ImageView fitWidth="400" fx:id="img_scan" preserveRatio="true" />
+					</children>
+				</HBox>
 			</children>
 		</StackPane>
 

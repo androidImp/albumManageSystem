@@ -14,11 +14,14 @@ import com.alibaba.simpleimage.analyze.sift.render.RenderImage;
 
 import cluster.ClusterUtils;
 import cluster.ImagePoint;
-import javafx.application.Platform;
+import javafx.animation.FadeTransition;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -27,8 +30,13 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import javafx.stage.WindowEvent;
+import javafx.util.Duration;
 import model.Album;
 import model.Photo;
 import util.DBUtil;
@@ -46,6 +54,8 @@ public class ShowPhotosStage extends BaseStage {
 	private Button btn_add;
 	private TextField tf_search;
 	private FileChooser fileChooser;
+	private HBox hb_scan;
+	private ImageView img_scan;
 
 	public ShowPhotosStage(Album album, String name) {
 		// TODO Auto-generated constructor stub
@@ -55,7 +65,6 @@ public class ShowPhotosStage extends BaseStage {
 		lookUpViewById();
 		configurePhotoList();
 		configureTitle();
-
 		configureButtonAdd();
 		configureCloseProperty();
 		show();
@@ -93,6 +102,7 @@ public class ShowPhotosStage extends BaseStage {
 		// TODO Auto-generated method stub
 		ll_title.setText(album.getAlbumName());
 		ll_date.setText(album.getCreateDate());
+
 	}
 
 	// To do background;
@@ -103,10 +113,28 @@ public class ShowPhotosStage extends BaseStage {
 		ll_date = (Label) root.lookup("#ll_date");
 		btn_add = (Button) root.lookup("#btn_add");
 		tf_search = (TextField) root.lookup("#tf_search");
+		hb_scan = (HBox) root.lookup("#hb_scan");
+		img_scan = (ImageView) root.lookup("#img_scan");
+		hb_scan.visibleProperty().bind(gv_photo.visibleProperty().not());
+		Image image = new Image("/Pic/bg.jpeg");
+		img_scan.setImage(image);
+
+		img_scan.setOnMouseClicked(new EventHandler<Event>() {
+
+			@Override
+			public void handle(Event event) {
+				// TODO Auto-generated method stub
+				if (((MouseEvent) event).getClickCount() >= 2) {
+					gv_photo.setVisible(true);
+				}
+			}
+		});
+		
 	}
 
 	public void configurePhotoList() {
-		gv_photo.setPadding(new Insets(10));
+		gv_photo.setCellWidth(70);
+		gv_photo.setCellHeight(70);
 		new Thread(new RenderImageTask()).start();
 		gv_photo.setCellFactory(param -> new ImageCell());
 

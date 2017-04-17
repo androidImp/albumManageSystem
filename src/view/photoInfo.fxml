@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.VBox?>
+
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+	minWidth="-Infinity" spacing="10.0" xmlns="http://javafx.com/javafx/8"
+	xmlns:fx="http://javafx.com/fxml/1">
+	<children>
+
+		<VBox spacing="10.0">
+			<children>
+				<TextField fx:id="tf_name" promptText="为照片添加一个名字" />
+				<Label fx:id="ll_path" text="Label" />
+				<Label fx:id="ll_createDate" text="Label" />
+			</children>
+		</VBox>
+		<Separator prefWidth="200.0" />
+		<HBox>
+			<children>
+				<Label fx:id="ll_size" text="Label" />
+			</children>
+		</HBox>
+		<Separator prefWidth="200.0" />
+		<TextField fx:id="tf_profile" promptText="添加对相片的描述" />
+	</children>
+	<padding>
+		<Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+	</padding>
+</VBox>

@@ -1,21 +1,42 @@
 package view;
 
 import org.controlsfx.control.GridCell;
+import org.controlsfx.control.GridView;
 
+import javafx.animation.Transition;
+import javafx.animation.TranslateTransition;
+import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 import model.Photo;
-import util.DBUtil;
 
 public class ImageCell extends GridCell<Photo> {
 	public ImageCell() {
 		// TODO Auto-generated constructor stub
 		configureImageMenu();
+		setOnMouseClicked(new EventHandler<Event>() {
+
+			@Override
+			public void handle(Event event) {
+				// TODO Auto-generated method stub
+				if (((MouseEvent) event).getClickCount() >= 2) {
+					getGridView().setVisible(false);
+
+				}
+
+			}
+		});
 	}
 
 	private void configureImageMenu() {
@@ -62,8 +83,8 @@ public class ImageCell extends GridCell<Photo> {
 			@Override
 			public void handle(ActionEvent event) {
 				// TODO
-				// show photoInfoStage
-				// getIndex();
+				new PhotoInfoStage(getItem());
+
 			}
 		});
 	}
