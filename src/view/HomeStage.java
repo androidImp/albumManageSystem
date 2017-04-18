@@ -32,19 +32,15 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import javafx.util.Callback;
 import model.Album;
 import model.Photo;
 import model.SearchItemCell;
@@ -68,15 +64,14 @@ public class HomeStage extends BaseStage {
 		FXMLLoader loader = new FXMLLoader();
 		try {
 			loader.setLocation(getClass().getResource("mainStage.fxml"));
-//			root = FXMLLoader.load(getClass().getResource("homePage.fxml"));
+			// root = FXMLLoader.load(getClass().getResource("homePage.fxml"));
 			root = loader.load();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		setName(name);
-		homePageController controller = loader.getController();
-		controller.setMainApp(this);
+
 		Scene scene = new Scene(root, 800, 600);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		setScene(scene);
@@ -88,6 +83,8 @@ public class HomeStage extends BaseStage {
 		configureUserMenu();
 		configureCloseProperty();
 		addContextMenuToAlbums();
+		homePageController controller = loader.getController();
+		controller.setMainApp(this);
 		DBUtil.createExpressionsTable(username.get());
 		configureCluster();
 		configureKDTree();
@@ -258,7 +255,7 @@ public class HomeStage extends BaseStage {
 	 */
 	private void configureData() {
 		DBUtil.createPhotosTable(username.get());
-//		ls_album.setItems(DBUtil.getAlbums(username.get()));
+		// ls_album.setItems(DBUtil.getAlbums(username.get()));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -312,55 +309,8 @@ public class HomeStage extends BaseStage {
 		tv_menu.setRoot(rootItem);
 	}
 
-	@SuppressWarnings("unchecked")
 	public void initAlbumList() {
-		// ls_album.setCellFactory((ListView<Album> l) -> new AlbumCell());
-		// ls_album.setOnMouseClicked(new EventHandler<Event>() {
-		//
-		// @Override
-		// public void handle(Event event) {
-		// // TODO Auto-generated method stub
-		// if (((MouseEvent) event).getClickCount() >= 2) {
-		// Album album = ls_album.getSelectionModel().getSelectedItem();
-		// if (album != null) {
-		//// new PhotoStage(album, getName()).show();
-		// new ShowPhotosStage(album, getName());
-		// }
-		//
-		// }
-		// }
-		// });
-		TableColumn<Album, String> coverColumn = new TableColumn<>("相册封面");
-		coverColumn.setCellValueFactory(new PropertyValueFactory<>("coverUri"));
-		coverColumn.setCellFactory(new Callback<TableColumn<Album, String>, TableCell<Album, String>>() {
-
-			@Override
-			public TableCell<Album, String> call(TableColumn<Album, String> param) {
-				// TODO Auto-generated method stub
-				return new ImageTableCell();
-			}
-		});
 		
-//		TableColumn<Album, String> nameColumn = new TableColumn<>("相册名");
-//		nameColumn.setSortType(SortType.DESCENDING);
-//		nameColumn.setCellValueFactory(new PropertyValueFactory<>("albumName"));
-//		TableColumn<Album, String> dateColumn = new TableColumn<>("创建日期");
-//		dateColumn.setSortType(SortType.DESCENDING);
-//		dateColumn.setCellValueFactory(new PropertyValueFactory<>("createDate"));
-//		TableColumn<Album, String> sizeColumn = new TableColumn<>("相册大小");
-//		sizeColumn.setCellValueFactory(new PropertyValueFactory<>("size"));
-//		sizeColumn.setCellValueFactory(
-//				new Callback<TableColumn.CellDataFeatures<Album, String>, ObservableValue<String>>() {
-//
-//					@Override
-//					public ObservableValue<String> call(CellDataFeatures<Album, String> param) {
-//						// TODO Auto-generated method stub
-//						return new SimpleStringProperty(DataUtil.convertSizeToString(param.getValue().getSize()));
-//					}
-//				});
-//		TableColumn<Album, String> profileColumn = new TableColumn<>("相册描述");
-//		profileColumn.setCellValueFactory(new PropertyValueFactory<>(" profile"));
-//		ls_album.getColumns().addAll(coverColumn, nameColumn, dateColumn, sizeColumn,profileColumn);
 		ls_album.setOnMouseClicked(new EventHandler<Event>() {
 
 			@Override

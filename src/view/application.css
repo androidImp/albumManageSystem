@@ -15,5 +15,8 @@
 .list-cell:empty .list-cell {
     -fx-border-width: 0.0px;
 }
- 
+#tv_album .table-cell{
+	 -fx-alignment : center;
+	 
+}
 

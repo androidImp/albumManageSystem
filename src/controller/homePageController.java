@@ -1,9 +1,15 @@
 package controller;
 
 import java.util.Optional;
+import java.util.concurrent.Callable;
 
 import javafx.application.Platform;
+import javafx.beans.binding.Binding;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -14,6 +20,7 @@ import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableColumn.SortType;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
@@ -31,8 +38,10 @@ import util.DataUtil;
 import util.DateUtil;
 import view.HomeStage;
 import view.ImageTableCell;
+import view.ShowPhotosStage;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 
 public class homePageController {
 	// @FXML
@@ -60,6 +69,7 @@ public class homePageController {
 	@FXML
 	TableColumn<Album, String> columnProfile;
 	private HomeStage homeStage;
+
 	@FXML
 	private void initialize() {
 		columnCover.setCellValueFactory(new PropertyValueFactory<>("coverUri"));
@@ -71,8 +81,8 @@ public class homePageController {
 				return new ImageTableCell();
 			}
 		});
+
 		columnName.setCellValueFactory(new PropertyValueFactory<>("albumName"));
-		
 		columnDate.setCellValueFactory(new PropertyValueFactory<>("createDate"));
 		columnSize.setCellValueFactory(new PropertyValueFactory<>("size"));
 		columnSize.setCellValueFactory(
@@ -81,11 +91,21 @@ public class homePageController {
 					@Override
 					public ObservableValue<String> call(CellDataFeatures<Album, String> param) {
 						// TODO Auto-generated method stub
-						return new SimpleStringProperty(DataUtil.convertSizeToString(param.getValue().getSize()));
+
+						return Bindings.createStringBinding(new Callable<String>() {
+
+							@Override
+							public String call() throws Exception {
+								// TODO Auto-generated method stub
+								return DataUtil.convertSizeToString(param.getValue().getSize());
+
+							}
+						}, param.getValue().sizeProperty());
+						
 					}
 				});
+		columnProfile.setCellValueFactory(new PropertyValueFactory<>("albumProfile"));
 
-		columnProfile.setCellValueFactory(new PropertyValueFactory<>(" profile"));
 	}
 
 	@FXML
@@ -158,9 +178,10 @@ public class homePageController {
 			DBUtil.saveAlbums(tv_album.getItems(), name);
 		});
 	}
-	 public void setMainApp(HomeStage homeStage) {
-	        this.homeStage = homeStage;
-	        // Add observable list data to the table
-	        tv_album.setItems(homeStage.getAlbumData());
-	    }
+
+	public void setMainApp(HomeStage homeStage) {
+		this.homeStage = homeStage;
+		// Add observable list data to the table
+		tv_album.setItems(homeStage.getAlbumData());
+	}
 }
