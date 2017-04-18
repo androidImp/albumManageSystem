@@ -84,7 +84,6 @@ public class homePageController {
 
 		columnName.setCellValueFactory(new PropertyValueFactory<>("albumName"));
 		columnDate.setCellValueFactory(new PropertyValueFactory<>("createDate"));
-		columnSize.setCellValueFactory(new PropertyValueFactory<>("size"));
 		columnSize.setCellValueFactory(
 				new Callback<TableColumn.CellDataFeatures<Album, String>, ObservableValue<String>>() {
 

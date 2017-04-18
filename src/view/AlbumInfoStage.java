@@ -46,11 +46,12 @@ public class AlbumInfoStage extends BaseStage {
 		tf_name.setText(album.getAlbumName());
 		tf_profile.setText(album.getAlbumProfile());
 		ll_date.setText(album.getCreateDate());
-		ll_count.setText(album.getPhotosNumber().toString());
+		ll_count.setText(String.valueOf(album.getPhotosNumber()));
 		ll_size.setText(DataUtil.convertSizeToString(album.getSize()));
 	}
 
 	public void configureName() {
+
 		tf_name.textProperty().addListener(new ChangeListener<String>() {
 
 			@Override
@@ -60,6 +61,7 @@ public class AlbumInfoStage extends BaseStage {
 				album.setAlbumName(newValue);
 			}
 		});
+
 	}
 
 	public void configureProfile() {
@@ -68,10 +70,11 @@ public class AlbumInfoStage extends BaseStage {
 			@Override
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
 				// TODO Auto-generated method stub
-				tf_profile.setText(newValue);
+				// tf_profile.setText(newValue);
 				album.setAlbumProfile(newValue);
 			}
 		});
+
 	}
 
 	public void findViewById() {

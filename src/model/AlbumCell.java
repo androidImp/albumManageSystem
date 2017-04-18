@@ -49,7 +49,7 @@ public class AlbumCell extends ListCell<Album> {
 				img_cover.setImage(new Image(newValue));
 			}
 		});
-		item.nameProperty().addListener(new ChangeListener<String>() {
+		item.albumNameProperty().addListener(new ChangeListener<String>() {
 
 			@Override
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {

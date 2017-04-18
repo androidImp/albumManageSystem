@@ -218,6 +218,7 @@ public class ShowPhotosStage extends BaseStage {
 					gv_photo.getItems().add(photo);
 				}
 				DBUtil.savePhotos(gv_photo.getItems(), getUsername());
+				album.setPhotosNumber(album.getPhotosNumber() + filesList.size());
 				album.setSize(size);
 			}
 

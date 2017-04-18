@@ -43,83 +43,6 @@ public class Album {
 	 */
 	private SimpleDoubleProperty size = new SimpleDoubleProperty(this, "size");
 
-	public Integer getId() {
-		return id.get();
-	}
-
-	public void setId(Integer id) {
-		this.id.set(id);
-	}
-
-	public ObservableList<String> getPhotosUri() {
-		return photosUri.get();
-	}
-
-	public void setPhotosUri(ObservableList<String> photosUri) {
-		this.photosUri.set(photosUri);
-	}
-
-	public String getCoverUri() {
-		return coverUri.get();
-	}
-
-	public void setCoverUri(String coverUri) {
-		this.coverUri.set(coverUri);
-	}
-
-	public String getCreateDate() {
-		return createDate.get();
-	}
-
-	public void setCreateDate(String createDate) {
-		this.createDate.set(createDate);
-
-	}
-
-	public Integer getPhotosNumber() {
-		return photosNumber.get();
-	}
-
-	public void setPhotosNumber(Integer photosNumber) {
-		this.photosNumber.set(photosNumber);
-	}
-
-	public String getAlbumName() {
-		return albumName.get();
-	}
-
-	public void setAlbumName(String albumName) {
-		this.albumName.set(albumName);
-	}
-
-	public String getAlbumProfile() {
-		return albumProfile.get();
-	}
-
-	public void setAlbumProfile(String albumProfile) {
-		this.albumProfile.set(albumProfile);
-	}
-
-	public Double getSize() {
-		return size.get();
-	}
-
-	public void setSize(Double size) {
-		this.size.set(size);
-	}
-
-	public StringProperty coverUriProperty() {
-		return coverUri;
-	}
-
-	public StringProperty nameProperty() {
-		return albumName;
-	}
-
-	public DoubleProperty sizeProperty() {
-		return size;
-	}
-
 	@Override
 	public boolean equals(Object obj) {
 		// TODO Auto-generated method stub
@@ -127,7 +50,7 @@ public class Album {
 			return false;
 		}
 		Album album = (Album) obj;
-		return getId().equals(album.getId());
+		return getId() == album.getId();
 	}
 
 	@Override
@@ -135,4 +58,101 @@ public class Album {
 		// TODO Auto-generated method stub
 		return super.hashCode();
 	}
+
+	public SimpleIntegerProperty idProperty() {
+		return this.id;
+	}
+
+	public int getId() {
+		return this.idProperty().get();
+	}
+
+	public void setId(int id) {
+		this.idProperty().set(id);
+	}
+
+	public SimpleStringProperty albumNameProperty() {
+		return this.albumName;
+	}
+
+	public java.lang.String getAlbumName() {
+		return this.albumNameProperty().get();
+	}
+
+	public void setAlbumName(java.lang.String albumName) {
+		this.albumNameProperty().set(albumName);
+	}
+
+	public SimpleStringProperty albumProfileProperty() {
+		return this.albumProfile;
+	}
+
+	public java.lang.String getAlbumProfile() {
+		return this.albumProfileProperty().get();
+	}
+
+	public void setAlbumProfile(java.lang.String albumProfile) {
+		this.albumProfileProperty().set(albumProfile);
+	}
+
+	public ListProperty<String> photosUriProperty() {
+		return this.photosUri;
+	}
+
+	public javafx.collections.ObservableList<java.lang.String> getPhotosUri() {
+		return this.photosUriProperty().get();
+	}
+
+	public void setPhotosUri(javafx.collections.ObservableList<java.lang.String> photosUri) {
+		this.photosUriProperty().set(photosUri);
+	}
+
+	public SimpleStringProperty coverUriProperty() {
+		return this.coverUri;
+	}
+
+	public java.lang.String getCoverUri() {
+		return this.coverUriProperty().get();
+	}
+
+	public void setCoverUri(java.lang.String coverUri) {
+		this.coverUriProperty().set(coverUri);
+	}
+
+	public SimpleStringProperty createDateProperty() {
+		return this.createDate;
+	}
+
+	public java.lang.String getCreateDate() {
+		return this.createDateProperty().get();
+	}
+
+	public void setCreateDate(java.lang.String createDate) {
+		this.createDateProperty().set(createDate);
+	}
+
+	public SimpleIntegerProperty photosNumberProperty() {
+		return this.photosNumber;
+	}
+
+	public int getPhotosNumber() {
+		return this.photosNumberProperty().get();
+	}
+
+	public void setPhotosNumber(int photosNumber) {
+		this.photosNumberProperty().set(photosNumber);
+	}
+
+	public SimpleDoubleProperty sizeProperty() {
+		return this.size;
+	}
+
+	public double getSize() {
+		return this.sizeProperty().get();
+	}
+
+	public void setSize(double size) {
+		this.sizeProperty().set(size);
+	}
+
 }

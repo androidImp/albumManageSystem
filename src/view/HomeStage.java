@@ -310,7 +310,7 @@ public class HomeStage extends BaseStage {
 	}
 
 	public void initAlbumList() {
-		
+
 		ls_album.setOnMouseClicked(new EventHandler<Event>() {
 
 			@Override
