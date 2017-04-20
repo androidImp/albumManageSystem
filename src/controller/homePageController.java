@@ -15,6 +15,7 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.TableColumn.CellDataFeatures;
@@ -36,6 +37,7 @@ import model.Album;
 import util.DBUtil;
 import util.DataUtil;
 import util.DateUtil;
+import util.DialogUtil;
 import view.HomeStage;
 import view.ImageTableCell;
 import view.ShowPhotosStage;
@@ -100,7 +102,7 @@ public class homePageController {
 
 							}
 						}, param.getValue().sizeProperty());
-						
+
 					}
 				});
 		columnProfile.setCellValueFactory(new PropertyValueFactory<>("albumProfile"));
@@ -158,23 +160,29 @@ public class homePageController {
 		});
 		Optional<Pair<String, String>> result = dialog.showAndWait();
 		result.ifPresent(albumNamePassword -> {
-			Album album = new Album();
-			album.setId(HomeStage.index++);
-			album.setAlbumName(albumNamePassword.getKey());
-			album.setAlbumProfile(albumNamePassword.getValue());
-			album.setCreateDate(DateUtil.getFormatDate());
-			album.setPhotosNumber(0);
-			album.setSize(0.0);
-			album.setCoverUri("Pic/emptyCover.png");
-			album.setPhotosUri(FXCollections.observableArrayList());
-			// ls_album.getItems().add(album);
-			// String name = ((HomeStage)
-			// ls_album.getScene().getWindow()).getName();
-			// DBUtil.saveAlbums(ls_album.getItems(), name);
-			tv_album.getItems().add(album);
-			String name = homeStage.getName();
-//			String name = ((HomeStage) tv_album.getScene().getWindow()).getName();
-			DBUtil.saveAlbums(tv_album.getItems(), name);
+			if (DBUtil.queryAlbum(homeStage.getName(), albumNamePassword.getKey())) {
+				Album album = new Album();
+				album.setId(HomeStage.index++);
+				album.setAlbumName(albumNamePassword.getKey());
+				album.setAlbumProfile(albumNamePassword.getValue());
+				album.setCreateDate(DateUtil.getFormatDate());
+				album.setPhotosNumber(0);
+				album.setSize(0.0);
+				album.setCoverUri("Pic/emptyCover.png");
+				album.setPhotosUri(FXCollections.observableArrayList());
+				// ls_album.getItems().add(album);
+				// String name = ((HomeStage)
+				// ls_album.getScene().getWindow()).getName();
+				// DBUtil.saveAlbums(ls_album.getItems(), name);
+				tv_album.getItems().add(album);
+				String name = homeStage.getName();
+				// String name = ((HomeStage)
+				// tv_album.getScene().getWindow()).getName();
+				DBUtil.saveAlbums(tv_album.getItems(), name);
+			}else{
+				DialogUtil.showDialog(AlertType.CONFIRMATION, "已存在同名相册,请更改你想要的相册名后再试", "添加相册情况");
+			}
+
 		});
 	}
 

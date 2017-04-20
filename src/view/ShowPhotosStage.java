@@ -27,6 +27,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -42,6 +43,7 @@ import model.Photo;
 import util.DBUtil;
 import util.DataUtil;
 import util.DateUtil;
+import util.DialogUtil;
 import util.FileChooserUtil;
 
 public class ShowPhotosStage extends BaseStage {
@@ -205,21 +207,31 @@ public class ShowPhotosStage extends BaseStage {
 			if (filesList != null) {
 				fileChooser.setInitialFileName(filesList.get(0).getAbsolutePath());
 				double size = album.getSize();
+				int fails = 0;
 				for (int i = 0; i < filesList.size(); i++) {
 					File file = filesList.get(i);
 					String path = file.getAbsoluteFile().toURI().toString();
-					size += file.length();
-					Photo photo = new Photo();
-					photo.setMd5(DataUtil.getMD5(file));
-					photo.setId(album.getId());
-					int index = file.getName().lastIndexOf(".");
-					photo.setName(file.getName().substring(0, index));
-					photo.setUri(path);
-					photo.setCreateDate(DateUtil.getFormatDate(file.lastModified()));
-					photo.setSize(file.length());
-					album.getPhotosUri().add(path);
-					gv_photo.getItems().add(photo);
+					ObservableList<String> uris = album.getPhotosUri();
+					if (uris.contains(path)) {
+						// TO DO alert that insert fails;
+						fails++;
+					} else {
+						size += file.length();
+						Photo photo = new Photo();
+						photo.setMd5(DataUtil.getMD5(file));
+						photo.setId(album.getId());
+						int index = file.getName().lastIndexOf(".");
+						photo.setName(file.getName().substring(0, index));
+						photo.setUri(path);
+						photo.setCreateDate(DateUtil.getFormatDate(file.lastModified()));
+						photo.setSize(file.length());
+						uris.add(path);
+						gv_photo.getItems().add(photo);
+					}
+
 				}
+				DialogUtil.showDialog(AlertType.CONFIRMATION,
+						String.format("成功导入% d 张图片,其中有% d 张图片已存在而导入失败", filesList.size() - fails, fails), "相片导入情况");
 				DBUtil.savePhotos(gv_photo.getItems(), getUsername());
 				album.setPhotosNumber(album.getPhotosNumber() + filesList.size());
 				album.setSize(size);

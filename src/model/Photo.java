@@ -107,10 +107,31 @@ public class Photo {
 	@Override
 	public boolean equals(Object obj) {
 		// TODO Auto-generated method stub
-		if(obj == null){
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof Album)) {
 			return false;
 		}
 		Photo photo = (Photo) obj;
-		return getId().equals(photo.getId()) && getMd5().equals(photo.getMd5());
+		return photo.getId() == getId() && photo.getName().equals(getName()) && photo.getProfile().equals(getProfile())
+				&& photo.getUri().equals(getUri()) && photo.getCreateDate().equals(getCreateDate())
+				&& photo.getMd5() == photo.getMd5()
+				&& Double.doubleToLongBits(photo.getSize()) == Double.doubleToLongBits(getSize());
+
+	}
+
+	@Override
+	public int hashCode() {
+		// TODO Auto-generated method stub
+		int result = 17;
+		result = result * 37 + getId();
+		result = result * 37 + getName().hashCode();
+		result = result * 37 + getProfile().hashCode();
+		result = result * 37 + getUri().hashCode();
+		result = result * 37 + getCreateDate().hashCode();
+		long tmp = Double.doubleToLongBits(getSize());
+		result = result * 37 + (int) (tmp ^ (tmp >>> 32));
+		return result;
 	}
 }

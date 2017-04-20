@@ -1,13 +1,10 @@
 package model;
 
-import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-import javafx.collections.ObservableList;
 
 public class Album {
 	/**
@@ -49,14 +46,32 @@ public class Album {
 		if (obj == null) {
 			return false;
 		}
+		if (!(obj instanceof Album)) {
+			return false;
+		}
 		Album album = (Album) obj;
-		return getId() == album.getId();
+		return album.getId() == getId() && album.getAlbumName().equals(getAlbumName())
+				&& album.getAlbumProfile().equals(getAlbumProfile()) && album.getCoverUri().equals(getCoverUri())
+				&& album.getCreateDate().equals(getCreateDate()) && album.getPhotosNumber() == album.getPhotosNumber()
+				&& Double.doubleToLongBits(album.getSize()) == Double.doubleToLongBits(getSize())
+				&& album.getPhotosUri().equals(getPhotosUri());
+
 	}
 
 	@Override
 	public int hashCode() {
 		// TODO Auto-generated method stub
-		return super.hashCode();
+		int result = 17;
+		result = result * 37 + getId();
+		result = result * 37 + getAlbumName().hashCode();
+		result = result * 37 + getAlbumProfile().hashCode();
+		result = result * 37 + getCoverUri().hashCode();
+		result = result * 37 + getPhotosNumber();
+		result = result * 37 + getCreateDate().hashCode();
+		long tmp = Double.doubleToLongBits(getSize());
+		result = result * 37 + (int) (tmp ^ (tmp >>> 32));
+		result = result * 37 + getPhotosUri().hashCode();
+		return result;
 	}
 
 	public SimpleIntegerProperty idProperty() {

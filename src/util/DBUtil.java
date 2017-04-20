@@ -295,6 +295,27 @@ public class DBUtil {
 		return FXCollections.observableArrayList(photos);
 	}
 
+	public static boolean queryAlbum(String username, String albumName) {
+		getConnection();
+		String sql_query = "select name from albums_" + username + " where name = " + albumName;
+		try {
+			statement = connection.prepareStatement(sql_query);
+			ResultSet rs = statement.executeQuery();
+			rs.next();
+			if (rs.getRow() > 0) {
+				return false;
+			} else {
+				return true;
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			releaseConnection(getCurrentMethod());
+		}
+		return true;
+	}
+
 	public static void deleteAlbum(String name) {
 		String sql_delete = "delete from albums_" + name;
 		getConnection();
