@@ -11,6 +11,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -95,6 +96,7 @@ public class ImageCell extends GridCell<Photo> {
 		super.updateItem(item, empty);
 		if (!empty) {
 			VBox vBox = new VBox();
+			vBox.setAlignment(Pos.CENTER);
 			Image image = new Image(item.getUri(), true);
 			ImageView imageView = new ImageView(image);
 			imageView.setFitHeight(80);

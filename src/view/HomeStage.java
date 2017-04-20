@@ -212,6 +212,10 @@ public class HomeStage extends BaseStage {
 	}
 
 	// todo 处理单击 item 之后的跳转
+	/**
+	 * 查询图片之后对图片的点击事件的处理
+	 * @param lv
+	 */
 	private void configureSearchItem(ListView<Photo> lv) {
 		lv.setCellFactory(param -> new SearchItemCell());
 		lv.setOnMouseClicked(new EventHandler<Event>() {

@@ -129,12 +129,15 @@ public class ShowPhotosStage extends BaseStage {
 				}
 			}
 		});
-		
+
 	}
 
 	public void configurePhotoList() {
-		gv_photo.setCellWidth(70);
-		gv_photo.setCellHeight(70);
+		gv_photo.setCellWidth(85);
+		gv_photo.setCellHeight(85);
+		gv_photo.setPadding(new Insets(10));
+		gv_photo.setHorizontalCellSpacing(5);
+		gv_photo.setVerticalCellSpacing(5);
 		new Thread(new RenderImageTask()).start();
 		gv_photo.setCellFactory(param -> new ImageCell());
 

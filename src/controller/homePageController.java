@@ -123,7 +123,6 @@ public class homePageController {
 		grid.setHgap(10);
 		grid.setVgap(10);
 		grid.setPadding(new Insets(20, 150, 10, 10));
-
 		TextField albumName = new TextField();
 		albumName.setPromptText("albumName");
 		TextField profile = new TextField();
@@ -173,7 +172,8 @@ public class homePageController {
 			// ls_album.getScene().getWindow()).getName();
 			// DBUtil.saveAlbums(ls_album.getItems(), name);
 			tv_album.getItems().add(album);
-			String name = ((HomeStage) tv_album.getScene().getWindow()).getName();
+			String name = homeStage.getName();
+//			String name = ((HomeStage) tv_album.getScene().getWindow()).getName();
 			DBUtil.saveAlbums(tv_album.getItems(), name);
 		});
 	}
