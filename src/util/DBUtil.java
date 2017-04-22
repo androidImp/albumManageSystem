@@ -2,6 +2,7 @@ package util;
 
 import java.security.MessageDigest;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,6 +19,7 @@ import model.Album;
 import model.Photo;
 
 public class DBUtil {
+
 	private static Connection connection;
 	private static PreparedStatement statement;
 	// albums 表中元素的列号
@@ -297,9 +299,10 @@ public class DBUtil {
 
 	public static boolean queryAlbum(String username, String albumName) {
 		getConnection();
-		String sql_query = "select name from albums_" + username + " where name = " + albumName;
+		String sql_query = "select name from albums_" + username + " where name =? " ;
 		try {
 			statement = connection.prepareStatement(sql_query);
+			statement.setString(1, albumName);
 			ResultSet rs = statement.executeQuery();
 			rs.next();
 			if (rs.getRow() > 0) {
@@ -310,10 +313,11 @@ public class DBUtil {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return false;
 		} finally {
-			releaseConnection(getCurrentMethod());
+			 releaseConnection(getCurrentMethod());
 		}
-		return true;
+
 	}
 
 	public static void deleteAlbum(String name) {
@@ -508,8 +512,11 @@ public class DBUtil {
 
 	private static void releaseConnection(String curPos) {
 		try {
-			if (statement != null)
-				statement.close();
+			if (!connection.isClosed()) {
+				if (statement != null)
+					statement.close();
+			}
+
 			if (connection != null)
 				connection.close();
 		} catch (SQLException e) {
@@ -599,15 +606,16 @@ public class DBUtil {
 	 * @return
 	 */
 	public static List<Point> getExpressions(String name, int dimension) {
-		String sql_query = "select uri,expression from expressions_" + name;
+		String sql_query = "select id,uri,expression from expressions_" + name;
 		getConnection();
 		List<Point> points = new ArrayList<>();
 		try {
 			statement = connection.prepareStatement(sql_query);
 			ResultSet rs = statement.executeQuery();
 			while (rs.next()) {
-				Point point = new Point(DataUtil.expressionTodoubleArray(rs.getString(2), dimension));
-				point.setUrl(rs.getString(1));
+				Point point = new Point(DataUtil.expressionTodoubleArray(rs.getString(3), dimension));
+				point.setId(rs.getInt(1));
+				point.setUrl(rs.getString(2));
 				points.add(point);
 			}
 		} catch (SQLException e) {

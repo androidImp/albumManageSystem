@@ -69,6 +69,7 @@ public class ShowPhotosStage extends BaseStage {
 		configureTitle();
 		configureButtonAdd();
 		configureCloseProperty();
+		
 		show();
 
 	}
@@ -140,6 +141,7 @@ public class ShowPhotosStage extends BaseStage {
 		gv_photo.setPadding(new Insets(10));
 		gv_photo.setHorizontalCellSpacing(5);
 		gv_photo.setVerticalCellSpacing(5);
+		
 		new Thread(new RenderImageTask()).start();
 		gv_photo.setCellFactory(param -> new ImageCell());
 
@@ -163,6 +165,7 @@ public class ShowPhotosStage extends BaseStage {
 			// TODO Auto-generated method stub
 			ObservableList<Photo> photos = DBUtil.getPhotosByAlbum(album.getId(), username.get());
 			gv_photo.setItems(photos);
+			System.out.println("大小: "+gv_photo.getItems().size());
 			return null;
 		}
 	}

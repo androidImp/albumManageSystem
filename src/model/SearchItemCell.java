@@ -25,7 +25,7 @@ public class SearchItemCell extends ListCell<Photo> {
 		if (!empty) {
 			img_photo.setImage(new Image(item.getUri()));
 			Label ll_name = new Label(item.getName());
-			hBox.getChildren().addAll(ll_name, img_photo);
+			hBox.getChildren().addAll(img_photo, ll_name);
 			setGraphic(hBox);
 		}
 

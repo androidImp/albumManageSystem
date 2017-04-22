@@ -1,5 +1,6 @@
 package view;
 
+import java.io.EOFException;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -11,6 +12,7 @@ import java.util.prefs.Preferences;
 import org.apache.commons.math3.ml.clustering.CentroidCluster;
 
 import cluster.ClusterUtils;
+import cluster.KDSearchUtil;
 import cluster.Point;
 import controller.homePageController;
 import edu.wlu.cs.levy.CG.KDTree;
@@ -48,7 +50,7 @@ import util.DBUtil;
 
 public class HomeStage extends BaseStage {
 	public static int index;
-	private static final int DIMENSIONS_OF_KDTREE = 100;
+
 	// ListView<Album> ls_album;
 	TableView<Album> ls_album;
 	Parent root = null;
@@ -56,7 +58,7 @@ public class HomeStage extends BaseStage {
 	TextField tf_search;
 	TreeView<String> tv_menu;
 	SimpleStringProperty username = new SimpleStringProperty("name");
-	KDTree<String> kdTree = new KDTree<>(DIMENSIONS_OF_KDTREE);
+
 	List<CentroidCluster<Point>> centers = new ArrayList<>();
 
 	public HomeStage(String name) {
@@ -92,19 +94,7 @@ public class HomeStage extends BaseStage {
 
 	private void configureKDTree() {
 		// TODO Auto-generated method stub
-		List<Point> points = DBUtil.getExpressions(username.get(), DIMENSIONS_OF_KDTREE);
-		for (int i = 0; i < points.size(); i++) {
-			Point point = points.get(i);
-			try {
-				kdTree.insert(points.get(i).getPoint(), point.getUrl());
-			} catch (KeySizeException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (KeyDuplicateException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+		KDSearchUtil.configureKDTree(username.get());
 
 	}
 
@@ -134,7 +124,12 @@ public class HomeStage extends BaseStage {
 					centers.add(centroidCluster);
 				}
 
-			} catch (ClassNotFoundException | IOException e) {
+			} catch (EOFException e) {
+				// TODO: handle exception
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -214,6 +209,7 @@ public class HomeStage extends BaseStage {
 	// todo 处理单击 item 之后的跳转
 	/**
 	 * 查询图片之后对图片的点击事件的处理
+	 * 
 	 * @param lv
 	 */
 	private void configureSearchItem(ListView<Photo> lv) {
@@ -224,31 +220,7 @@ public class HomeStage extends BaseStage {
 			public void handle(Event event) {
 				// TODO Auto-generated method stub
 				Photo photo = lv.getSelectionModel().getSelectedItem();
-				double[] key = DBUtil.queryExpression(username.get(), DIMENSIONS_OF_KDTREE, photo.getId(),
-						photo.getMd5());
-				if (key != null) {
-					try {
-						List<String> uris = kdTree.nearest(key, 10);
-						Stage stage = new Stage();
-						VBox root = new VBox();
-						Scene scene = new Scene(root, 400, 400);
-						stage.setScene(scene);
-						ListView<ImageView> listView = new ListView<ImageView>();
-						root.getChildren().add(listView);
-						listView.getItems().add(new ImageView(photo.getUri()));
-						for (String string : uris) {
-							ImageView imageView = new ImageView(string);
-							listView.getItems().add(imageView);
-						}
-						stage.show();
-					} catch (KeySizeException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (IllegalArgumentException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
+				KDSearchUtil.queryNearestPic(username.get(), photo);
 
 			}
 		});

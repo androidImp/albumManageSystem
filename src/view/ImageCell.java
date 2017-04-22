@@ -3,6 +3,7 @@ package view;
 import org.controlsfx.control.GridCell;
 import org.controlsfx.control.GridView;
 
+import cluster.KDSearchUtil;
 import javafx.animation.Transition;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
@@ -45,11 +46,26 @@ public class ImageCell extends GridCell<Photo> {
 		MenuItem scan_item = new MenuItem("浏览信息");
 		MenuItem delete_item = new MenuItem("删除");
 		MenuItem rotate_item = new MenuItem("旋转");
+		MenuItem search_item = new MenuItem("查找相似图片");
 		configureItemScan(scan_item);
 		configureItemDelete(delete_item);
 		configureItemRotate(rotate_item);
-		contextMenu.getItems().addAll(scan_item, delete_item, rotate_item);
+		configureItemSearch(search_item);
+		contextMenu.getItems().addAll(scan_item, delete_item, rotate_item, search_item);
 		setContextMenu(contextMenu);
+	}
+
+	private void configureItemSearch(MenuItem search_item) {
+		// TODO Auto-generated method stub
+		search_item.setOnAction(new EventHandler<ActionEvent>() {
+			
+			@Override
+			public void handle(ActionEvent event) {
+				// TODO Auto-generated method stub
+				KDSearchUtil.queryNearestPic(((ShowPhotosStage) getGridView().getScene().getWindow()).getUsername(), getItem());
+			}
+		});
+		
 	}
 
 	private void configureItemRotate(MenuItem rotate_item) {

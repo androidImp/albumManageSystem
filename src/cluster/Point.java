@@ -6,12 +6,20 @@ import org.apache.commons.math3.ml.clustering.Clusterable;
 
 public class Point implements Clusterable,Serializable {
 	
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -1724586718364177013L;
 	public double[] features;
-
+	int id;
 	public String getUrl() {
 		return url;
 	}
