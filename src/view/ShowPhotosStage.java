@@ -14,10 +14,8 @@ import com.alibaba.simpleimage.analyze.sift.render.RenderImage;
 
 import cluster.ClusterUtils;
 import cluster.ImagePoint;
-import javafx.animation.FadeTransition;
+import cluster.KDSearchUtil;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -37,7 +35,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import javafx.stage.WindowEvent;
-import javafx.util.Duration;
 import model.Album;
 import model.Photo;
 import util.DBUtil;
@@ -69,7 +66,7 @@ public class ShowPhotosStage extends BaseStage {
 		configureTitle();
 		configureButtonAdd();
 		configureCloseProperty();
-		
+
 		show();
 
 	}
@@ -141,7 +138,7 @@ public class ShowPhotosStage extends BaseStage {
 		gv_photo.setPadding(new Insets(10));
 		gv_photo.setHorizontalCellSpacing(5);
 		gv_photo.setVerticalCellSpacing(5);
-		
+
 		new Thread(new RenderImageTask()).start();
 		gv_photo.setCellFactory(param -> new ImageCell());
 
@@ -165,33 +162,42 @@ public class ShowPhotosStage extends BaseStage {
 			// TODO Auto-generated method stub
 			ObservableList<Photo> photos = DBUtil.getPhotosByAlbum(album.getId(), username.get());
 			gv_photo.setItems(photos);
-			System.out.println("大小: "+gv_photo.getItems().size());
+			System.out.println("大小: " + gv_photo.getItems().size());
 			return null;
 		}
 	}
 
 	class RenderExpressionTask extends Task<Void> {
 		List<File> filesList;
+		int startIndex;
 
-		public RenderExpressionTask(List<File> filesList) {
+		public RenderExpressionTask(List<File> filesList, int startIndex) {
 			// TODO Auto-generated constructor stub
 			this.filesList = filesList;
+			this.startIndex = startIndex;
 		}
 
 		@Override
 		protected Void call() throws Exception {
 			// TODO Auto-generated method stub
 			SIFT sift = new SIFT();
-			for (File file : filesList) {
+			ObservableList<Photo> photos = gv_photo.getItems();
+			for (int i = 0; i < filesList.size(); i++) {
+				File file = filesList.get(i);
 				BufferedImage image = null;
 				image = ImageIO.read(file);
 				RenderImage ri = new RenderImage(image);
 				sift.detectFeatures(ri.toPixelFloatArray(null));
 				ImagePoint imagePoint = new ImagePoint(sift.getGlobalFeaturePoints());
 				try {
+					String expression = DataUtil.doubleArrayToExpression(ClusterUtils.distribute(imagePoint));
 					DBUtil.addExpression(username.get(), album.getId(), DataUtil.getMD5(file),
-							file.getAbsoluteFile().toURI().toString(),
-							DataUtil.doubleArrayToExpression(ClusterUtils.distribute(imagePoint)));
+							file.getAbsoluteFile().toURI().toString(), expression);
+					KDSearchUtil
+							.insertNode(
+									KDSearchUtil.constructKeyWithAlbumId(DataUtil.expressionTodoubleArray(expression,
+											KDSearchUtil.DIMENSIONS_OF_KDTREE), album.getId()),
+									photos.get(startIndex + i));
 				} catch (Exception e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -220,14 +226,10 @@ public class ShowPhotosStage extends BaseStage {
 						fails++;
 					} else {
 						size += file.length();
-						Photo photo = new Photo();
-						photo.setMd5(DataUtil.getMD5(file));
-						photo.setId(album.getId());
 						int index = file.getName().lastIndexOf(".");
-						photo.setName(file.getName().substring(0, index));
-						photo.setUri(path);
-						photo.setCreateDate(DateUtil.getFormatDate(file.lastModified()));
-						photo.setSize(file.length());
+						Photo photo = new Photo(album.getId(), path, DateUtil.getFormatDate(file.lastModified()),
+								file.getName().substring(0, index), DataUtil.getMD5(file), file.length(), "");
+						photo.setId(album.getId());
 						uris.add(path);
 						gv_photo.getItems().add(photo);
 					}
@@ -238,11 +240,10 @@ public class ShowPhotosStage extends BaseStage {
 				DBUtil.savePhotos(gv_photo.getItems(), getUsername());
 				album.setPhotosNumber(album.getPhotosNumber() + filesList.size());
 				album.setSize(size);
+
 			}
-
 			// sift 特征直方图存储;
-			new Thread(new RenderExpressionTask(filesList)).start();
-
+			new Thread(new RenderExpressionTask(filesList, gv_photo.getItems().size() - filesList.size())).start();
 		});
 	}
 
@@ -256,7 +257,8 @@ public class ShowPhotosStage extends BaseStage {
 			// 数据库中存储的文件路径为 file:(path),所以这里去掉了前5个字符:
 			File file = new File(photo.getUri().substring(5, photo.getUri().length()));
 			album.setSize(album.getSize() - file.length());
-
+			double[] key = DBUtil.getExpression(username.get(), photo.getMd5(), photo.getId());
+			KDSearchUtil.deleteNode(KDSearchUtil.constructKeyWithAlbumId(key, photo.getId()));
 		}
 	}
 }

@@ -58,14 +58,15 @@ public class ImageCell extends GridCell<Photo> {
 	private void configureItemSearch(MenuItem search_item) {
 		// TODO Auto-generated method stub
 		search_item.setOnAction(new EventHandler<ActionEvent>() {
-			
+
 			@Override
 			public void handle(ActionEvent event) {
 				// TODO Auto-generated method stub
-				KDSearchUtil.queryNearestPic(((ShowPhotosStage) getGridView().getScene().getWindow()).getUsername(), getItem());
+				KDSearchUtil.queryNearestPic(((ShowPhotosStage) getGridView().getScene().getWindow()).getUsername(),
+						getItem());
 			}
 		});
-		
+
 	}
 
 	private void configureItemRotate(MenuItem rotate_item) {

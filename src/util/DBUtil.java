@@ -12,6 +12,7 @@ import java.util.List;
 
 import com.sun.javafx.binding.StringFormatter;
 
+import cluster.KDSearchUtil;
 import cluster.Point;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -221,21 +222,24 @@ public class DBUtil {
 			statement = connection.prepareStatement(sql_select);
 			rs = statement.executeQuery();
 			while (rs.next()) {
-				Photo photo = new Photo();
-				String md5 = rs.getString(MD5);
-				int id = rs.getInt(PHOTO_ID);
-				String name = rs.getString(PHOTO_NAME);
-				String uri = rs.getString(PHOTO_URI);
-				String date = rs.getString(PHOTO_CREATEDATE);
-				String profile = rs.getString(PHOTO_PROFILE);
-				double size = rs.getDouble(PHOTO_SIZE);
-				photo.setMd5(md5);
-				photo.setId(id);
-				photo.setName(name);
-				photo.setUri(uri);
-				photo.setCreateDate(date);
-				photo.setProfile(profile);
-				photo.setSize(size);
+				Photo photo = new Photo(rs.getInt(PHOTO_ID), rs.getString(PHOTO_URI), rs.getString(PHOTO_CREATEDATE),
+						rs.getString(PHOTO_NAME), rs.getString(MD5), rs.getDouble(PHOTO_SIZE),
+						rs.getString(PHOTO_PROFILE));
+				// String md5 = rs.getString(MD5);
+				// int id = rs.getInt(PHOTO_ID);
+				// String name = rs.getString(PHOTO_NAME);
+				// String uri = rs.getString(PHOTO_URI);
+				// String date = rs.getString(PHOTO_CREATEDATE);
+				// String profile = rs.getString(PHOTO_PROFILE);
+				// double size = rs.getDouble(PHOTO_SIZE);
+				//
+				// photo.setMd5(md5);
+				// photo.setId(id);
+				// photo.setName(name);
+				// photo.setUri(uri);
+				// photo.setCreateDate(date);
+				// photo.setProfile(profile);
+				// photo.setSize(size);
 				photos.add(photo);
 			}
 		} catch (SQLException e) {
@@ -297,9 +301,40 @@ public class DBUtil {
 		return FXCollections.observableArrayList(photos);
 	}
 
+	public static ObservableList<Photo> queryPhoto(String username) {
+		String sql_select = "select * from photos_" + username;
+		List<Photo> photos = new ArrayList<>();
+		ResultSet rs;
+		getConnection();
+		try {
+			statement = connection.prepareStatement(sql_select);
+			rs = statement.executeQuery();
+			while (rs.next()) {
+				Photo photo = new Photo();
+				photo.setMd5(rs.getString(MD5));
+				photo.setId(rs.getInt(PHOTO_ID));
+				photo.setName(rs.getString(PHOTO_NAME));
+				photo.setUri(rs.getString(PHOTO_URI));
+				photo.setCreateDate(rs.getString(PHOTO_CREATEDATE));
+				photo.setProfile(rs.getString(PHOTO_PROFILE));
+				photo.setSize(rs.getDouble(PHOTO_SIZE));
+				photos.add(photo);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			String methodName = getCurrentMethod();
+			LogUtil.e(methodName, "无法获取相册信息");
+			e.printStackTrace();
+
+		} finally {
+			releaseConnection(getCurrentMethod());
+		}
+		return FXCollections.observableArrayList(photos);
+	}
+
 	public static boolean queryAlbum(String username, String albumName) {
 		getConnection();
-		String sql_query = "select name from albums_" + username + " where name =? " ;
+		String sql_query = "select name from albums_" + username + " where name =? ";
 		try {
 			statement = connection.prepareStatement(sql_query);
 			statement.setString(1, albumName);
@@ -315,7 +350,7 @@ public class DBUtil {
 			e.printStackTrace();
 			return false;
 		} finally {
-			 releaseConnection(getCurrentMethod());
+			releaseConnection(getCurrentMethod());
 		}
 
 	}
@@ -690,5 +725,30 @@ public class DBUtil {
 		} finally {
 			releaseConnection(getCurrentMethod());
 		}
+	}
+
+	public static double[] getExpression(String username, String md5, int id) {
+		String sql_query = "select expression from expressions_" + username + " where id = ? and md5 = ?";
+		getConnection();
+		try {
+			statement = connection.prepareStatement(sql_query);
+			statement.setInt(1, id);
+			statement.setString(2, md5);
+			ResultSet rs = statement.executeQuery();
+			rs.next();
+			if (rs.getRow() != 0) {
+				String expression = rs.getString(1);
+				return DataUtil.expressionTodoubleArray(expression, KDSearchUtil.DIMENSIONS_OF_KDTREE);
+
+			} else {
+				return null;
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			releaseConnection(getCurrentMethod());
+		}
+		return null;
 	}
 }

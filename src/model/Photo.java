@@ -134,4 +134,19 @@ public class Photo {
 		result = result * 37 + (int) (tmp ^ (tmp >>> 32));
 		return result;
 	}
+
+	public Photo() {
+		super();
+	}
+
+	public Photo(int id, String uri, String createDate, String name, String md5, double size, String profile) {
+		super();
+		setId(id);
+		setUri(uri);
+		setCreateDate(createDate);
+		setName(name);
+		setMd5(md5);
+		setSize(size);
+		setProfile(profile);
+	}
 }
