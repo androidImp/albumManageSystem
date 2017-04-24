@@ -4,6 +4,11 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
 
@@ -15,6 +20,7 @@ import com.alibaba.simpleimage.analyze.sift.render.RenderImage;
 import cluster.ClusterUtils;
 import cluster.ImagePoint;
 import cluster.KDSearchUtil;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -93,7 +99,7 @@ public class ShowPhotosStage extends BaseStage {
 			@Override
 			public void handle(WindowEvent event) {
 				// TODO Auto-generated method stub
-				DBUtil.savePhotos(gv_photo.getItems(), username.get());
+				DBUtil.savePhotosData(gv_photo.getItems(), username.get());
 			}
 		});
 	}
@@ -162,7 +168,7 @@ public class ShowPhotosStage extends BaseStage {
 			// TODO Auto-generated method stub
 			ObservableList<Photo> photos = DBUtil.getPhotosByAlbum(album.getId(), username.get());
 			gv_photo.setItems(photos);
-			System.out.println("大小: " + gv_photo.getItems().size());
+			// System.out.println("大小: " + gv_photo.getItems().size());
 			return null;
 		}
 	}
@@ -227,34 +233,98 @@ public class ShowPhotosStage extends BaseStage {
 		});
 	}
 
+	/**
+	 * 从文件列表中导入图片,并将其存储到数据库中
+	 * 
+	 * @param filesList
+	 *            文件列表
+	 */
 	private void importPicFromFiles(List<File> filesList) {
+		// TO DO 通过线程池的执行情况来添加加载情况的显示以便增加用户体验
 		if (filesList != null) {
 			fileChooser.setInitialFileName(filesList.get(0).getAbsolutePath());
-			double size = album.getSize();
-			int fails = 0;
-			for (int i = 0; i < filesList.size(); i++) {
-				File file = filesList.get(i);
-				String path = file.getAbsoluteFile().toURI().toString();
-				ObservableList<String> uris = album.getPhotosUri();
-				if (uris.contains(path)) {
-					// TO DO alert that insert fails;
-					fails++;
-				} else {
-					size += file.length();
-					int index = file.getName().lastIndexOf(".");
-					Photo photo = new Photo(album.getId(), path, DateUtil.getFormatDate(file.lastModified()),
-							file.getName().substring(0, index), ParseUtil.getMD5(file), file.length(), "");
-					photo.setModified(true);
-					uris.add(path);
-					gv_photo.getItems().add(photo);
+			// ExecutorService threadPool = Executors.newCachedThreadPool();
+			ThreadPoolExecutor executor = new ThreadPoolExecutor(8, Runtime.getRuntime().availableProcessors() * 4, 2,
+					TimeUnit.MINUTES, new LinkedBlockingQueue<>());
+			int size = filesList.size() / 20 + 1;
+			for (int i = 0; i < size; i++) {
+				int startIndex = 20 * i;
+				int endIndex = 20 * (i + 1);
+				if (endIndex > filesList.size()) {
+					endIndex = filesList.size();
 				}
+				RenderImageRunnable runnable = new RenderImageRunnable(filesList.subList(startIndex, endIndex), album);
+				executor.execute(runnable);
+				// for (int i = 0; i < filesList.size(); i++) {
+				// File file = filesList.get(i);
+				// String path = file.getAbsoluteFile().toURI().toString();
+				// ObservableList<String> uris = album.getPhotosUri();
+				// if (uris.contains(path)) {
+				// // TO DO alert that insert fails;
+				// fails++;
+				// } else {
+				// executor.execute(new Runnable() {
+				// public void run() {
+				// album.setSize(album.getSize() + file.length());
+				// album.setPhotosNumber(album.getPhotosNumber() + 1);
+				// int index = file.getName().lastIndexOf(".");
+				// Photo photo = new Photo(album.getId(), path,
+				// DateUtil.getFormatDate(file.lastModified()),
+				// file.getName().substring(0, index), ParseUtil.getMD5(file),
+				// file.length(), "");
+				// photo.setModified(true);
+				// BufferedImage image = null;
+				// try {
+				// image = ImageIO.read(file);
+				// } catch (IOException e1) {
+				// // TODO Auto-generated catch block
+				// e1.printStackTrace();
+				// }
+				// RenderImage ri = new RenderImage(image);
+				// SIFT sift = new SIFT();
+				// sift.detectFeatures(ri.toPixelFloatArray(null));
+				//
+				// ImagePoint imagePoint = new
+				// ImagePoint(sift.getGlobalFeaturePoints());
+				// try {
+				//
+				// double[] express = ClusterUtils.distribute(imagePoint);
+				// String expression =
+				// ParseUtil.doubleArrayToExpression(express);
+				//
+				// DBUtil.addExpression(username.get(), album.getId(),
+				// ParseUtil.getMD5(file),
+				// file.getAbsoluteFile().toURI().toString(), expression);
+				// KDSearchUtil.insertNode(KDSearchUtil.constructKeyWithAlbumId(express,
+				// album.getId()),
+				// photo);
+				//
+				// } catch (Exception e) {
+				// // TODO Auto-generated catch block
+				// e.printStackTrace();
+				// }
+				// Platform.runLater(new Runnable() {
+				//
+				// @Override
+				// public void run() {
+				// // TODO Auto-generated method stub
+				// uris.add(path);
+				// gv_photo.getItems().add(photo);
+				// }
+				// });
+				// }
+				//
+				// });
+				//
+				// }
 			}
-			DialogUtil.showDialog(AlertType.CONFIRMATION,
-					String.format("成功导入% d 张图片,其中有% d 张图片已存在而导入失败", filesList.size() - fails, fails), "相片导入情况");
-			DBUtil.savePhotos(gv_photo.getItems(), getUsername());
-			album.setPhotosNumber(album.getPhotosNumber() + filesList.size());
-			album.setSize(size);
-			new Thread(new RenderExpressionTask(filesList, gv_photo.getItems().size() - filesList.size())).start();
+			// DialogUtil.showDialog(AlertType.CONFIRMATION,
+			// String.format("成功导入% d 张图片,其中有% d 张图片已存在而导入失败", filesList.size()
+			// - fails, fails), "相片导入情况");
+			DBUtil.savePhotosData(gv_photo.getItems(), getUsername());
+
+			// new Thread(new RenderExpressionTask(filesList,
+			// gv_photo.getItems().size() - filesList.size())).start();
 		}
 
 	}
@@ -272,5 +342,73 @@ public class ShowPhotosStage extends BaseStage {
 			double[] key = DBUtil.getExpression(username.get(), photo.getMd5(), photo.getId());
 			KDSearchUtil.deleteNode(KDSearchUtil.constructKeyWithAlbumId(key, photo.getId()));
 		}
+	}
+
+	class RenderImageRunnable implements Runnable {
+		private List<File> files;
+		private Album album;
+
+		public RenderImageRunnable(List<File> files, Album album) {
+			// TODO Auto-generated constructor stub
+			this.files = files;
+			this.album = album;
+		}
+
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			ObservableList<String> uris = album.getPhotosUri();
+			SIFT sift = new SIFT();
+			for (File file : files) {
+				String path = file.getAbsoluteFile().toURI().toString();
+				if (uris.contains(path)) {
+					// TO DO deal with existing photo
+				} else {
+					album.setSize(album.getSize() + file.length());
+					album.setPhotosNumber(album.getPhotosNumber() + 1);
+
+					int index = file.getName().lastIndexOf(".");
+					Photo photo = new Photo(album.getId(), path, DateUtil.getFormatDate(file.lastModified()),
+							file.getName().substring(0, index), ParseUtil.getMD5(file), file.length(), "");
+					photo.setModified(true);
+					BufferedImage image = null;
+					try {
+						image = ImageIO.read(file);
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					RenderImage ri = new RenderImage(image);
+
+					sift.detectFeatures(ri.toPixelFloatArray(null));
+
+					ImagePoint imagePoint = new ImagePoint(sift.getGlobalFeaturePoints());
+					try {
+
+						double[] express = ClusterUtils.distribute(imagePoint);
+						String expression = ParseUtil.doubleArrayToExpression(express);
+
+						DBUtil.addExpression(username.get(), album.getId(), ParseUtil.getMD5(file),
+								file.getAbsoluteFile().toURI().toString(), expression);
+						KDSearchUtil.insertNode(KDSearchUtil.constructKeyWithAlbumId(express, album.getId()), photo);
+
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					Platform.runLater(new Runnable() {
+
+						@Override
+						public void run() {
+							// TODO Auto-generated method stub
+							uris.add(path);
+							gv_photo.getItems().add(photo);
+						}
+					});
+				}
+
+			}
+		}
+
 	}
 }

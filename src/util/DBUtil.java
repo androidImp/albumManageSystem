@@ -216,6 +216,92 @@ public class DBUtil {
 		}
 	}
 
+	public static void savePhotosData(List<Photo> photos, String username) {
+		getConnection();
+		String sql_select = "select md5,id from photos_" + username + " where md5 = ? and id = ?";
+		String sql_insert = "insert into photos_" + username
+				+ "(md5,id,name,uri,createDate,profile,size) values(?,?,?,?,?,?,?)";
+		String sql_update = "update photos_" + username
+				+ " set name=?,uri=?,createDate=?,profile=?,size=? where md5=? and id = ?";
+		PreparedStatement insert = null;
+		PreparedStatement update = null;
+		PreparedStatement select = null;
+		try {
+			insert = connection.prepareStatement(sql_insert);
+			update = connection.prepareStatement(sql_update);
+			connection.setAutoCommit(false);
+			for (Photo photo : photos) {
+				if (photo.isModified()) {
+					select = connection.prepareStatement(sql_select);
+					select.setString(1, photo.getMd5());
+					select.setInt(2, photo.getId());
+					ResultSet resultSet = select.executeQuery();
+					resultSet.next();
+					if (resultSet.getRow() == 0) {
+						insert.setString(1, photo.getMd5());
+						insert.setInt(2, photo.getId());
+						insert.setString(3, photo.getName());
+						insert.setString(4, photo.getUri());
+						insert.setString(5, photo.getCreateDate());
+						insert.setString(6, photo.getProfile());
+						insert.setDouble(7, photo.getSize());
+						select.close();
+						insert.addBatch();
+						// insert.executeUpdate();
+					} else {
+						update.setString(1, photo.getName());
+						update.setString(2, photo.getUri());
+						update.setString(3, photo.getCreateDate());
+						update.setString(4, photo.getProfile());
+						update.setDouble(5, photo.getSize());
+						update.setString(6, photo.getMd5());
+						update.setInt(7, photo.getId());
+						select.close();
+						update.addBatch();
+						// update.executeUpdate();
+
+					}
+				}
+
+			}
+			insert.executeBatch();
+			update.executeBatch();
+			connection.commit();
+			connection.setAutoCommit(true);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			String methodName = getCurrentMethod();
+			LogUtil.e(methodName, "无法保存相册信息");
+		} finally {
+			if (select != null) {
+				try {
+					select.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			if (insert != null) {
+				try {
+					insert.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			if (update != null) {
+				try {
+					update.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			releaseConnection(getCurrentMethod());
+		}
+	}
+
 	public static ObservableList<Album> getAlbums(String username) {
 		getConnection();
 		List<Album> albums = new ArrayList<>();
@@ -751,7 +837,9 @@ public class DBUtil {
 			statement.setString(2, md5);
 			statement.setString(3, uri);
 			statement.setString(4, expression);
+
 			statement.executeUpdate();
+
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

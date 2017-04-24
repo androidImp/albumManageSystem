@@ -40,7 +40,7 @@ import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
 import javafx.util.Callback;
 import model.Album;
-import model.ImageCell;
+import model.ImageListCell;
 import model.Photo;
 import util.DBUtil;
 import util.ParseUtil;
@@ -154,7 +154,7 @@ public class PhotoStage extends BaseStage {
 
 	public void configureListView() {
 		lv_photo.setItems(DBUtil.getPhotosByAlbum(album.getId(), username.get()));
-		lv_photo.setCellFactory((ListView<Photo> l) -> new ImageCell());
+		lv_photo.setCellFactory((ListView<Photo> l) -> new ImageListCell());
 		lv_photo.setOnMouseClicked(new EventHandler<Event>() {
 
 			@Override

@@ -2,6 +2,7 @@ package cluster;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.alibaba.simpleimage.analyze.sift.scale.FeaturePoint;
 
@@ -22,6 +23,7 @@ public class ImagePoint {
 	}
 
 	String url;
+
 	public double[] getExpression() {
 		return expression;
 	}

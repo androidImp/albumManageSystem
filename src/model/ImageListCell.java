@@ -6,7 +6,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 
-public class ImageCell extends ListCell<Photo> {
+public class ImageListCell extends ListCell<Photo> {
 	@Override
 	protected void updateItem(Photo item, boolean empty) {
 		// TODO Auto-generated method stub
