@@ -18,7 +18,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.util.Pair;
 import util.DBUtil;
-import util.DataUtil;
+import util.ParseUtil;
 import view.HomeStage;
 import view.LoginStage;
 import javafx.scene.control.Hyperlink;
@@ -39,7 +39,7 @@ public class loginController {
 		String username = tf_username.getText();
 		String password = tf_passsword.getText();
 		String encodedPassword;
-		encodedPassword = DataUtil.getMD5(password);
+		encodedPassword = ParseUtil.getMD5(password);
 		if (DBUtil.verifyUser(username, encodedPassword)) {
 			Platform.runLater(new Runnable() {
 
@@ -122,7 +122,7 @@ public class loginController {
 		});
 		Optional<Pair<String, String>> result = dialog.showAndWait();
 		result.ifPresent(albumNamePassword -> {
-			DBUtil.addUser(username.getText(), DataUtil.getMD5(password.getText()), nickname.getText());
+			DBUtil.addUser(username.getText(), ParseUtil.getMD5(password.getText()), nickname.getText());
 		});
 	}
 

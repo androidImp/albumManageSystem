@@ -2,15 +2,12 @@ package util;
 
 import java.security.MessageDigest;
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.sun.javafx.binding.StringFormatter;
 
 import cluster.KDSearchUtil;
 import cluster.Point;
@@ -21,8 +18,8 @@ import model.Photo;
 
 public class DBUtil {
 
-	private static Connection connection;
-	private static PreparedStatement statement;
+	private static Connection connection = null;
+	private static PreparedStatement statement = null;
 	// albums 表中元素的列号
 	public static int ID = 1;
 	public static int NAME = 2;
@@ -102,7 +99,7 @@ public class DBUtil {
 					insert.setString(5, album.getCreateDate());
 					insert.setInt(6, album.getPhotosNumber());
 					insert.setDouble(7, album.getSize());
-					insert.setString(8, DataUtil.parseListToString(album.getPhotosUri()));
+					insert.setString(8, ParseUtil.parseListToString(album.getPhotosUri()));
 					select.close();
 					insert.executeUpdate();
 				} else {
@@ -112,7 +109,7 @@ public class DBUtil {
 					update.setString(4, album.getCreateDate());
 					update.setInt(5, album.getPhotosNumber());
 					update.setDouble(6, album.getSize());
-					update.setString(7, DataUtil.parseListToString(album.getPhotosUri()));
+					update.setString(7, ParseUtil.parseListToString(album.getPhotosUri()));
 					update.setInt(8, album.getId());
 					select.close();
 					update.executeUpdate();
@@ -131,6 +128,14 @@ public class DBUtil {
 		}
 	}
 
+	/**
+	 * 将该用户所用户的图片存储到数据库中;
+	 * 
+	 * @param photos
+	 *            将要存储的图片对象
+	 * @param username
+	 *            图片的所有者
+	 */
 	public static void savePhotos(List<Photo> photos, String username) {
 		getConnection();
 		String sql_select = "select md5,id from photos_" + username + " where md5 = ? and id = ?";
@@ -138,47 +143,76 @@ public class DBUtil {
 				+ "(md5,id,name,uri,createDate,profile,size) values(?,?,?,?,?,?,?)";
 		String sql_update = "update photos_" + username
 				+ " set name=?,uri=?,createDate=?,profile=?,size=? where md5=? and id = ?";
+		PreparedStatement insert = null;
+		PreparedStatement update = null;
+		PreparedStatement select = null;
 		try {
-			PreparedStatement insert = connection.prepareStatement(sql_insert);
-			PreparedStatement update = connection.prepareStatement(sql_update);
+			insert = connection.prepareStatement(sql_insert);
+			update = connection.prepareStatement(sql_update);
 			for (Photo photo : photos) {
-				PreparedStatement select = connection.prepareStatement(sql_select);
-				select.setString(1, photo.getMd5());
-				select.setInt(2, photo.getId());
-				ResultSet resultSet = select.executeQuery();
-				resultSet.next();
-				if (resultSet.getRow() == 0) {
-					insert.setString(1, photo.getMd5());
-					insert.setInt(2, photo.getId());
-					insert.setString(3, photo.getName());
-					insert.setString(4, photo.getUri());
-					insert.setString(5, photo.getCreateDate());
-					insert.setString(6, photo.getProfile());
-					insert.setDouble(7, photo.getSize());
-					select.close();
-					insert.executeUpdate();
-				} else {
-					update.setString(1, photo.getName());
-					update.setString(2, photo.getUri());
-					update.setString(3, photo.getCreateDate());
-					update.setString(4, photo.getProfile());
-					update.setDouble(5, photo.getSize());
-					update.setString(6, photo.getMd5());
-					update.setInt(7, photo.getId());
-					select.close();
-					update.executeUpdate();
+				if (photo.isModified()) {
+					select = connection.prepareStatement(sql_select);
+					select.setString(1, photo.getMd5());
+					select.setInt(2, photo.getId());
+					ResultSet resultSet = select.executeQuery();
+					resultSet.next();
+					if (resultSet.getRow() == 0) {
+						insert.setString(1, photo.getMd5());
+						insert.setInt(2, photo.getId());
+						insert.setString(3, photo.getName());
+						insert.setString(4, photo.getUri());
+						insert.setString(5, photo.getCreateDate());
+						insert.setString(6, photo.getProfile());
+						insert.setDouble(7, photo.getSize());
+						select.close();
+						insert.executeUpdate();
+					} else {
+						update.setString(1, photo.getName());
+						update.setString(2, photo.getUri());
+						update.setString(3, photo.getCreateDate());
+						update.setString(4, photo.getProfile());
+						update.setDouble(5, photo.getSize());
+						update.setString(6, photo.getMd5());
+						update.setInt(7, photo.getId());
+						select.close();
+						update.executeUpdate();
 
+					}
 				}
 
 			}
-			insert.close();
-			update.close();
-			connection.close();
+
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			String methodName = getCurrentMethod();
 			LogUtil.e(methodName, "无法保存相册信息");
+		} finally {
+			if (select != null) {
+				try {
+					select.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			if (insert != null) {
+				try {
+					insert.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			if (update != null) {
+				try {
+					update.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			releaseConnection(getCurrentMethod());
 		}
 	}
 
@@ -198,7 +232,7 @@ public class DBUtil {
 				album.setCoverUri(rs.getString(COVERURI));
 				album.setCreateDate(rs.getString(CREATEDATE));
 				album.setSize(rs.getDouble(SIZE));
-				ObservableList<String> photosUri = DataUtil.parseUrlToList(rs.getString(PHOTOSURI));
+				ObservableList<String> photosUri = ParseUtil.parseUrlToList(rs.getString(PHOTOSURI));
 				album.setPhotosUri(photosUri);
 				albums.add(album);
 			}
@@ -547,12 +581,11 @@ public class DBUtil {
 
 	private static void releaseConnection(String curPos) {
 		try {
-			if (!connection.isClosed()) {
-				if (statement != null)
-					statement.close();
-			}
 
-			if (connection != null)
+			if (statement != null && !statement.isClosed())
+				statement.close();
+
+			if (connection != null && !connection.isClosed())
 				connection.close();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -648,7 +681,7 @@ public class DBUtil {
 			statement = connection.prepareStatement(sql_query);
 			ResultSet rs = statement.executeQuery();
 			while (rs.next()) {
-				Point point = new Point(DataUtil.expressionTodoubleArray(rs.getString(3), dimension));
+				Point point = new Point(ParseUtil.expressionTodoubleArray(rs.getString(3), dimension));
 				point.setId(rs.getInt(1));
 				point.setUrl(rs.getString(2));
 				points.add(point);
@@ -687,7 +720,7 @@ public class DBUtil {
 			rs.next();
 			if (rs.getRow() != 0) {
 				String string = rs.getString(1);
-				return DataUtil.expressionTodoubleArray(string, dimension);
+				return ParseUtil.expressionTodoubleArray(string, dimension);
 			}
 			return null;
 		} catch (SQLException e) {
@@ -738,7 +771,7 @@ public class DBUtil {
 			rs.next();
 			if (rs.getRow() != 0) {
 				String expression = rs.getString(1);
-				return DataUtil.expressionTodoubleArray(expression, KDSearchUtil.DIMENSIONS_OF_KDTREE);
+				return ParseUtil.expressionTodoubleArray(expression, KDSearchUtil.DIMENSIONS_OF_KDTREE);
 
 			} else {
 				return null;

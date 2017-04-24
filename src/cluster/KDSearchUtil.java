@@ -11,6 +11,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import model.ContentSearchItemCell;
 import model.Photo;
 import util.DBUtil;
 
@@ -60,13 +61,16 @@ public class KDSearchUtil {
 				Scene scene = new Scene(root, 400, 400);
 				stage.setScene(scene);
 				// 构造新的界面;
-				ListView<ImageView> listView = new ListView<ImageView>();
+				ListView<Photo> listView = new ListView<Photo>();
+				listView.setUserData(key);
+				listView.setCellFactory(param -> new ContentSearchItemCell());
 				root.getChildren().add(listView);
-				listView.getItems().add(new ImageView(photo.getUri()));
-				for (Photo ph : photos) {
-					ImageView imageView = new ImageView(ph.getUri());
-					listView.getItems().add(imageView);
-				}
+				listView.getItems().add(photo);
+				listView.getItems().addAll(photos);
+				// for (Photo ph : photos) {
+				// ImageView imageView = new ImageView(ph.getUri());
+				// listView.getItems().add(imageView);
+				// }
 				stage.show();
 			} catch (KeySizeException e) {
 				// TODO Auto-generated catch block

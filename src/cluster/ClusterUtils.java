@@ -68,4 +68,13 @@ public class ClusterUtils {
 		}
 		return Math.sqrt(distance);
 	}
+
+	public static double getSum(double[] key) {
+		// TODO Auto-generated method stub
+		double sum = 0.0;
+		for(int i = 0; i < key.length; i++){
+			sum += key[i] * key[i];
+		}
+		return Math.sqrt(sum);
+	}
 }

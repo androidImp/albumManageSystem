@@ -14,7 +14,7 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import util.DataUtil;
+import util.ParseUtil;
 
 public class AlbumCell extends ListCell<Album> {
 	@FXML
@@ -63,7 +63,7 @@ public class AlbumCell extends ListCell<Album> {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
 				// TODO Auto-generated method stub
-				ll_space_usage.setText(DataUtil.convertSizeToString(newValue.doubleValue()));
+				ll_space_usage.setText(ParseUtil.convertSizeToString(newValue.doubleValue()));
 			}
 		});
 	}
@@ -71,7 +71,7 @@ public class AlbumCell extends ListCell<Album> {
 	private void addContent(Album item) {
 		img_cover.setImage(new Image(item.getCoverUri()));
 		ll_name.setText(item.getAlbumName());
-		ll_space_usage.setText(DataUtil.convertSizeToString(item.getSize()));
+		ll_space_usage.setText(ParseUtil.convertSizeToString(item.getSize()));
 		ll_created_date.setText(item.getCreateDate());
 		setGraphic(root);
 	}

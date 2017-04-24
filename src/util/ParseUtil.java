@@ -13,7 +13,7 @@ import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-public class DataUtil {
+public class ParseUtil {
 	public static String STRING_SEPARATOR = ",";
 
 	public static String convertSizeToString(double size) {
@@ -82,7 +82,7 @@ public class DataUtil {
 
 	public static String getMD5(File file) {
 		if (!file.exists() || !file.isFile()) {
-			LogUtil.e(DataUtil.class.getName(), "当前地址的文件已经移动或者删除,无法获取!");
+			LogUtil.e(ParseUtil.class.getName(), "当前地址的文件已经移动或者删除,无法获取!");
 			return null;
 		}
 
@@ -98,10 +98,10 @@ public class DataUtil {
 			}
 			in.close();
 		} catch (NoSuchAlgorithmException e) {
-			LogUtil.e(DataUtil.class.getName(), "使用的错误的加密算法名称");
+			LogUtil.e(ParseUtil.class.getName(), "使用的错误的加密算法名称");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			LogUtil.e(DataUtil.class.getName(), "文件读取错误!");
+			LogUtil.e(ParseUtil.class.getName(), "文件读取错误!");
 		}
 		BigInteger bigInt = new BigInteger(1, digest.digest());
 		return bigInt.toString(16);

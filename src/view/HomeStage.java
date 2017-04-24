@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.prefs.Preferences;
 
 import org.apache.commons.math3.ml.clustering.CentroidCluster;
@@ -26,6 +27,10 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Side;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
@@ -35,6 +40,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.WindowEvent;
 import model.Album;
@@ -353,10 +359,18 @@ public class HomeStage extends BaseStage {
 			@Override
 			public void handle(ActionEvent event) {
 				// TODO Auto-generated method stub
-				ls_album.getItems().clear();
-				DBUtil.deleteAlbum(username.get());
-				DBUtil.deletePhoto(username.get());
-				DBUtil.deleteExpressions(username.get());
+				Alert alert = new Alert(AlertType.WARNING);
+				alert.setTitle("删除相册");
+				alert.setContentText("确定要清除当前存储的内容吗?");
+				Optional<ButtonType> resultType = alert.showAndWait();
+				if (resultType.isPresent()) {
+					ls_album.getItems().clear();
+					DBUtil.deleteAlbum(username.get());
+					DBUtil.deletePhoto(username.get());
+					DBUtil.deleteExpressions(username.get());
+
+				}
+
 			}
 		});
 

@@ -35,7 +35,7 @@ import javafx.util.Callback;
 import javafx.util.Pair;
 import model.Album;
 import util.DBUtil;
-import util.DataUtil;
+import util.ParseUtil;
 import util.DateUtil;
 import util.DialogUtil;
 import view.HomeStage;
@@ -98,7 +98,7 @@ public class homePageController {
 							@Override
 							public String call() throws Exception {
 								// TODO Auto-generated method stub
-								return DataUtil.convertSizeToString(param.getValue().getSize());
+								return ParseUtil.convertSizeToString(param.getValue().getSize());
 
 							}
 						}, param.getValue().sizeProperty());
@@ -179,7 +179,7 @@ public class homePageController {
 				// String name = ((HomeStage)
 				// tv_album.getScene().getWindow()).getName();
 				DBUtil.saveAlbums(tv_album.getItems(), name);
-			}else{
+			} else {
 				DialogUtil.showDialog(AlertType.CONFIRMATION, "已存在同名相册,请更改你想要的相册名后再试", "添加相册情况");
 			}
 

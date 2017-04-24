@@ -43,7 +43,7 @@ import model.Album;
 import model.ImageCell;
 import model.Photo;
 import util.DBUtil;
-import util.DataUtil;
+import util.ParseUtil;
 import util.DateUtil;
 import util.FileChooserUtil;
 import util.LogUtil;
@@ -274,7 +274,7 @@ public class PhotoStage extends BaseStage {
 					String path = file.getAbsoluteFile().toURI().toString();
 					size += file.length();
 					Photo photo = new Photo();
-					photo.setMd5(DataUtil.getMD5(file));
+					photo.setMd5(ParseUtil.getMD5(file));
 					photo.setId(album.getId());
 					photo.setName(file.getName());
 					photo.setUri(path);
@@ -301,9 +301,9 @@ public class PhotoStage extends BaseStage {
 						sift.detectFeatures(ri.toPixelFloatArray(null));
 						ImagePoint imagePoint = new ImagePoint(sift.getGlobalFeaturePoints());
 						try {
-							DBUtil.addExpression(username.get(), album.getId(), DataUtil.getMD5(file),
+							DBUtil.addExpression(username.get(), album.getId(), ParseUtil.getMD5(file),
 									file.getAbsoluteFile().toURI().toString(),
-									DataUtil.doubleArrayToExpression(ClusterUtils.distribute(imagePoint)));
+									ParseUtil.doubleArrayToExpression(ClusterUtils.distribute(imagePoint)));
 						} catch (Exception e1) {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();

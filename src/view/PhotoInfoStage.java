@@ -10,7 +10,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import model.Photo;
-import util.DataUtil;
+import util.ParseUtil;
 
 public class PhotoInfoStage extends BaseStage {
 	Parent root = null;
@@ -43,7 +43,7 @@ public class PhotoInfoStage extends BaseStage {
 		configureProfile(photo);
 		ll_createDate.setText(photo.getCreateDate());
 		ll_path.setText(photo.getUri());
-		ll_size.setText(DataUtil.convertSizeToString(photo.getSize()));
+		ll_size.setText(ParseUtil.convertSizeToString(photo.getSize()));
 	}
 
 	private void configureName(Photo photo) {
@@ -54,6 +54,7 @@ public class PhotoInfoStage extends BaseStage {
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
 				// TODO Auto-generated method stub
 				photo.setName(newValue);
+				photo.setModified(true);
 			}
 		});
 	}
@@ -66,6 +67,7 @@ public class PhotoInfoStage extends BaseStage {
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
 				// TODO Auto-generated method stub
 				photo.setProfile(newValue);
+				photo.setModified(true);
 			}
 		});
 	}

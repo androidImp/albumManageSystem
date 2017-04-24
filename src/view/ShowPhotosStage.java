@@ -38,7 +38,7 @@ import javafx.stage.WindowEvent;
 import model.Album;
 import model.Photo;
 import util.DBUtil;
-import util.DataUtil;
+import util.ParseUtil;
 import util.DateUtil;
 import util.DialogUtil;
 import util.FileChooserUtil;
@@ -182,20 +182,21 @@ public class ShowPhotosStage extends BaseStage {
 			// TODO Auto-generated method stub
 			SIFT sift = new SIFT();
 			ObservableList<Photo> photos = gv_photo.getItems();
-			for (int i = 0; i < filesList.size(); i++) {
-				File file = filesList.get(i);
+			for (int i = startIndex; i < photos.size(); i++) {
+				File file = new File(photos.get(i).getUri());
 				BufferedImage image = null;
 				image = ImageIO.read(file);
 				RenderImage ri = new RenderImage(image);
 				sift.detectFeatures(ri.toPixelFloatArray(null));
 				ImagePoint imagePoint = new ImagePoint(sift.getGlobalFeaturePoints());
 				try {
-					String expression = DataUtil.doubleArrayToExpression(ClusterUtils.distribute(imagePoint));
-					DBUtil.addExpression(username.get(), album.getId(), DataUtil.getMD5(file),
+					String expression = ParseUtil.doubleArrayToExpression(ClusterUtils.distribute(imagePoint));
+
+					DBUtil.addExpression(username.get(), album.getId(), ParseUtil.getMD5(file),
 							file.getAbsoluteFile().toURI().toString(), expression);
 					KDSearchUtil
 							.insertNode(
-									KDSearchUtil.constructKeyWithAlbumId(DataUtil.expressionTodoubleArray(expression,
+									KDSearchUtil.constructKeyWithAlbumId(ParseUtil.expressionTodoubleArray(expression,
 											KDSearchUtil.DIMENSIONS_OF_KDTREE), album.getId()),
 									photos.get(startIndex + i));
 				} catch (Exception e1) {
@@ -213,38 +214,42 @@ public class ShowPhotosStage extends BaseStage {
 		btn_add.setOnAction((final ActionEvent e) -> {
 			FileChooserUtil.configureFileChooser(fileChooser);
 			List<File> filesList = fileChooser.showOpenMultipleDialog(ShowPhotosStage.this);
-			if (filesList != null) {
-				fileChooser.setInitialFileName(filesList.get(0).getAbsolutePath());
-				double size = album.getSize();
-				int fails = 0;
-				for (int i = 0; i < filesList.size(); i++) {
-					File file = filesList.get(i);
-					String path = file.getAbsoluteFile().toURI().toString();
-					ObservableList<String> uris = album.getPhotosUri();
-					if (uris.contains(path)) {
-						// TO DO alert that insert fails;
-						fails++;
-					} else {
-						size += file.length();
-						int index = file.getName().lastIndexOf(".");
-						Photo photo = new Photo(album.getId(), path, DateUtil.getFormatDate(file.lastModified()),
-								file.getName().substring(0, index), DataUtil.getMD5(file), file.length(), "");
-						photo.setId(album.getId());
-						uris.add(path);
-						gv_photo.getItems().add(photo);
-					}
-
-				}
-				DialogUtil.showDialog(AlertType.CONFIRMATION,
-						String.format("成功导入% d 张图片,其中有% d 张图片已存在而导入失败", filesList.size() - fails, fails), "相片导入情况");
-				DBUtil.savePhotos(gv_photo.getItems(), getUsername());
-				album.setPhotosNumber(album.getPhotosNumber() + filesList.size());
-				album.setSize(size);
-
-			}
+			importPicFromFiles(filesList);
 			// sift 特征直方图存储;
-			new Thread(new RenderExpressionTask(filesList, gv_photo.getItems().size() - filesList.size())).start();
+
 		});
+	}
+
+	private void importPicFromFiles(List<File> filesList) {
+		if (filesList != null) {
+			fileChooser.setInitialFileName(filesList.get(0).getAbsolutePath());
+			double size = album.getSize();
+			int fails = 0;
+			for (int i = 0; i < filesList.size(); i++) {
+				File file = filesList.get(i);
+				String path = file.getAbsoluteFile().toURI().toString();
+				ObservableList<String> uris = album.getPhotosUri();
+				if (uris.contains(path)) {
+					// TO DO alert that insert fails;
+					fails++;
+				} else {
+					size += file.length();
+					int index = file.getName().lastIndexOf(".");
+					Photo photo = new Photo(album.getId(), path, DateUtil.getFormatDate(file.lastModified()),
+							file.getName().substring(0, index), ParseUtil.getMD5(file), file.length(), "");
+					photo.setModified(true);
+					uris.add(path);
+					gv_photo.getItems().add(photo);
+				}
+			}
+			DialogUtil.showDialog(AlertType.CONFIRMATION,
+					String.format("成功导入% d 张图片,其中有% d 张图片已存在而导入失败", filesList.size() - fails, fails), "相片导入情况");
+			DBUtil.savePhotos(gv_photo.getItems(), getUsername());
+			album.setPhotosNumber(album.getPhotosNumber() + filesList.size());
+			album.setSize(size);
+			new Thread(new RenderExpressionTask(filesList, gv_photo.getItems().size() - filesList.size())).start();
+		}
+
 	}
 
 	public void deletePhoto(int index) {

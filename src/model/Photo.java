@@ -1,5 +1,6 @@
 package model;
 
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -33,6 +34,7 @@ public class Photo {
 	 * 相片描述
 	 */
 	private SimpleStringProperty profile = new SimpleStringProperty(this, "profile");
+	private SimpleBooleanProperty modified = new SimpleBooleanProperty(this, "modified");
 
 	// /**
 	// * SIFT 特征值;
@@ -137,6 +139,7 @@ public class Photo {
 
 	public Photo() {
 		super();
+		modified.set(false);
 	}
 
 	public Photo(int id, String uri, String createDate, String name, String md5, double size, String profile) {
@@ -148,5 +151,19 @@ public class Photo {
 		setMd5(md5);
 		setSize(size);
 		setProfile(profile);
+		modified.set(false);
 	}
+
+	public final SimpleBooleanProperty modifiedProperty() {
+		return this.modified;
+	}
+
+	public final boolean isModified() {
+		return this.modifiedProperty().get();
+	}
+
+	public final void setModified(final boolean modified) {
+		this.modifiedProperty().set(modified);
+	}
+
 }

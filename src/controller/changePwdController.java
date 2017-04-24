@@ -7,7 +7,7 @@ import javafx.scene.control.Button;
 
 import javafx.scene.control.PasswordField;
 import util.DBUtil;
-import util.DataUtil;
+import util.ParseUtil;
 import view.ChangePwdStage;
 
 public class changePwdController {
@@ -29,8 +29,8 @@ public class changePwdController {
 		String confirmPwd = pf_confirm_pwd.getText();
 		String username = ((ChangePwdStage) pf_pwd.getScene().getWindow()).getUsername();
 		if (newPwd.equals(confirmPwd)) {
-			if (DBUtil.verifyUser(username, DataUtil.getMD5(originalPwd))) {
-				DBUtil.updateUserInfo(username, DataUtil.getMD5(newPwd), "");
+			if (DBUtil.verifyUser(username, ParseUtil.getMD5(originalPwd))) {
+				DBUtil.updateUserInfo(username, ParseUtil.getMD5(newPwd), "");
 			} else {
 				showPrompt(AlertType.ERROR, "输入的原始密码错误");
 			}

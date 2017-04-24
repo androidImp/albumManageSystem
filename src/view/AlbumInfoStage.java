@@ -11,7 +11,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import model.Album;
-import util.DataUtil;
+import util.ParseUtil;
 
 public class AlbumInfoStage extends BaseStage {
 	private Album album;
@@ -47,7 +47,7 @@ public class AlbumInfoStage extends BaseStage {
 		tf_profile.setText(album.getAlbumProfile());
 		ll_date.setText(album.getCreateDate());
 		ll_count.setText(String.valueOf(album.getPhotosNumber()));
-		ll_size.setText(DataUtil.convertSizeToString(album.getSize()));
+		ll_size.setText(ParseUtil.convertSizeToString(album.getSize()));
 	}
 
 	public void configureName() {
