@@ -37,7 +37,7 @@ public class ContentSearchItemCell extends ListCell<Photo> {
 			VBox vBox_img = new VBox();
 			vBox_img.setAlignment(Pos.CENTER);
 			ImageView imageView = new ImageView(item.getUri());
-			imageView.setFitHeight(100);
+			imageView.setFitWidth(100);
 			imageView.setPreserveRatio(true);
 			vBox_img.getChildren().addAll(imageView);
 			VBox vBox_info = new VBox(10);
@@ -48,6 +48,7 @@ public class ContentSearchItemCell extends ListCell<Photo> {
 			Label ll_resemblance = new Label();
 
 			double[] key = (double[]) getListView().getUserData();
+			// TO DO "123" 改为当前用户名
 			double expression[] = DBUtil.getExpression("123", getItem().getMd5(), getItem().getId());
 
 			try {

@@ -44,10 +44,14 @@ public class KDSearchUtil {
 				e.printStackTrace();
 			}
 		}
+		System.out.println("配置 KD 树结束");
 	}
 
 	public static void queryNearestPic(String username, Photo photo) {
+		System.out.println("开始查询相似图片");
 		double[] key = DBUtil.queryExpression(username, DIMENSIONS_OF_KDTREE, photo.getId(), photo.getMd5());
+		if (key == null)
+			System.out.println("key is null");
 		if (key != null) {
 			try {
 				double[] query = new double[key.length + 1];
@@ -67,10 +71,6 @@ public class KDSearchUtil {
 				root.getChildren().add(listView);
 				listView.getItems().add(photo);
 				listView.getItems().addAll(photos);
-				// for (Photo ph : photos) {
-				// ImageView imageView = new ImageView(ph.getUri());
-				// listView.getItems().add(imageView);
-				// }
 				stage.show();
 			} catch (KeySizeException e) {
 				// TODO Auto-generated catch block
@@ -80,6 +80,7 @@ public class KDSearchUtil {
 				e.printStackTrace();
 			}
 		}
+		System.out.println("查询相似图片结束");
 	}
 
 	public static double[] constructKeyWithAlbumId(double[] preKey, int id) {
@@ -93,6 +94,7 @@ public class KDSearchUtil {
 	}
 
 	public static void deleteNode(double key[]) {
+		System.out.println("删除节点");
 		try {
 			kdTree.delete(key);
 		} catch (KeySizeException | KeyMissingException e) {
@@ -102,6 +104,7 @@ public class KDSearchUtil {
 	}
 
 	public static void insertNode(double key[], Photo value) {
+		System.out.println("添加节点");
 		try {
 			kdTree.insert(key, value);
 		} catch (KeySizeException | KeyDuplicateException e) {

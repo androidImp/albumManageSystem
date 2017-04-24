@@ -178,30 +178,37 @@ public class ShowPhotosStage extends BaseStage {
 		}
 
 		@Override
-		protected Void call() throws Exception {
+		protected Void call() {
 			// TODO Auto-generated method stub
 			SIFT sift = new SIFT();
 			ObservableList<Photo> photos = gv_photo.getItems();
 			for (int i = startIndex; i < photos.size(); i++) {
-				File file = new File(photos.get(i).getUri());
+				File file = new File(photos.get(i).getUri().substring(5));
 				BufferedImage image = null;
-				image = ImageIO.read(file);
+				try {
+					image = ImageIO.read(file);
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 				RenderImage ri = new RenderImage(image);
+
 				sift.detectFeatures(ri.toPixelFloatArray(null));
+
 				ImagePoint imagePoint = new ImagePoint(sift.getGlobalFeaturePoints());
 				try {
-					String expression = ParseUtil.doubleArrayToExpression(ClusterUtils.distribute(imagePoint));
+
+					double[] express = ClusterUtils.distribute(imagePoint);
+					String expression = ParseUtil.doubleArrayToExpression(express);
 
 					DBUtil.addExpression(username.get(), album.getId(), ParseUtil.getMD5(file),
 							file.getAbsoluteFile().toURI().toString(), expression);
-					KDSearchUtil
-							.insertNode(
-									KDSearchUtil.constructKeyWithAlbumId(ParseUtil.expressionTodoubleArray(expression,
-											KDSearchUtil.DIMENSIONS_OF_KDTREE), album.getId()),
-									photos.get(startIndex + i));
-				} catch (Exception e1) {
+					KDSearchUtil.insertNode(KDSearchUtil.constructKeyWithAlbumId(express, album.getId()),
+							photos.get(startIndex + i));
+
+				} catch (Exception e) {
 					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					e.printStackTrace();
 				}
 			}
 			return null;
