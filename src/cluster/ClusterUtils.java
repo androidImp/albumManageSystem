@@ -59,6 +59,9 @@ public class ClusterUtils {
 	 * @throws Exception
 	 */
 	public static double getDistance(double[] a, double[] b) throws Exception {
+		if(a == null ||  b == null){
+			throw new Exception("Point cann't be null");
+		}
 		if (a.length != b.length) {
 			throw new Exception("获取两点间的距离出错,两个点的数量不一致");
 		}

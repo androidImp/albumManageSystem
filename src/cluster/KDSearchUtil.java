@@ -84,6 +84,9 @@ public class KDSearchUtil {
 	}
 
 	public static double[] constructKeyWithAlbumId(double[] preKey, int id) {
+		if (preKey == null) {
+			return null;
+		}
 		int len = preKey.length;
 		double[] key = new double[len + 1];
 		for (int i = 0; i < len; i++) {
@@ -111,5 +114,9 @@ public class KDSearchUtil {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	public static void clearNode() {
+		kdTree = new KDTree<>(DIMENSIONS_OF_KDTREE + 1);
 	}
 }

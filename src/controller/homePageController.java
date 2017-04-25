@@ -170,15 +170,10 @@ public class homePageController {
 				album.setSize(0.0);
 				album.setCoverUri("Pic/emptyCover.png");
 				album.setPhotosUri(FXCollections.observableArrayList());
-				// ls_album.getItems().add(album);
-				// String name = ((HomeStage)
-				// ls_album.getScene().getWindow()).getName();
-				// DBUtil.saveAlbums(ls_album.getItems(), name);
 				tv_album.getItems().add(album);
 				String name = homeStage.getName();
-				// String name = ((HomeStage)
-				// tv_album.getScene().getWindow()).getName();
-				DBUtil.saveAlbums(tv_album.getItems(), name);
+				DBUtil.saveAlbumInfo(album, name);
+
 			} else {
 				DialogUtil.showDialog(AlertType.CONFIRMATION, "已存在同名相册,请更改你想要的相册名后再试", "添加相册情况");
 			}

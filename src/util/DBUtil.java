@@ -21,22 +21,22 @@ public class DBUtil {
 	private static Connection connection = null;
 	private static PreparedStatement statement = null;
 	// albums 表中元素的列号
-	public static int ID = 1;
-	public static int NAME = 2;
-	public static int PROFILE = 3;
-	public static int COVERURI = 4;
-	public static int CREATEDATE = 5;
-	public static int PHOTONUMBER = 6;
-	public static int SIZE = 7;
+	public final static int ID = 1;
+	public final static int NAME = 2;
+	public final static int PROFILE = 3;
+	public final static int COVERURI = 4;
+	public final static int CREATEDATE = 5;
+	public final static int PHOTONUMBER = 6;
+	public final static int SIZE = 7;
 	// photos 表中元素的列号
-	public static int PHOTOSURI = 8;
-	public static int MD5 = 1;
-	public static int PHOTO_ID = 2;
-	public static int PHOTO_NAME = 3;
-	public static int PHOTO_URI = 4;
-	public static int PHOTO_CREATEDATE = 5;
-	public static int PHOTO_PROFILE = 6;
-	public static int PHOTO_SIZE = 7;
+	public final static int PHOTOSURI = 8;
+	public final static int MD5 = 1;
+	public final static int PHOTO_ID = 2;
+	public final static int PHOTO_NAME = 3;
+	public final static int PHOTO_URI = 4;
+	public final static int PHOTO_CREATEDATE = 5;
+	public final static int PHOTO_PROFILE = 6;
+	public final static int PHOTO_SIZE = 7;
 
 	public static void getConnection() {
 		try {
@@ -318,6 +318,7 @@ public class DBUtil {
 				album.setCoverUri(rs.getString(COVERURI));
 				album.setCreateDate(rs.getString(CREATEDATE));
 				album.setSize(rs.getDouble(SIZE));
+				album.setPhotosNumber(rs.getInt(PHOTONUMBER));
 				ObservableList<String> photosUri = ParseUtil.parseUrlToList(rs.getString(PHOTOSURI));
 				album.setPhotosUri(photosUri);
 				albums.add(album);
@@ -871,5 +872,93 @@ public class DBUtil {
 			releaseConnection(getCurrentMethod());
 		}
 		return null;
+	}
+
+	public static void addExpressionBatch(String name, int id, List<Photo> photos, List<String> expressionToAdd) {
+		// TODO Auto-generated method stub
+		String sql_insert = "insert into expressions_" + name + " (id,md5,uri,expression) values(?,?,?,?)";
+		getConnection();
+		try {
+			statement = connection.prepareStatement(sql_insert);
+			connection.setAutoCommit(false);
+			for (int i = 0; i < photos.size(); i++) {
+				Photo photo = photos.get(i);
+				statement.setInt(1, id);
+				statement.setString(2, photo.getMd5());
+				statement.setString(3, photo.getUri());
+				statement.setString(4, expressionToAdd.get(i));
+				statement.addBatch();
+			}
+			statement.executeBatch();
+			connection.commit();
+			connection.setAutoCommit(true);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			try {
+				connection.rollback();
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+				LogUtil.e(getCurrentMethod(), "批量插入直方图表示时出现问题,回滚失败");
+			}
+
+		} finally {
+			releaseConnection(getCurrentMethod());
+		}
+	}
+
+	public static void saveAlbumInfo(Album album, String username) {
+		getConnection();
+		String sql_insert = "insert into albums_" + username
+				+ "(id,name,profile,coverUri,createDate,photoNumber,size,photosUri) values(?,?,?,?,?,?,?,?)";
+		try {
+			statement = connection.prepareStatement(sql_insert);
+			statement.setInt(1, album.getId());
+			statement.setString(2, album.getAlbumName());
+			statement.setString(3, album.getAlbumProfile());
+			statement.setString(4, album.getCoverUri());
+			statement.setString(5, album.getCreateDate());
+			statement.setInt(6, album.getPhotosNumber());
+			statement.setDouble(7, album.getSize());
+			statement.setString(8, ParseUtil.parseListToString(album.getPhotosUri()));
+			statement.executeUpdate();
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			String methodName = getCurrentMethod();
+			LogUtil.e(methodName, "保存相册信息出错");
+			e.printStackTrace();
+		} finally {
+			releaseConnection(getCurrentMethod());
+		}
+	}
+
+	public static void updateAlbumInfo(String username, Album album) {
+		// TODO Auto-generated method stub
+		getConnection();
+		String sql_update = "update albums_" + username
+				+ " set name=?,profile=?,coverUri=?,createDate=?,photoNumber=?,size=?,photosUri=? where id=?";
+		try {
+			statement = connection.prepareStatement(sql_update);
+			statement.setString(1, album.getAlbumName());
+			statement.setString(2, album.getAlbumProfile());
+			statement.setString(3, album.getCoverUri());
+			statement.setString(4, album.getCreateDate());
+			statement.setInt(5, album.getPhotosNumber());
+			statement.setDouble(6, album.getSize());
+			statement.setString(7, ParseUtil.parseListToString(album.getPhotosUri()));
+			statement.setInt(8, album.getId());
+			statement.executeUpdate();
+			System.out.println("photosNumber: " + album.getPhotosNumber());
+			System.out.println("update album at: " + album.getId());
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			String methodName = getCurrentMethod();
+			LogUtil.e(methodName, "更新相册信息出错");
+			e.printStackTrace();
+		} finally {
+			releaseConnection(getCurrentMethod());
+		}
 	}
 }

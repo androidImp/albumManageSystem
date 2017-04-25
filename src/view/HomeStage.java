@@ -51,8 +51,8 @@ import util.DBUtil;
 public class HomeStage extends BaseStage {
 	public static int index;
 
-	// ListView<Album> ls_album;
-	TableView<Album> ls_album;
+
+	TableView<Album> tv_album;
 	Parent root = null;
 	Label ll_name;
 	TextField tf_search;
@@ -159,7 +159,7 @@ public class HomeStage extends BaseStage {
 				// 可以使用 JAXB
 				Preferences preferences = Preferences.userNodeForPackage(getClass());
 				preferences.putInt("index", index);
-				DBUtil.saveAlbums(ls_album.getItems(), username.get());
+				// DBUtil.saveAlbums(tv_album.getItems(), username.get());
 				Platform.exit();
 			}
 		});
@@ -231,13 +231,12 @@ public class HomeStage extends BaseStage {
 	 */
 	private void configureData() {
 		DBUtil.createPhotosTable(username.get());
-		// ls_album.setItems(DBUtil.getAlbums(username.get()));
+
 	}
 
 	@SuppressWarnings("unchecked")
 	private void initView() {
-		// ls_album = (ListView<Album>) root.lookup("#ls_album");
-		ls_album = (TableView<Album>) root.lookup("#tv_album");
+		tv_album = (TableView<Album>) root.lookup("#tv_album");
 		tf_search = (TextField) root.lookup("#tf_search");
 		ll_name = (Label) root.lookup("#ll_name");
 		ll_name.setText(username.get());
@@ -287,13 +286,13 @@ public class HomeStage extends BaseStage {
 
 	public void initAlbumList() {
 
-		ls_album.setOnMouseClicked(new EventHandler<Event>() {
+		tv_album.setOnMouseClicked(new EventHandler<Event>() {
 
 			@Override
 			public void handle(Event event) {
 				// TODO Auto-generated method stub
 				if (((MouseEvent) event).getClickCount() >= 2) {
-					Album album = ls_album.getSelectionModel().getSelectedItem();
+					Album album = tv_album.getSelectionModel().getSelectedItem();
 					if (album != null) {
 						// new PhotoStage(album, getName()).show();
 						new ShowPhotosStage(album, getName());
@@ -313,10 +312,10 @@ public class HomeStage extends BaseStage {
 			@Override
 			public void handle(ActionEvent event) {
 				// TODO Auto-generated method stub
-				int index = ls_album.getSelectionModel().getSelectedIndex();
+				int index = tv_album.getSelectionModel().getSelectedIndex();
 				if (index != -1) {
-					int id = ls_album.getSelectionModel().getSelectedItem().getId();
-					ls_album.getItems().remove(index);
+					int id = tv_album.getSelectionModel().getSelectedItem().getId();
+					tv_album.getItems().remove(index);
 					DBUtil.deleteAlbum(id, username.get());
 					DBUtil.deletePhotoByAlbum(id, username.get());
 					DBUtil.deleteExpressionsOfAlbum(username.get(), id);
@@ -328,7 +327,7 @@ public class HomeStage extends BaseStage {
 			@Override
 			public void handle(ActionEvent event) {
 				// TODO Auto-generated method stub
-				new AlbumInfoStage(ls_album.getSelectionModel().getSelectedItem());
+				new AlbumInfoStage(tv_album.getSelectionModel().getSelectedItem());
 			}
 		});
 		open_item.setOnAction(new EventHandler<ActionEvent>() {
@@ -336,12 +335,12 @@ public class HomeStage extends BaseStage {
 			@Override
 			public void handle(ActionEvent event) {
 				// TODO Auto-generated method stub
-				new PhotoStage(ls_album.getSelectionModel().getSelectedItem(), getName()).show();
+				new PhotoStage(tv_album.getSelectionModel().getSelectedItem(), getName()).show();
 
 			}
 		});
 		menu.getItems().addAll(open_item, scan_item, delete_item);
-		ls_album.setContextMenu(menu);
+		tv_album.setContextMenu(menu);
 	}
 
 	public void setName(String name) {
@@ -364,11 +363,11 @@ public class HomeStage extends BaseStage {
 				alert.setContentText("确定要清除当前存储的内容吗?");
 				Optional<ButtonType> resultType = alert.showAndWait();
 				if (resultType.isPresent()) {
-					ls_album.getItems().clear();
+					tv_album.getItems().clear();
 					DBUtil.deleteAlbum(username.get());
 					DBUtil.deletePhoto(username.get());
 					DBUtil.deleteExpressions(username.get());
-
+					KDSearchUtil.clearNode();
 				}
 
 			}

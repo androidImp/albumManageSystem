@@ -3,6 +3,7 @@ package view;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -50,6 +51,7 @@ import util.DialogUtil;
 import util.FileChooserUtil;
 
 public class ShowPhotosStage extends BaseStage {
+	private static final int BATCH_OF_IMAGE_RENDER = 10;
 	SimpleStringProperty username = new SimpleStringProperty("name");
 	private Album album;
 	GridView<Photo> gv_photo;
@@ -66,6 +68,7 @@ public class ShowPhotosStage extends BaseStage {
 		// TODO Auto-generated constructor stub
 		setUsername(name);
 		this.album = album;
+		System.out.println(album.getPhotosNumber());
 		initView();
 		lookUpViewById();
 		configurePhotoList();
@@ -99,7 +102,9 @@ public class ShowPhotosStage extends BaseStage {
 			@Override
 			public void handle(WindowEvent event) {
 				// TODO Auto-generated method stub
-				DBUtil.savePhotosData(gv_photo.getItems(), username.get());
+				// DBUtil.savePhotosData(gv_photo.getItems(), username.get());
+				DBUtil.updateAlbumInfo(getUsername(), album);
+//				Platform.exit();
 			}
 		});
 	}
@@ -246,85 +251,18 @@ public class ShowPhotosStage extends BaseStage {
 			// ExecutorService threadPool = Executors.newCachedThreadPool();
 			ThreadPoolExecutor executor = new ThreadPoolExecutor(8, Runtime.getRuntime().availableProcessors() * 4, 2,
 					TimeUnit.MINUTES, new LinkedBlockingQueue<>());
-			int size = filesList.size() / 20 + 1;
+			int size = filesList.size() / BATCH_OF_IMAGE_RENDER + 1;
 			for (int i = 0; i < size; i++) {
-				int startIndex = 20 * i;
-				int endIndex = 20 * (i + 1);
+				int startIndex = 10 * i;
+				int endIndex = 10 * (i + 1);
 				if (endIndex > filesList.size()) {
 					endIndex = filesList.size();
 				}
 				RenderImageRunnable runnable = new RenderImageRunnable(filesList.subList(startIndex, endIndex), album);
 				executor.execute(runnable);
-				// for (int i = 0; i < filesList.size(); i++) {
-				// File file = filesList.get(i);
-				// String path = file.getAbsoluteFile().toURI().toString();
-				// ObservableList<String> uris = album.getPhotosUri();
-				// if (uris.contains(path)) {
-				// // TO DO alert that insert fails;
-				// fails++;
-				// } else {
-				// executor.execute(new Runnable() {
-				// public void run() {
-				// album.setSize(album.getSize() + file.length());
-				// album.setPhotosNumber(album.getPhotosNumber() + 1);
-				// int index = file.getName().lastIndexOf(".");
-				// Photo photo = new Photo(album.getId(), path,
-				// DateUtil.getFormatDate(file.lastModified()),
-				// file.getName().substring(0, index), ParseUtil.getMD5(file),
-				// file.length(), "");
-				// photo.setModified(true);
-				// BufferedImage image = null;
-				// try {
-				// image = ImageIO.read(file);
-				// } catch (IOException e1) {
-				// // TODO Auto-generated catch block
-				// e1.printStackTrace();
-				// }
-				// RenderImage ri = new RenderImage(image);
-				// SIFT sift = new SIFT();
-				// sift.detectFeatures(ri.toPixelFloatArray(null));
-				//
-				// ImagePoint imagePoint = new
-				// ImagePoint(sift.getGlobalFeaturePoints());
-				// try {
-				//
-				// double[] express = ClusterUtils.distribute(imagePoint);
-				// String expression =
-				// ParseUtil.doubleArrayToExpression(express);
-				//
-				// DBUtil.addExpression(username.get(), album.getId(),
-				// ParseUtil.getMD5(file),
-				// file.getAbsoluteFile().toURI().toString(), expression);
-				// KDSearchUtil.insertNode(KDSearchUtil.constructKeyWithAlbumId(express,
-				// album.getId()),
-				// photo);
-				//
-				// } catch (Exception e) {
-				// // TODO Auto-generated catch block
-				// e.printStackTrace();
-				// }
-				// Platform.runLater(new Runnable() {
-				//
-				// @Override
-				// public void run() {
-				// // TODO Auto-generated method stub
-				// uris.add(path);
-				// gv_photo.getItems().add(photo);
-				// }
-				// });
-				// }
-				//
-				// });
-				//
-				// }
-			}
-			// DialogUtil.showDialog(AlertType.CONFIRMATION,
-			// String.format("成功导入% d 张图片,其中有% d 张图片已存在而导入失败", filesList.size()
-			// - fails, fails), "相片导入情况");
-			DBUtil.savePhotosData(gv_photo.getItems(), getUsername());
 
-			// new Thread(new RenderExpressionTask(filesList,
-			// gv_photo.getItems().size() - filesList.size())).start();
+			}
+
 		}
 
 	}
@@ -358,19 +296,23 @@ public class ShowPhotosStage extends BaseStage {
 		public void run() {
 			// TODO Auto-generated method stub
 			ObservableList<String> uris = album.getPhotosUri();
+			List<Photo> photos = new ArrayList<>();
+			List<String> urisToAdd = new ArrayList<>();
+			List<String> expressionToAdd = new ArrayList<>();
 			SIFT sift = new SIFT();
+			double size = 0;
 			for (File file : files) {
 				String path = file.getAbsoluteFile().toURI().toString();
 				if (uris.contains(path)) {
 					// TO DO deal with existing photo
 				} else {
-					album.setSize(album.getSize() + file.length());
-					album.setPhotosNumber(album.getPhotosNumber() + 1);
-
 					int index = file.getName().lastIndexOf(".");
+					size += file.length();
 					Photo photo = new Photo(album.getId(), path, DateUtil.getFormatDate(file.lastModified()),
 							file.getName().substring(0, index), ParseUtil.getMD5(file), file.length(), "");
 					photo.setModified(true);
+					photos.add(photo);
+					urisToAdd.add(path);
 					BufferedImage image = null;
 					try {
 						image = ImageIO.read(file);
@@ -379,35 +321,37 @@ public class ShowPhotosStage extends BaseStage {
 						e1.printStackTrace();
 					}
 					RenderImage ri = new RenderImage(image);
-
 					sift.detectFeatures(ri.toPixelFloatArray(null));
-
 					ImagePoint imagePoint = new ImagePoint(sift.getGlobalFeaturePoints());
 					try {
 
 						double[] express = ClusterUtils.distribute(imagePoint);
 						String expression = ParseUtil.doubleArrayToExpression(express);
-
-						DBUtil.addExpression(username.get(), album.getId(), ParseUtil.getMD5(file),
-								file.getAbsoluteFile().toURI().toString(), expression);
+						expressionToAdd.add(expression);
+						// DBUtil.addExpression(username.get(), album.getId(),
+						// photo.getMd5(), photo.getUri(), expression);
 						KDSearchUtil.insertNode(KDSearchUtil.constructKeyWithAlbumId(express, album.getId()), photo);
 
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					Platform.runLater(new Runnable() {
 
-						@Override
-						public void run() {
-							// TODO Auto-generated method stub
-							uris.add(path);
-							gv_photo.getItems().add(photo);
-						}
-					});
 				}
-
 			}
+			DBUtil.addExpressionBatch(username.get(), album.getId(), photos, expressionToAdd);
+			DBUtil.savePhotosData(photos, getUsername());
+			album.setSize(album.getSize() + size);
+			album.setPhotosNumber(album.getPhotosNumber() + files.size());
+			Platform.runLater(new Runnable() {
+
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+					uris.addAll(urisToAdd);
+					gv_photo.getItems().addAll(photos);
+				}
+			});
 		}
 
 	}
