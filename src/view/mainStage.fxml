@@ -21,9 +21,10 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TableColumn?>
 
-<GridPane alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity"
+<GridPane fx:controller="controller.HomePageController"
+	alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity"
 	prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8"
-	xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.homePageController">
+	xmlns:fx="http://javafx.com/fxml/1">
 	<columnConstraints>
 		<ColumnConstraints hgrow="ALWAYS" minWidth="80.0"
 			prefWidth="0.0" />
@@ -47,7 +48,8 @@
 		<!-- <ListView fx:id="ls_album" orientation="HORIZONTAL" GridPane.columnIndex="1" 
 			GridPane.columnSpan="3" GridPane.rowIndex="1" GridPane.rowSpan="5"> </ListView> -->
 		<TableView fx:id="tv_album" GridPane.columnIndex="1"
-			GridPane.columnSpan="3" GridPane.rowIndex="1" GridPane.rowSpan="5">
+			onMouseClicked="#browsePhotos" GridPane.columnSpan="3"
+			GridPane.rowIndex="1" GridPane.rowSpan="5">
 			<columns>
 				<TableColumn fx:id="columnCover" prefWidth="75.0" text="相册封面" />
 				<TableColumn fx:id="columnName" prefWidth="75.0" text="相册名" />
@@ -101,7 +103,6 @@
 					</children>
 				</HBox>
 			</children>
-
 		</VBox>
 		<VBox GridPane.columnIndex="0" GridPane.columnSpan="1"
 			GridPane.rowIndex="3" GridPane.rowSpan="3">

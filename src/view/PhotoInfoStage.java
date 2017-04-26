@@ -2,6 +2,7 @@ package view;
 
 import java.io.IOException;
 
+import controller.PhotoInfoController;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXMLLoader;
@@ -13,26 +14,23 @@ import model.Photo;
 import util.ParseUtil;
 
 public class PhotoInfoStage extends BaseStage {
-	Parent root = null;
+
 	TextField tf_name;
 	TextField tf_profile;
 	Label ll_path;
 	Label ll_createDate;
 	Label ll_size;
+	Parent root;
+	FXMLLoader loader;
+	Photo photo;
 
 	public PhotoInfoStage(Photo photo) {
-
-		try {
-			root = FXMLLoader.load(getClass().getResource("photoInfo.fxml"));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		setPhoto(photo);
+		loadStageFromFXML();
+		configureController();
 		lookUpViewId();
+
 		showPhotoInfo(photo);
-		Scene scene = new Scene(root);
-		setScene(scene);
-		show();
 	}
 
 	private void showPhotoInfo(Photo photo) {
@@ -80,5 +78,39 @@ public class PhotoInfoStage extends BaseStage {
 		ll_createDate = (Label) root.lookup("#ll_createDate");
 		ll_size = (Label) root.lookup("#ll_size");
 
+	}
+
+	@Override
+	protected void loadStageFromFXML() {
+		// TODO Auto-generated method stub
+		loader = new FXMLLoader();
+		loader.setLocation(getClass().getResource("photoInfo.fxml"));
+		try {
+			root = loader.load();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Scene scene = new Scene(root);
+		setScene(scene);
+		show();
+	}
+
+	@Override
+	protected void configureController() {
+		// TODO Auto-generated method stub
+		if (loader != null) {
+			PhotoInfoController controller = loader.getController();
+			controller.configureStage(this);
+		}
+
+	}
+
+	public Photo getPhoto() {
+		return photo;
+	}
+
+	public void setPhoto(Photo photo) {
+		this.photo = photo;
 	}
 }

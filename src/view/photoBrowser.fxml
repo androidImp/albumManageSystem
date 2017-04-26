@@ -43,7 +43,8 @@
 				</HBox>
 				<HBox spacing="20.0" GridPane.columnIndex="1">
 					<children>
-						<Button fx:id="btn_add" mnemonicParsing="false" text="添加" />
+						<Button fx:id="btn_add" mnemonicParsing="false" text="添加"
+							 />
 						<TextField fx:id="tf_search" promptText="输入查询内容"
 							GridPane.columnIndex="1" HBox.hgrow="ALWAYS" />
 					</children>
@@ -60,7 +61,8 @@
 					VBox.vgrow="ALWAYS" />
 				<HBox alignment="CENTER" fx:id="hb_scan">
 					<children>
-						<ImageView fitWidth="400" fx:id="img_scan" preserveRatio="true" />
+						<ImageView fitWidth="400" fx:id="img_scan"
+							preserveRatio="true" />
 					</children>
 				</HBox>
 			</children>

@@ -24,7 +24,7 @@ import view.LoginStage;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.RadioButton;
 
-public class loginController {
+public class LoginController implements ControllerInitializable<LoginStage> {
 	@FXML
 	private TextField tf_username;
 	@FXML
@@ -33,6 +33,7 @@ public class loginController {
 	Hyperlink link_signUp;
 	@FXML
 	RadioButton rb_login_free;
+	LoginStage stage;
 
 	@FXML
 	public void login() {
@@ -51,7 +52,7 @@ public class loginController {
 					preferences.put(username, username);
 					preferences.put(username + "pwd", encodedPassword);
 					preferences.putBoolean("loginFree", rb_login_free.isSelected());
-					preferences.put("origin","");
+					preferences.put("origin", "");
 					DBUtil.createAlbumsTable(username);
 					tf_username.getScene().getWindow().hide();
 					new HomeStage(username).show();
@@ -126,4 +127,48 @@ public class loginController {
 		});
 	}
 
+	@Override
+	public void initialize() {
+		// TODO Auto-generated method stub
+		DBUtil.createUsersTable();
+		configureBtnLoginFree();
+	}
+
+	@Override
+	public void configureStage(LoginStage stage) {
+		// TODO Auto-generated method stub
+		this.stage = stage;
+	}
+
+	private void configureBtnLoginFree() {
+		// TODO Auto-generated method stub
+		if (rb_login_free.isSelected()) {
+			Preferences preferences = Preferences.userNodeForPackage(LoginStage.class);
+			String lastUser = preferences.get("lastUser", "");
+			String username = preferences.get(lastUser, "");
+			String password = preferences.get(lastUser + "pwd", "");
+			String origin = preferences.get("origin", "");
+			if (!origin.equals("HomeStage")) {
+				if (DBUtil.verifyUser(username, password)) {
+					Platform.runLater(new Runnable() {
+
+						@Override
+						public void run() {
+							// TODO Auto-generated method stub
+							DBUtil.createAlbumsTable(username);
+							tf_username.getScene().getWindow().hide();
+							preferences.put("origin", "");
+							new HomeStage(username).show();
+
+						}
+					});
+				} else {
+					Alert alert = new Alert(AlertType.WARNING);
+					alert.setTitle("警告");
+					alert.setContentText("用户不存在或密码错误");
+					alert.show();
+				}
+			}
+		}
+	}
 }

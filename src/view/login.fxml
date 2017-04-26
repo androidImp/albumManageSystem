@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.*?>
 
 
-<VBox fx:controller="controller.loginController" alignment="BASELINE_LEFT"
+<VBox fx:controller="controller.LoginController" alignment="BASELINE_LEFT"
 	maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
 	minWidth="-Infinity" prefHeight="300.0" prefWidth="300.0" spacing="10.0"
 	xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">

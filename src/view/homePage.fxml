@@ -19,7 +19,7 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TableColumn?>
 
-<GridPane fx:controller="controller.homePageController"
+<GridPane fx:controller="controller.HomePageController"
 	alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity"
 	prefHeight="600.0" prefWidth="800.0" xmlns:fx="http://javafx.com/fxml/1"
 	xmlns="http://javafx.com/javafx/8">

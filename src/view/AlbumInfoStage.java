@@ -2,6 +2,7 @@ package view;
 
 import java.io.IOException;
 
+import controller.ShowAlbumInfoController;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXMLLoader;
@@ -9,79 +10,50 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
 import model.Album;
 import util.ParseUtil;
 
 public class AlbumInfoStage extends BaseStage {
+
 	private Album album;
-	Label ll_date;
-	Label ll_count;
-	Label ll_size;
-	TextField tf_name;
-	TextField tf_profile;
+
 	Parent root;
+	FXMLLoader loader;
 
 	public AlbumInfoStage(Album album) {
 		// TODO Auto-generated constructor stub
-		this.album = album;
+		setAlbum(album);
+		loadStageFromFXML();
+		configureController();
 
+	}
+
+	@Override
+	protected void configureController() {
+		ShowAlbumInfoController controller = loader.getController();
+		controller.configureStage(this);
+	}
+
+	@Override
+	protected void loadStageFromFXML() {
+		loader = new FXMLLoader();
 		try {
-			root = FXMLLoader.load(getClass().getResource("showAlbumInfo.fxml"));
+			loader.setLocation(getClass().getResource("showAlbumInfo.fxml"));
+			root = loader.load();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		Scene scene = new Scene(root, 300, 300);
 		setScene(scene);
-		findViewById();
-		configureName();
-		configureProfile();
-		configureInfo();
 		show();
 	}
 
-	private void configureInfo() {
-		// TODO Auto-generated method stub
-		tf_name.setText(album.getAlbumName());
-		tf_profile.setText(album.getAlbumProfile());
-		ll_date.setText(album.getCreateDate());
-		ll_count.setText(String.valueOf(album.getPhotosNumber()));
-		ll_size.setText(ParseUtil.convertSizeToString(album.getSize()));
+	public Album getAlbum() {
+		return album;
 	}
 
-	public void configureName() {
-
-		tf_name.textProperty().addListener(new ChangeListener<String>() {
-
-			@Override
-			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-				// TODO Auto-generated method stub
-				tf_name.setText(newValue);
-				album.setAlbumName(newValue);
-			}
-		});
-
-	}
-
-	public void configureProfile() {
-		tf_profile.textProperty().addListener(new ChangeListener<String>() {
-
-			@Override
-			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-				// TODO Auto-generated method stub
-				// tf_profile.setText(newValue);
-				album.setAlbumProfile(newValue);
-			}
-		});
-
-	}
-
-	public void findViewById() {
-		ll_date = (Label) root.lookup("#ll_date");
-		ll_count = (Label) root.lookup("#ll_count");
-		ll_size = (Label) root.lookup("#ll_size");
-		tf_name = (TextField) root.lookup("#tf_name");
-		tf_profile = (TextField) root.lookup("#tf_profile");
+	public void setAlbum(Album album) {
+		this.album = album;
 	}
 }

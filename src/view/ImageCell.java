@@ -4,23 +4,17 @@ import org.controlsfx.control.GridCell;
 import org.controlsfx.control.GridView;
 
 import cluster.KDSearchUtil;
-import javafx.animation.Transition;
-import javafx.animation.TranslateTransition;
-import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
-import javafx.util.Duration;
+import model.Album;
 import model.Photo;
 
 public class ImageCell extends GridCell<Photo> {
@@ -62,7 +56,7 @@ public class ImageCell extends GridCell<Photo> {
 			@Override
 			public void handle(ActionEvent event) {
 				// TODO Auto-generated method stub
-				KDSearchUtil.queryNearestPic(((ShowPhotosStage) getGridView().getScene().getWindow()).getUsername(),
+				KDSearchUtil.queryNearestPic(((PhotoBrowserStage) getGridView().getScene().getWindow()).getUsername(),
 						getItem());
 			}
 		});
@@ -89,8 +83,17 @@ public class ImageCell extends GridCell<Photo> {
 			@Override
 			public void handle(ActionEvent event) {
 				// TODO Auto-generated method stub
-				ShowPhotosStage showPhotosStage = (ShowPhotosStage) getGridView().getScene().getWindow();
-				showPhotosStage.deletePhoto(getIndex());
+				int index = getIndex();
+				GridView<Photo> gridView = getGridView();
+				gridView.getItems().remove(index);
+				PhotoBrowserStage stage = (PhotoBrowserStage) gridView.getScene().getWindow();
+				stage.getAlbum().getPhotosUri().remove(index);
+				Album album = stage.getAlbum();
+				// 数据库中存储的文件路径为 file:(path),所以这里去掉了前5个字符:
+				Photo photo = getItem();
+				album.setSize(album.getSize() - photo.getSize());
+				photo.deletePhoto(stage.getUsername());
+
 			}
 		});
 	}

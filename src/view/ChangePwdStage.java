@@ -2,37 +2,60 @@ package view;
 
 import java.io.IOException;
 
+import controller.ChangePwdController;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-public class ChangePwdStage extends BaseStage{
+public class ChangePwdStage extends BaseStage {
 	public SimpleStringProperty username = new SimpleStringProperty("name");
-	public ChangePwdStage(String name){
-		Parent parent = null;
+	FXMLLoader loader;
+	Parent root;
+
+	public ChangePwdStage(String name) {
+		setUsername(name);
+		loadStageFromFXML();
+		configureController();
+	}
+
+	public final SimpleStringProperty usernameProperty() {
+		return this.username;
+	}
+
+	public final String getUsername() {
+		return this.usernameProperty().get();
+	}
+
+	public final void setUsername(final String username) {
+		this.usernameProperty().set(username);
+	}
+
+	@Override
+	protected void loadStageFromFXML() {
+		// TODO Auto-generated method stub
+		loader = new FXMLLoader();
 		try {
-			parent = FXMLLoader.load(getClass().getResource("changePwd.fxml"));
+			loader.setLocation(getClass().getResource("changePwd.fxml"));
+			root = loader.load();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		setUsername(name);
-		Scene scene = new Scene(parent,300,300);
+
+		Scene scene = new Scene(root, 300, 300);
 		setScene(scene);
 		show();
 	}
-	public final SimpleStringProperty usernameProperty() {
-		return this.username;
+
+	@Override
+	protected void configureController() {
+		// TODO Auto-generated method stub
+
+		ChangePwdController changePwdController = loader.getController();
+		changePwdController.configureStage(this);
+
 	}
-	
-	public final String getUsername() {
-		return this.usernameProperty().get();
-	}
-	
-	public final void setUsername(final String username) {
-		this.usernameProperty().set(username);
-	}
-	
+
 }

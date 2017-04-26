@@ -44,11 +44,11 @@ public class KDSearchUtil {
 				e.printStackTrace();
 			}
 		}
-		System.out.println("配置 KD 树结束");
+		// System.out.println("配置 KD 树结束");
 	}
 
 	public static void queryNearestPic(String username, Photo photo) {
-		System.out.println("开始查询相似图片");
+		// System.out.println("开始查询相似图片");
 		double[] key = DBUtil.queryExpression(username, DIMENSIONS_OF_KDTREE, photo.getId(), photo.getMd5());
 		if (key == null)
 			System.out.println("key is null");
@@ -69,8 +69,10 @@ public class KDSearchUtil {
 				listView.setUserData(key);
 				listView.setCellFactory(param -> new ContentSearchItemCell());
 				root.getChildren().add(listView);
-				listView.getItems().add(photo);
-				listView.getItems().addAll(photos);
+				for (int i = photos.size() - 1; i >= 0; i--) {
+					listView.getItems().add(photos.get(i));
+				}
+
 				stage.show();
 			} catch (KeySizeException e) {
 				// TODO Auto-generated catch block
@@ -80,7 +82,7 @@ public class KDSearchUtil {
 				e.printStackTrace();
 			}
 		}
-		System.out.println("查询相似图片结束");
+		// System.out.println("查询相似图片结束");
 	}
 
 	public static double[] constructKeyWithAlbumId(double[] preKey, int id) {
@@ -97,7 +99,9 @@ public class KDSearchUtil {
 	}
 
 	public static void deleteNode(double key[]) {
-		System.out.println("删除节点");
+		if (key == null) {
+			throw new IllegalStateException("key 不能为空!");
+		}
 		try {
 			kdTree.delete(key);
 		} catch (KeySizeException | KeyMissingException e) {
@@ -107,7 +111,7 @@ public class KDSearchUtil {
 	}
 
 	public static void insertNode(double key[], Photo value) {
-		System.out.println("添加节点");
+		// System.out.println("添加节点");
 		try {
 			kdTree.insert(key, value);
 		} catch (KeySizeException | KeyDuplicateException e) {

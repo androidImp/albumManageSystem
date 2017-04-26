@@ -10,7 +10,7 @@ import util.DBUtil;
 import util.ParseUtil;
 import view.ChangePwdStage;
 
-public class changePwdController {
+public class ChangePwdController implements ControllerInitializable<ChangePwdStage> {
 	@FXML
 	private PasswordField pf_pwd;
 	@FXML
@@ -21,6 +21,7 @@ public class changePwdController {
 	private Button btn_cancel;
 	@FXML
 	private Button btn_confirm;
+	ChangePwdStage stage;
 
 	@FXML
 	public void changePwd() {
@@ -41,8 +42,8 @@ public class changePwdController {
 
 	@FXML
 	public void cancelOperation() {
-		 ChangePwdStage stage = (ChangePwdStage) btn_cancel.getScene().getWindow();
-		 stage.close();
+		ChangePwdStage stage = (ChangePwdStage) btn_cancel.getScene().getWindow();
+		stage.close();
 	}
 
 	public void showPrompt(AlertType type, String message) {
@@ -50,6 +51,18 @@ public class changePwdController {
 		alert.setTitle("错误提示");
 		alert.setContentText(message);
 		alert.showAndWait();
+	}
+
+	@Override
+	public void initialize() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void configureStage(ChangePwdStage stage) {
+		// TODO Auto-generated method stub
+		this.stage = stage;
 	}
 
 }

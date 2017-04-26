@@ -1,9 +1,15 @@
 package model;
 
+import java.io.File;
+
+import org.controlsfx.control.GridView;
+
+import cluster.KDSearchUtil;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
+import util.DBUtil;
 
 public class Photo {
 	/**
@@ -116,10 +122,9 @@ public class Photo {
 			return false;
 		}
 		Photo photo = (Photo) obj;
-		return photo.getId() == getId() && photo.getName().equals(getName()) && photo.getProfile().equals(getProfile())
-				&& photo.getUri().equals(getUri()) && photo.getCreateDate().equals(getCreateDate())
-				&& photo.getMd5() == photo.getMd5()
-				&& Double.doubleToLongBits(photo.getSize()) == Double.doubleToLongBits(getSize());
+		return getId() == getId() && getName().equals(getName()) && getProfile().equals(getProfile())
+				&& getUri().equals(getUri()) && getCreateDate().equals(getCreateDate()) && getMd5() == getMd5()
+				&& Double.doubleToLongBits(getSize()) == Double.doubleToLongBits(getSize());
 
 	}
 
@@ -166,4 +171,15 @@ public class Photo {
 		this.modifiedProperty().set(modified);
 	}
 
+	public void deletePhoto(String username) {
+		double[] key = DBUtil.getExpression(username, getMd5(), getId());
+		DBUtil.deletePhoto(getMd5(), getId(), username);
+		DBUtil.deleteExpressionOfPhoto(username, getId(), getMd5());
+		if (key == null) {
+			throw new IllegalStateException("无法得到图片的特征值表示");
+		} else {
+			KDSearchUtil.deleteNode(KDSearchUtil.constructKeyWithAlbumId(key, getId()));
+		}
+
+	}
 }

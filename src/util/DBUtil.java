@@ -861,7 +861,6 @@ public class DBUtil {
 			if (rs.getRow() != 0) {
 				String expression = rs.getString(1);
 				return ParseUtil.expressionTodoubleArray(expression, KDSearchUtil.DIMENSIONS_OF_KDTREE);
-
 			} else {
 				return null;
 			}
@@ -950,8 +949,6 @@ public class DBUtil {
 			statement.setString(7, ParseUtil.parseListToString(album.getPhotosUri()));
 			statement.setInt(8, album.getId());
 			statement.executeUpdate();
-			System.out.println("photosNumber: " + album.getPhotosNumber());
-			System.out.println("update album at: " + album.getId());
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			String methodName = getCurrentMethod();

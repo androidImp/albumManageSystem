@@ -15,7 +15,7 @@ import org.apache.commons.math3.ml.clustering.CentroidCluster;
 import cluster.ClusterUtils;
 import cluster.KDSearchUtil;
 import cluster.Point;
-import controller.homePageController;
+import controller.HomePageController;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ObservableList;
@@ -49,52 +49,39 @@ import model.SearchItemCell;
 import util.DBUtil;
 
 public class HomeStage extends BaseStage {
+
 	public static int index;
-
-
 	TableView<Album> tv_album;
-	Parent root = null;
 	Label ll_name;
 	TextField tf_search;
 	TreeView<String> tv_menu;
-	SimpleStringProperty username = new SimpleStringProperty("name");
-
+	String username;
+	FXMLLoader loader;
+	Parent root;
 	List<CentroidCluster<Point>> centers = new ArrayList<>();
 
 	public HomeStage(String name) {
 		// TODO Auto-generated constructor stub
-		FXMLLoader loader = new FXMLLoader();
-		try {
-			loader.setLocation(getClass().getResource("mainStage.fxml"));
-			// root = FXMLLoader.load(getClass().getResource("homePage.fxml"));
-			root = loader.load();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		setName(name);
-
-		Scene scene = new Scene(root, 800, 600);
-		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-		setScene(scene);
+		setUsername(name);
 		initParameters();
+		// initAlbumList();
+		loadStageFromFXML();
+		configureController();
 		initView();
-		initAlbumList();
 		configureData();
 		configureSearchView();
-		configureUserMenu();
-		configureCloseProperty();
 		addContextMenuToAlbums();
-		homePageController controller = loader.getController();
-		controller.setMainApp(this);
-		DBUtil.createExpressionsTable(username.get());
+		configureCloseProperty();
+		configureSearchView();
+		configureUserMenu();
+		addContextMenuToAlbums();
 		configureCluster();
 		configureKDTree();
 	}
 
 	private void configureKDTree() {
 		// TODO Auto-generated method stub
-		KDSearchUtil.configureKDTree(username.get());
+		KDSearchUtil.configureKDTree(getUsername());
 
 	}
 
@@ -159,7 +146,7 @@ public class HomeStage extends BaseStage {
 				// 可以使用 JAXB
 				Preferences preferences = Preferences.userNodeForPackage(getClass());
 				preferences.putInt("index", index);
-				// DBUtil.saveAlbums(tv_album.getItems(), username.get());
+				// DBUtil.saveAlbums(tv_album.getItems(), getUserName());
 				Platform.exit();
 			}
 		});
@@ -188,7 +175,7 @@ public class HomeStage extends BaseStage {
 					@Override
 					protected Void call() throws Exception {
 						// TODO Auto-generated method stub
-						ObservableList<Photo> photos = DBUtil.queryPhotoByName(tf_search.getText(), username.get());
+						ObservableList<Photo> photos = DBUtil.queryPhotoByName(tf_search.getText(), getUsername());
 						Platform.runLater(new Runnable() {
 							@Override
 							public void run() {
@@ -220,7 +207,7 @@ public class HomeStage extends BaseStage {
 			public void handle(Event event) {
 				// TODO Auto-generated method stub
 				Photo photo = lv.getSelectionModel().getSelectedItem();
-				KDSearchUtil.queryNearestPic(username.get(), photo);
+				KDSearchUtil.queryNearestPic(getUsername(), photo);
 
 			}
 		});
@@ -230,8 +217,9 @@ public class HomeStage extends BaseStage {
 	 * 初始化用户数据
 	 */
 	private void configureData() {
-		DBUtil.createPhotosTable(username.get());
-
+		DBUtil.createPhotosTable(getUsername());
+		tv_album.setItems(DBUtil.getAlbums(getUsername()));
+		DBUtil.createExpressionsTable(getUsername());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -239,9 +227,8 @@ public class HomeStage extends BaseStage {
 		tv_album = (TableView<Album>) root.lookup("#tv_album");
 		tf_search = (TextField) root.lookup("#tf_search");
 		ll_name = (Label) root.lookup("#ll_name");
-		ll_name.setText(username.get());
+		ll_name.setText(getUsername());
 		tv_menu = (TreeView<String>) root.lookup("#tv_menu");
-		show();
 	}
 
 	/**
@@ -294,8 +281,8 @@ public class HomeStage extends BaseStage {
 				if (((MouseEvent) event).getClickCount() >= 2) {
 					Album album = tv_album.getSelectionModel().getSelectedItem();
 					if (album != null) {
-						// new PhotoStage(album, getName()).show();
-						new ShowPhotosStage(album, getName());
+						new PhotoBrowserStage(album, getUsername());
+
 					}
 
 				}
@@ -316,9 +303,9 @@ public class HomeStage extends BaseStage {
 				if (index != -1) {
 					int id = tv_album.getSelectionModel().getSelectedItem().getId();
 					tv_album.getItems().remove(index);
-					DBUtil.deleteAlbum(id, username.get());
-					DBUtil.deletePhotoByAlbum(id, username.get());
-					DBUtil.deleteExpressionsOfAlbum(username.get(), id);
+					DBUtil.deleteAlbum(id, getUsername());
+					DBUtil.deletePhotoByAlbum(id, getUsername());
+					DBUtil.deleteExpressionsOfAlbum(getUsername(), id);
 				}
 			}
 		});
@@ -335,20 +322,12 @@ public class HomeStage extends BaseStage {
 			@Override
 			public void handle(ActionEvent event) {
 				// TODO Auto-generated method stub
-				new PhotoStage(tv_album.getSelectionModel().getSelectedItem(), getName()).show();
+				new PhotoStage(tv_album.getSelectionModel().getSelectedItem(), getUsername()).show();
 
 			}
 		});
 		menu.getItems().addAll(open_item, scan_item, delete_item);
 		tv_album.setContextMenu(menu);
-	}
-
-	public void setName(String name) {
-		username.set(name);
-	}
-
-	public String getName() {
-		return username.get();
 	}
 
 	private void configureLinkClear(Hyperlink link) {
@@ -364,9 +343,9 @@ public class HomeStage extends BaseStage {
 				Optional<ButtonType> resultType = alert.showAndWait();
 				if (resultType.isPresent()) {
 					tv_album.getItems().clear();
-					DBUtil.deleteAlbum(username.get());
-					DBUtil.deletePhoto(username.get());
-					DBUtil.deleteExpressions(username.get());
+					DBUtil.deleteAlbum(getUsername());
+					DBUtil.deletePhoto(getUsername());
+					DBUtil.deleteExpressions(getUsername());
 					KDSearchUtil.clearNode();
 				}
 
@@ -382,7 +361,7 @@ public class HomeStage extends BaseStage {
 			@Override
 			public void handle(ActionEvent event) {
 				// TODO Auto-generated method stub
-				new ChangePwdStage(username.get());
+				new ChangePwdStage(getUsername());
 			}
 		});
 	}
@@ -394,7 +373,7 @@ public class HomeStage extends BaseStage {
 			@Override
 			public void handle(ActionEvent event) {
 				// TODO Auto-generated method stub
-				new ChangePwdStage(username.get());
+				new ChangePwdStage(getUsername());
 			}
 		});
 
@@ -430,7 +409,38 @@ public class HomeStage extends BaseStage {
 
 	public ObservableList<Album> getAlbumData() {
 		// TODO Auto-generated method stub
-		return DBUtil.getAlbums(username.get());
+		return DBUtil.getAlbums(getUsername());
 	}
 
+	@Override
+	protected void loadStageFromFXML() {
+		// TODO Auto-generated method stub
+		loader = new FXMLLoader();
+		loader.setLocation(getClass().getResource("mainStage.fxml"));
+		try {
+			root = loader.load();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		Scene scene = new Scene(root, 800, 600);
+		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		setScene(scene);
+		show();
+	}
+
+	@Override
+	protected void configureController() {
+		// TODO Auto-generated method stub
+		HomePageController controller = loader.getController();
+		controller.configureStage(this);
+
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
 }

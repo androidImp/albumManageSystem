@@ -36,6 +36,7 @@ import javafx.scene.control.Pagination;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
 import javafx.util.Callback;
@@ -47,13 +48,14 @@ import util.ParseUtil;
 import util.DateUtil;
 import util.FileChooserUtil;
 import util.LogUtil;
+
 /**
- * 旧版相册的浏览界面,新版为{@link ShowPhotosStage}
- * 旧版是因为当初没有解决 {@link GridView} 
- * @author niuniumei 
+ * 旧版相册的浏览界面,新版为{@link PhotoBrowserStage} 旧版是因为当初没有解决 {@link GridView}
+ * 
+ * @author niuniumei
  *
  */
-public class PhotoStage extends BaseStage {
+public class PhotoStage extends Stage {
 	public int EMPTY = 2147483647;
 	public int DEFAULT_HEIGHT = 200;
 	public int DEFAULT_WIDTH = 250;
@@ -257,7 +259,7 @@ public class PhotoStage extends BaseStage {
 					width = MAX_WIDTH;
 				default_height.set(height);
 				default_width.set(width);
-				
+
 			}
 		});
 	}
@@ -365,4 +367,5 @@ public class PhotoStage extends BaseStage {
 	public String getName() {
 		return username.get();
 	}
+
 }

@@ -13,12 +13,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
+import javafx.stage.Stage;
 import util.DBUtil;
 
-public class LoginStage extends BaseStage {
+public class LoginStage extends Stage {
 	private RadioButton rb_login_free;
 	private Parent root;
 	private TextField tf_username;
+
 	public LoginStage() {
 		// TODO Auto-generated method stub
 		try {
@@ -39,7 +41,7 @@ public class LoginStage extends BaseStage {
 
 	private void initViews() {
 		// TODO Auto-generated method stub
-		rb_login_free = (RadioButton) root.lookup("#rb_login_free");		
+		rb_login_free = (RadioButton) root.lookup("#rb_login_free");
 		tf_username = (TextField) root.lookup("#tf_username");
 		if (rb_login_free != null) {
 			Preferences preferences = Preferences.userNodeForPackage(LoginStage.class);
@@ -67,7 +69,7 @@ public class LoginStage extends BaseStage {
 							tf_username.getScene().getWindow().hide();
 							preferences.put("origin", "");
 							new HomeStage(username).show();
-							
+
 						}
 					});
 				} else {
