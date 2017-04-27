@@ -194,7 +194,8 @@ public class HomePageController implements ControllerInitializable<HomeStage> {
 				album.setPhotosUri(FXCollections.observableArrayList());
 				tv_album.getItems().add(album);
 				String name = homeStage.getUsername();
-				DBUtil.saveAlbumInfo(album, name);
+				album.saveAlbum(name);
+				// DBUtil.saveAlbumInfo(album, name);
 
 			} else {
 				DialogUtil.showDialog(AlertType.CONFIRMATION, "已存在同名相册,请更改你想要的相册名后再试", "添加相册情况");

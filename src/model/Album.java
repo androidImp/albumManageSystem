@@ -5,6 +5,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleStringProperty;
+import util.DBUtil;
 
 public class Album {
 	/**
@@ -170,4 +171,7 @@ public class Album {
 		this.sizeProperty().set(size);
 	}
 
+	public void saveAlbum(String username) {
+		DBUtil.saveAlbumInfo(this, username);
+	}
 }

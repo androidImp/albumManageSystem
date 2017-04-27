@@ -77,7 +77,6 @@ public class PhotoBrowserStage extends Stage {
 		// TODO Auto-generated constructor stub
 		setUsername(name);
 		this.album = album;
-		System.out.println(album.getPhotosNumber());
 		initView();
 		lookUpViewById();
 		configurePhotoList();

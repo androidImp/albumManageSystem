@@ -1,9 +1,5 @@
 package model;
 
-import java.io.File;
-
-import org.controlsfx.control.GridView;
-
 import cluster.KDSearchUtil;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -122,9 +118,10 @@ public class Photo {
 			return false;
 		}
 		Photo photo = (Photo) obj;
-		return getId() == getId() && getName().equals(getName()) && getProfile().equals(getProfile())
-				&& getUri().equals(getUri()) && getCreateDate().equals(getCreateDate()) && getMd5() == getMd5()
-				&& Double.doubleToLongBits(getSize()) == Double.doubleToLongBits(getSize());
+		return getId() == photo.getId() && getName().equals(photo.getName()) && getProfile().equals(photo.getProfile())
+				&& getUri().equals(photo.getUri()) && getCreateDate().equals(photo.getCreateDate())
+				&& getMd5() == photo.getMd5()
+				&& Double.doubleToLongBits(getSize()) == Double.doubleToLongBits(photo.getSize());
 
 	}
 
