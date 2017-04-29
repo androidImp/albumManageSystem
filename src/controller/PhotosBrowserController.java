@@ -62,7 +62,7 @@ public class PhotosBrowserController implements ControllerInitializable<PhotoBro
 		// TODO Auto-generated method stub
 		configurePhotoList();
 		fileChooser = new FileChooser();
-//		System.out.println("stage: " + stage);
+		// System.out.println("stage: " + stage);
 	}
 
 	@Override

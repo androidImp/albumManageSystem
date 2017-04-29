@@ -9,7 +9,7 @@ import model.Photo;
 import util.DBUtil;
 import util.LogUtil;
 
-public class photoStageController {
+public class PhotoStageController {
 	@FXML
 	private Button btn_add;
 	@FXML

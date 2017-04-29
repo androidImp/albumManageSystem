@@ -6,7 +6,7 @@
 <?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.Button?>
 <!-- id -> css id -->
-<GridPane fx:controller="controller.photoStageController"
+<GridPane fx:controller="controller.PhotoStageController"
 	maxHeight="-Infinity" maxWidth="-Infinity" alignment="CENTER"
 	prefHeight="600.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8"
 	xmlns:fx="http://javafx.com/fxml/1">

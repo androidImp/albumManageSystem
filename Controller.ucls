@@ -28,8 +28,8 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="4" language="java" name="controller.photoStageController" project="MyAlbum" 
-    file="/MyAlbum/src/controller/photoStageController.java" binary="false" corner="BOTTOM_RIGHT">    
+  <class id="4" language="java" name="controller.PhotoStageController" project="MyAlbum" 
+    file="/MyAlbum/src/controller/PhotoStageController.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="86" y="-146"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
