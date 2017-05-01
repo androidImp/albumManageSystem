@@ -180,4 +180,11 @@ public class Album implements Serializable {
 	public void saveAlbum(String username) {
 		DBUtil.saveAlbumInfo(this, username);
 	}
+
+	public void delete(String username) {
+		// TODO Auto-generated method stub
+		DBUtil.deleteAlbum(getId(), username);
+		DBUtil.deletePhotoByAlbum(getId(), username);
+		DBUtil.deleteExpressionsOfAlbum(username, getId());
+	}
 }

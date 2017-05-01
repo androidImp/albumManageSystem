@@ -22,13 +22,13 @@ import util.DBUtil;
 import util.DateUtil;
 import util.DialogUtil;
 import view.HomeStage;
-import view.ShowAlbumStage;
+import view.AlbumBrowser;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 
-public class AlbumBrowserController implements ControllerInitializable<ShowAlbumStage> {
+public class AlbumBrowserController implements ControllerInitializable<AlbumBrowser> {
 	@FXML
 	private ImageView img_userIcon;
 	@FXML
@@ -37,7 +37,7 @@ public class AlbumBrowserController implements ControllerInitializable<ShowAlbum
 	private Label ll_photoNumber;
 	@FXML
 	private Label ll_albumNumber;
-	private ShowAlbumStage stage;
+	private AlbumBrowser stage;
 	@FXML
 	private GridView<Album> gv_album;
 	@FXML
@@ -55,7 +55,7 @@ public class AlbumBrowserController implements ControllerInitializable<ShowAlbum
 	}
 
 	@Override
-	public void configureStage(ShowAlbumStage stage) {
+	public void configureStage(AlbumBrowser stage) {
 		// TODO Auto-generated method stub
 		this.stage = stage;
 	}
@@ -128,7 +128,7 @@ public class AlbumBrowserController implements ControllerInitializable<ShowAlbum
 		result.ifPresent(albumNamePassword -> {
 			if (DBUtil.queryAlbum(stage.getUsername(), albumNamePassword.getKey())) {
 				Album album = new Album();
-				album.setId(HomeStage.index++);
+				album.setId(AlbumBrowser.index++);
 				album.setAlbumName(albumNamePassword.getKey());
 				album.setAlbumProfile(albumNamePassword.getValue());
 				album.setCreateDate(DateUtil.getFormatDate());

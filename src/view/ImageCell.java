@@ -72,7 +72,7 @@ public class ImageCell extends GridCell<Photo> {
 				double rotate = getGraphic().getRotate();
 				rotate = (rotate + 90) % 360;
 				getGraphic().setRotate(rotate);
-
+				
 			}
 		});
 	}

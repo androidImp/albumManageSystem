@@ -69,7 +69,7 @@ public class LoginStage extends Stage {
 							tf_username.getScene().getWindow().hide();
 							preferences.put("origin", "");
 							// new HomeStage(username).show();
-							new ShowAlbumStage(username).show();
+							new AlbumBrowser(username).show();
 
 						}
 					});
