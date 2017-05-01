@@ -95,7 +95,6 @@ public class PhotosBrowserController implements ControllerInitializable<PhotoBro
 		FileChooserUtil.configureFileChooser(fileChooser);
 		List<File> filesList = fileChooser.showOpenMultipleDialog(stage);
 		importPicFromFiles(filesList);
-
 	}
 
 	/**
@@ -195,6 +194,7 @@ public class PhotosBrowserController implements ControllerInitializable<PhotoBro
 			Platform.runLater(new Runnable() {
 				public void run() {
 					gv_photo.getItems().addAll(photos);
+
 				}
 			});
 

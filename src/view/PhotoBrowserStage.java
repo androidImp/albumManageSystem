@@ -87,7 +87,7 @@ public class PhotoBrowserStage extends Stage {
 		configureButtonAdd();
 		configureCloseProperty();
 		show();
-		
+
 	}
 
 	private void initView() {

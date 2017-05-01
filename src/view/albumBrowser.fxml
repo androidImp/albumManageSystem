@@ -42,13 +42,18 @@
 	</rowConstraints>
 	<children>
 		<HBox alignment="CENTER_LEFT">
+
+
 			<children>
-				<ImageView fx:id="img_userIcon" fitHeight="50.0" fitWidth="50.0"
-					pickOnBounds="true" preserveRatio="true">
+				<ImageView fx:id="img_userIcon" fitHeight="50.0"
+					style="-fx-effect:innershadow(gaussian,grey,10,0,0,0);"
+					 fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
 					<HBox.margin>
 						<Insets top="10" bottom="10" left="10" right="10"></Insets>
 					</HBox.margin>
 				</ImageView>
+
+
 				<VBox alignment="CENTER">
 					<children>
 						<Label text="你好!" />

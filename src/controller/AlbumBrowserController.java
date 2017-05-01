@@ -6,6 +6,7 @@ import org.controlsfx.control.GridView;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
@@ -52,6 +53,7 @@ public class AlbumBrowserController implements ControllerInitializable<AlbumBrow
 	private void configureGridView() {
 		gv_album.setCellFactory(param -> new AlbumInfoCell());
 		gv_album.setItems(DBUtil.getAlbums(stage.getUsername()));
+
 	}
 
 	@Override

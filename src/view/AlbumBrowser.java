@@ -70,6 +70,7 @@ public class AlbumBrowser extends BaseStage {
 		// TODO Auto-generated method stub
 		AlbumBrowserController controller = loader.getController();
 		controller.configure();
+
 	}
 
 	@Override

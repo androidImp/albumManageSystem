@@ -6,6 +6,10 @@ import java.util.List;
 
 import org.controlsfx.control.GridCell;
 
+import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -42,6 +46,7 @@ public class AlbumInfoCell extends GridCell<Album> {
 				new PhotoBrowserStage(getItem(), stage.getUsername());
 			}
 		});
+
 	}
 
 	private void configureContextMenu() {
@@ -50,11 +55,26 @@ public class AlbumInfoCell extends GridCell<Album> {
 		MenuItem scan_item = new MenuItem("浏览相册信息");
 		MenuItem delete_item = new MenuItem("删除");
 		MenuItem open_item = new MenuItem("打开");
+		MenuItem update_item = new MenuItem("更新");
 		configureItemScan(scan_item);
 		configureItemDelete(delete_item);
 		configureItemOpen(open_item);
-		contextMenu.getItems().addAll(open_item, scan_item, delete_item);
+		configureItemUpdate(update_item);
+		contextMenu.getItems().addAll(open_item, scan_item, delete_item, update_item);
 		setContextMenu(contextMenu);
+	}
+
+	private void configureItemUpdate(MenuItem update_item) {
+		// TODO Auto-generated method stub
+		update_item.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent event) {
+				// TODO Auto-generated method stub
+				updateItem(getItem(), false);
+
+			}
+		});
 	}
 
 	private void configureItemOpen(MenuItem open_item) {
@@ -128,9 +148,15 @@ public class AlbumInfoCell extends GridCell<Album> {
 			// parent.setStyle("-fx-background-color: white;" +
 			// "-fx-effect: dropshadow(gaussian, red,10, 0, 0, 0);" +
 			// "-fx-background-insets:10;");
-
 			setGraphic(parent);
+			getItem().photosUriProperty().addListener(new ListChangeListener<String>() {
 
+				@Override
+				public void onChanged(javafx.collections.ListChangeListener.Change<? extends String> c) {
+					// TODO Auto-generated method stub
+					updateItem(getItem(), false);
+				}
+			});
 		}
 	}
 }
