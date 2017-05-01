@@ -13,11 +13,13 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
 
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-	minWidth="-Infinity" prefHeight="600.0" prefWidth="600.0"
-	xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<VBox fx:controller="controller.PhotosBrowserController" maxHeight="-Infinity"
+	maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+	prefHeight="600.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8"
+	xmlns:fx="http://javafx.com/fxml/1">
 	<children>
 		<GridPane>
 			<columnConstraints>
@@ -43,8 +45,7 @@
 				</HBox>
 				<HBox spacing="20.0" GridPane.columnIndex="1">
 					<children>
-						<Button fx:id="btn_add" mnemonicParsing="false" text="添加"
-							 />
+						<Button fx:id="btn_add" mnemonicParsing="false" text="添加" />
 						<TextField fx:id="tf_search" promptText="输入查询内容"
 							GridPane.columnIndex="1" HBox.hgrow="ALWAYS" />
 					</children>
@@ -59,10 +60,33 @@
 			<children>
 				<GridView fx:id="gv_photo" prefHeight="200.0" prefWidth="200.0"
 					VBox.vgrow="ALWAYS" />
-				<HBox alignment="CENTER" fx:id="hb_scan">
+				<HBox fx:id="hb_scan">
 					<children>
-						<ImageView fitWidth="400" fx:id="img_scan"
-							preserveRatio="true" />
+						<HBox alignment="CENTER_LEFT">
+							<children>
+								<Button onAction="#previous"
+									style="-fx-background-image: url('/Pic/imgPrevious.png');  -fx-background-size: 35px;" />
+							</children>
+							<padding>
+								<Insets left="10"></Insets>
+							</padding>
+						</HBox>
+						<HBox alignment="CENTER" HBox.hgrow="ALWAYS">
+							<children>
+								<ImageView fitWidth="500" fx:id="img_scan"
+									preserveRatio="true" />
+							</children>
+						</HBox>
+
+						<HBox alignment="CENTER_RIGHT">
+							<children>
+								<Button onAction="#next"
+									style="-fx-background-image: url('/Pic/imgNext.png'); -fx-background-size: 35px;" />
+							</children>
+							<padding>
+								<Insets right="10"></Insets>
+							</padding>
+						</HBox>
 					</children>
 				</HBox>
 			</children>

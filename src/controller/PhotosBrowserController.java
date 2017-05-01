@@ -23,18 +23,21 @@ import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.geometry.Side;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
+import model.ImageCell;
 import model.Photo;
 import util.DBUtil;
 import util.DateUtil;
 import util.FileChooserUtil;
 import util.ParseUtil;
-import view.ImageCell;
 import view.PhotoBrowserStage;
 
 public class PhotosBrowserController implements ControllerInitializable<PhotoBrowserStage> {
@@ -62,7 +65,14 @@ public class PhotosBrowserController implements ControllerInitializable<PhotoBro
 		// TODO Auto-generated method stub
 		configurePhotoList();
 		fileChooser = new FileChooser();
+		configureScanOption();
 		// System.out.println("stage: " + stage);
+	}
+
+	private void configureScanOption() {
+		// TODO Auto-generated method stub
+		ContextMenu menu = new ContextMenu();
+		menu.show(img_scan, Side.RIGHT, 0, 0);
 	}
 
 	@Override
@@ -190,5 +200,23 @@ public class PhotosBrowserController implements ControllerInitializable<PhotoBro
 
 		}
 
+	}
+
+	@FXML
+	public void previous() {
+		ObservableList<Photo> photos = gv_photo.getItems();
+		int index = (int) gv_photo.getUserData();
+		index = (index + 1) % photos.size();
+		gv_photo.setUserData(index);
+		img_scan.setImage(new Image(photos.get(index).getUri()));
+	}
+
+	@FXML
+	public void next() {
+		ObservableList<Photo> photos = gv_photo.getItems();
+		int index = (int) gv_photo.getUserData();
+		index = (index - 1 + photos.size()) % photos.size();
+		gv_photo.setUserData(index);
+		img_scan.setImage(new Image(photos.get(index).getUri()));
 	}
 }

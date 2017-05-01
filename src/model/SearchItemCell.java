@@ -18,7 +18,7 @@ public class SearchItemCell extends ListCell<Photo> {
 		super.updateItem(item, empty);
 		HBox hBox = new HBox();
 		hBox.setSpacing(20);
-		hBox.setAlignment(Pos.CENTER_RIGHT);
+		hBox.setAlignment(Pos.CENTER_LEFT);
 		ImageView img_photo = new ImageView();
 		img_photo.setFitHeight(50);
 		img_photo.setFitWidth(50);

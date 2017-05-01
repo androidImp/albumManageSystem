@@ -23,6 +23,8 @@ import cluster.ImagePoint;
 import cluster.KDSearchUtil;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -44,6 +46,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import model.Album;
+import model.ImageCell;
 import model.Photo;
 import util.DBUtil;
 import util.ParseUtil;
@@ -84,7 +87,7 @@ public class PhotoBrowserStage extends Stage {
 		configureButtonAdd();
 		configureCloseProperty();
 		show();
-
+		
 	}
 
 	private void initView() {
@@ -134,6 +137,16 @@ public class PhotoBrowserStage extends Stage {
 		hb_scan = (HBox) root.lookup("#hb_scan");
 		img_scan = (ImageView) root.lookup("#img_scan");
 		hb_scan.visibleProperty().bind(gv_photo.visibleProperty().not());
+		hb_scan.visibleProperty().addListener(new ChangeListener<Boolean>() {
+
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+				// TODO Auto-generated method stub
+				if (newValue) {
+					img_scan.setImage(new Image(gv_photo.getItems().get((int) gv_photo.getUserData()).getUri()));
+				}
+			}
+		});
 		Image image = new Image("/Pic/bg.jpeg");
 		img_scan.setImage(image);
 

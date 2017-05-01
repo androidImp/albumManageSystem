@@ -1,9 +1,11 @@
-package view;
+package model;
 
 import org.controlsfx.control.GridCell;
 import org.controlsfx.control.GridView;
 
 import cluster.KDSearchUtil;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -14,8 +16,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
-import model.Album;
-import model.Photo;
+import view.PhotoBrowserStage;
+import view.PhotoInfoStage;
 
 public class ImageCell extends GridCell<Photo> {
 	public ImageCell() {
@@ -27,8 +29,8 @@ public class ImageCell extends GridCell<Photo> {
 			public void handle(Event event) {
 				// TODO Auto-generated method stub
 				if (((MouseEvent) event).getClickCount() >= 2) {
+					getGridView().setUserData(getIndex());
 					getGridView().setVisible(false);
-
 				}
 
 			}
@@ -72,7 +74,7 @@ public class ImageCell extends GridCell<Photo> {
 				double rotate = getGraphic().getRotate();
 				rotate = (rotate + 90) % 360;
 				getGraphic().setRotate(rotate);
-				
+
 			}
 		});
 	}
@@ -123,6 +125,9 @@ public class ImageCell extends GridCell<Photo> {
 			imageView.setFitWidth(80);
 			vBox.getChildren().add(imageView);
 			setGraphic(vBox);
+		} else {
+			setGraphic(null);
 		}
+
 	}
 }
