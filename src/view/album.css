@@ -30,40 +30,27 @@
 .button:hover {
    -fx-background-color: linear-gradient(#2A5058, #61a2b1);
 }
-.list-cell:empty{
-	-fx-background-color: white;
+.grid-cell{
+	-fx-padding: 8.0 15.0 15.0 15.0;
+    -fx-background-insets: 0.0,0.0 0.0 5.0 0.0, 0.0 0.0 6.0 0.0, 0.0 0.0 7.0 0.0;
+    -fx-background-radius: 8.0;
+    -fx-background-color: 
+        linear-gradient(from 0.0% 93.0% to 0.0% 100.0%, #a34313 0.0%, #903b12 100.0%),
+        #9d4024,
+        #d86e3a,
+        radial-gradient(center 50.0% 50.0%, radius 100.0%, #d86e3a, #c54e2c);
+    -fx-effect: dropshadow( gaussian , rgba(0.0,0.0,0.0,0.75) , 4.0,0.0,0.0,1.0 );
+    -fx-font-weight: bold;
+    -fx-font-size: 1.1em;
 }
-.list-cell:empty .list-cell {
-    -fx-border-width: 0.0px;
+.grid-cell:filled:hover  {
+    -fx-padding: 10.0 15.0 13.0 15.0;
+    -fx-background-insets: 2.0 0.0 0.0 0.0,2.0 0.0 3.0 0.0, 2.0 0.0 4.0 0.0, 2.0 0.0 5.0 0.0;
 }
-#tv_album .table-cell{
-	 -fx-alignment : center;
-	 
-}
-
-.list-cell:filled:selected:focused, .list-cell:filled:selected {
-    -fx-background-color: linear-gradient(#328BDB 0.0%, #207BCF 25.0%, #1973C9 75.0%, #0A65BF 100.0%);
-    -fx-text-fill: white;
-}
-
-.list-cell:even { /* <=== changed to even */
-    -fx-background-color: white;
-}
-
-.list-cell:filled:hover {
-    -fx-background-color: #0093ff;
-    -fx-text-fill: white;
-}
-.grid-cell:filled:selected:focused, .list-cell:filled:selected {
-    -fx-background-color: linear-gradient(#328BDB 0.0%, #207BCF 25.0%, #1973C9 75.0%, #0A65BF 100.0%);
-    -fx-text-fill: white;
-}
-
-
-
 .grid-cell:filled:hover {
-    -fx-background-color: #0093ff;
-    -fx-text-fill: white;
+   -fx-background-color: linear-gradient(#2A5058, #61a2b1);
 }
-
-
+.root{
+	-fx-background-image: url("/Pic/background.jpeg");
+	
+}

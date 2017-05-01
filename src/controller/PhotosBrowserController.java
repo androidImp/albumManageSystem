@@ -144,8 +144,9 @@ public class PhotosBrowserController implements ControllerInitializable<PhotoBro
 				} else {
 					int index = file.getName().lastIndexOf(".");
 					size += file.length();
-					Photo photo = new Photo(stage.getAlbum().getId(), path, DateUtil.getFormatDate(file.lastModified()),
-							file.getName().substring(0, index), ParseUtil.getMD5(file), file.length(), "");
+					Photo photo = new Photo(stage.getAlbum().getId(), stage.getAlbum().getAlbumName(), path,
+							DateUtil.getFormatDate(file.lastModified()), file.getName().substring(0, index),
+							ParseUtil.getMD5(file), file.length(), "");
 					photo.setModified(true);
 					photos.add(photo);
 					urisToAdd.add(path);

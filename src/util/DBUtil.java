@@ -9,6 +9,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.text.rtf.RTFEditorKit;
+
 import cluster.KDSearchUtil;
 import cluster.Point;
 import javafx.collections.FXCollections;
@@ -28,15 +30,16 @@ public class DBUtil {
 	public final static int CREATEDATE = 5;
 	public final static int PHOTONUMBER = 6;
 	public final static int SIZE = 7;
-	// photos 表中元素的列号
 	public final static int PHOTOSURI = 8;
+	// photos 表中元素的列号
 	public final static int MD5 = 1;
-	public final static int PHOTO_ID = 2;
-	public final static int PHOTO_NAME = 3;
-	public final static int PHOTO_URI = 4;
-	public final static int PHOTO_CREATEDATE = 5;
-	public final static int PHOTO_PROFILE = 6;
-	public final static int PHOTO_SIZE = 7;
+	private static final int ALBUMNAME = 2;
+	public final static int PHOTO_ID = 3;
+	public final static int PHOTO_NAME = 4;
+	public final static int PHOTO_URI = 5;
+	public final static int PHOTO_CREATEDATE = 6;
+	public final static int PHOTO_PROFILE = 7;
+	public final static int PHOTO_SIZE = 8;
 
 	public static void getConnection() {
 		try {
@@ -140,9 +143,9 @@ public class DBUtil {
 		getConnection();
 		String sql_select = "select md5,id from photos_" + username + " where md5 = ? and id = ?";
 		String sql_insert = "insert into photos_" + username
-				+ "(md5,id,name,uri,createDate,profile,size) values(?,?,?,?,?,?,?)";
+				+ "(md5,id,name,uri,createDate,profile,size,albumName) values(?,?,?,?,?,?,?,?)";
 		String sql_update = "update photos_" + username
-				+ " set name=?,uri=?,createDate=?,profile=?,size=? where md5=? and id = ?";
+				+ " set name=?,uri=?,createDate=?,profile=?,size=?,albumname=? where md5=? and id = ?";
 		PreparedStatement insert = null;
 		PreparedStatement update = null;
 		PreparedStatement select = null;
@@ -164,6 +167,7 @@ public class DBUtil {
 						insert.setString(5, photo.getCreateDate());
 						insert.setString(6, photo.getProfile());
 						insert.setDouble(7, photo.getSize());
+						insert.setString(8, photo.getAlbumName());
 						select.close();
 						insert.executeUpdate();
 					} else {
@@ -172,8 +176,9 @@ public class DBUtil {
 						update.setString(3, photo.getCreateDate());
 						update.setString(4, photo.getProfile());
 						update.setDouble(5, photo.getSize());
-						update.setString(6, photo.getMd5());
-						update.setInt(7, photo.getId());
+						update.setString(6, photo.getAlbumName());
+						update.setString(7, photo.getMd5());
+						update.setInt(8, photo.getId());
 						select.close();
 						update.executeUpdate();
 
@@ -220,9 +225,9 @@ public class DBUtil {
 		getConnection();
 		String sql_select = "select md5,id from photos_" + username + " where md5 = ? and id = ?";
 		String sql_insert = "insert into photos_" + username
-				+ "(md5,id,name,uri,createDate,profile,size) values(?,?,?,?,?,?,?)";
+				+ "(md5,id,albumName,name,uri,createDate,profile,size) values(?,?,?,?,?,?,?,?)";
 		String sql_update = "update photos_" + username
-				+ " set name=?,uri=?,createDate=?,profile=?,size=? where md5=? and id = ?";
+				+ " set name=?,albumName=?,uri=?,createDate=?,profile=?,size=? where md5=? and id = ?";
 		PreparedStatement insert = null;
 		PreparedStatement update = null;
 		PreparedStatement select = null;
@@ -240,22 +245,24 @@ public class DBUtil {
 					if (resultSet.getRow() == 0) {
 						insert.setString(1, photo.getMd5());
 						insert.setInt(2, photo.getId());
-						insert.setString(3, photo.getName());
-						insert.setString(4, photo.getUri());
-						insert.setString(5, photo.getCreateDate());
-						insert.setString(6, photo.getProfile());
-						insert.setDouble(7, photo.getSize());
+						insert.setString(3, photo.getAlbumName());
+						insert.setString(4, photo.getName());
+						insert.setString(5, photo.getUri());
+						insert.setString(6, photo.getCreateDate());
+						insert.setString(7, photo.getProfile());
+						insert.setDouble(8, photo.getSize());
 						select.close();
 						insert.addBatch();
 						// insert.executeUpdate();
 					} else {
 						update.setString(1, photo.getName());
-						update.setString(2, photo.getUri());
-						update.setString(3, photo.getCreateDate());
-						update.setString(4, photo.getProfile());
-						update.setDouble(5, photo.getSize());
-						update.setString(6, photo.getMd5());
-						update.setInt(7, photo.getId());
+						update.setString(2, photo.getAlbumName());
+						update.setString(3, photo.getUri());
+						update.setString(4, photo.getCreateDate());
+						update.setString(5, photo.getProfile());
+						update.setDouble(6, photo.getSize());
+						update.setString(7, photo.getMd5());
+						update.setInt(8, photo.getId());
 						select.close();
 						update.addBatch();
 						// update.executeUpdate();
@@ -343,9 +350,9 @@ public class DBUtil {
 			statement = connection.prepareStatement(sql_select);
 			rs = statement.executeQuery();
 			while (rs.next()) {
-				Photo photo = new Photo(rs.getInt(PHOTO_ID), rs.getString(PHOTO_URI), rs.getString(PHOTO_CREATEDATE),
-						rs.getString(PHOTO_NAME), rs.getString(MD5), rs.getDouble(PHOTO_SIZE),
-						rs.getString(PHOTO_PROFILE));
+				Photo photo = new Photo(rs.getInt(PHOTO_ID), rs.getString(ALBUMNAME), rs.getString(PHOTO_URI),
+						rs.getString(PHOTO_CREATEDATE), rs.getString(PHOTO_NAME), rs.getString(MD5),
+						rs.getDouble(PHOTO_SIZE), rs.getString(PHOTO_PROFILE));
 				// String md5 = rs.getString(MD5);
 				// int id = rs.getInt(PHOTO_ID);
 				// String name = rs.getString(PHOTO_NAME);
@@ -376,7 +383,8 @@ public class DBUtil {
 
 	public static void createPhotosTable(String username) {
 		String sql = "create table if not exists photos_" + username + "(md5 text," + "id integer not null,"
-				+ "name text not null," + "uri text,createDate text,profile text," + "size real,primary key(md5,id))";
+				+ "albumName name text not null," + "name text not null," + "uri text,createDate text,profile text,"
+				+ "size real,primary key(md5,id))";
 		getConnection();
 		try {
 			statement = connection.prepareStatement(sql);
@@ -402,12 +410,14 @@ public class DBUtil {
 			while (rs.next()) {
 				Photo photo = new Photo();
 				photo.setMd5(rs.getString(MD5));
+				photo.setAlbumName(rs.getString(ALBUMNAME));
 				photo.setId(rs.getInt(PHOTO_ID));
 				photo.setName(rs.getString(PHOTO_NAME));
 				photo.setUri(rs.getString(PHOTO_URI));
 				photo.setCreateDate(rs.getString(PHOTO_CREATEDATE));
 				photo.setProfile(rs.getString(PHOTO_PROFILE));
 				photo.setSize(rs.getDouble(PHOTO_SIZE));
+
 				photos.add(photo);
 			}
 		} catch (SQLException e) {

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.effect.GaussianBlur?>
+<?import javafx.scene.effect.BoxBlur?>
+
+<!-- style="-fx-background-color: rgba(255, 255, 255, 0.5); -fx-effect: dropshadow(gaussian, 
+	orange, 10, 0, 0, 5);" -->
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+	minWidth="-Infinity" spacing="5"
+	xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+	<children>
+		<HBox>
+			<children>
+				<VBox alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+					<children>
+						<Label fx:id="ll_name" />
+					</children>
+
+				</VBox>
+				<VBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+					<children>
+						<Label fx:id="ll_photoNumber" />
+					</children>
+				</VBox>
+			</children>
+			<VBox.margin>
+				<Insets left="5" right="5"></Insets>
+			</VBox.margin>
+		</HBox>
+		<HBox VBox.vgrow="ALWAYS">
+			<children>
+				<TilePane prefHeight="100" prefWidth="100" 
+					alignment="CENTER" HBox.hgrow="ALWAYS">
+					<children>
+						<ImageView fx:id="img_first" fitHeight="50.0" fitWidth="50.0" />
+						<ImageView fx:id="img_second" fitHeight="50.0" fitWidth="50.0" />
+						<ImageView fx:id="img_third" fitHeight="50.0" fitWidth="50.0" />
+						<ImageView fx:id="img_fourth" fitHeight="50.0" fitWidth="50.0" />
+					</children>
+					<HBox.margin>
+						<Insets />
+					</HBox.margin>
+				</TilePane>
+			</children>
+
+		</HBox>
+	</children>
+
+</VBox>

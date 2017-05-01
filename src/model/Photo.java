@@ -1,5 +1,7 @@
 package model;
 
+import java.io.Serializable;
+
 import cluster.KDSearchUtil;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -7,7 +9,15 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import util.DBUtil;
 
-public class Photo {
+public class Photo implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2061450379259737476L;
+	/**
+	 * 所属相册的名字
+	 */
+	private SimpleStringProperty albumName = new SimpleStringProperty(this, "albumName");
 	/**
 	 * 所属相册的索引号
 	 */
@@ -144,9 +154,11 @@ public class Photo {
 		modified.set(false);
 	}
 
-	public Photo(int id, String uri, String createDate, String name, String md5, double size, String profile) {
+	public Photo(int id, String albumName, String uri, String createDate, String name, String md5, double size,
+			String profile) {
 		super();
 		setId(id);
+		setAlbumName(albumName);
 		setUri(uri);
 		setCreateDate(createDate);
 		setName(name);
@@ -179,4 +191,17 @@ public class Photo {
 		}
 
 	}
+
+	public final SimpleStringProperty albumNameProperty() {
+		return this.albumName;
+	}
+
+	public final java.lang.String getAlbumName() {
+		return this.albumNameProperty().get();
+	}
+
+	public final void setAlbumName(final java.lang.String albumName) {
+		this.albumNameProperty().set(albumName);
+	}
+
 }

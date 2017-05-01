@@ -1,5 +1,7 @@
 package model;
 
+import java.io.Serializable;
+
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -7,7 +9,11 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleStringProperty;
 import util.DBUtil;
 
-public class Album {
+public class Album implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5550147392339343426L;
 	/**
 	 * 相册索引号
 	 */

@@ -68,7 +68,8 @@ public class LoginStage extends Stage {
 							DBUtil.createAlbumsTable(username);
 							tf_username.getScene().getWindow().hide();
 							preferences.put("origin", "");
-							new HomeStage(username).show();
+							// new HomeStage(username).show();
+							new ShowAlbumStage(username).show();
 
 						}
 					});
