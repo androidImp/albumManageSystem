@@ -33,6 +33,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
+import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -103,6 +104,7 @@ public class PhotoBrowserStage extends Stage {
 		Scene scene = new Scene(root);
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		setScene(scene);
+		scene.setCamera(new PerspectiveCamera());
 		fileChooser = new FileChooser();
 	}
 
@@ -150,17 +152,6 @@ public class PhotoBrowserStage extends Stage {
 		});
 		Image image = new Image("/Pic/bg.jpeg");
 		img_scan.setImage(image);
-
-		img_scan.setOnMouseClicked(new EventHandler<Event>() {
-
-			@Override
-			public void handle(Event event) {
-				// TODO Auto-generated method stub
-				if (((MouseEvent) event).getClickCount() >= 2) {
-					gv_photo.setVisible(true);
-				}
-			}
-		});
 
 	}
 
@@ -366,7 +357,12 @@ public class PhotoBrowserStage extends Stage {
 			// album.setPhotosNumber(album.getPhotosNumber() + files.size());
 			getAlbum().addAlbumSize(size);
 			getAlbum().addPhotoNumber(files.size());
-			getUser().addPhotoNumber(files.size());
+			Platform.runLater(new Runnable() {
+				public void run() {
+					getUser().addPhotoNumber(files.size());
+				}
+			});
+
 			Platform.runLater(new Runnable() {
 
 				@Override

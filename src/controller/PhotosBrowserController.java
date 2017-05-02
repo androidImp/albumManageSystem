@@ -19,11 +19,17 @@ import com.alibaba.simpleimage.analyze.sift.render.RenderImage;
 import cluster.ClusterUtils;
 import cluster.ImagePoint;
 import cluster.KDSearchUtil;
+import javafx.animation.Interpolator;
+import javafx.animation.RotateTransition;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
-import javafx.geometry.Side;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
@@ -31,8 +37,16 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.PixelReader;
+import javafx.scene.image.PixelWriter;
+import javafx.scene.image.WritableImage;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
+import javafx.scene.transform.Rotate;
 import javafx.stage.FileChooser;
+import javafx.util.Duration;
 import model.ImageCell;
 import model.Photo;
 import util.DBUtil;
@@ -42,6 +56,10 @@ import util.ParseUtil;
 import view.PhotoBrowserStage;
 
 public class PhotosBrowserController implements ControllerInitializable<PhotoBrowserStage> {
+	private static final int BRIGHTER = 1;
+	private static final int DARKER = 2;
+	private static final int GREY = 3;
+	private static final int INVERT = 4;
 	private static final int BATCH_OF_IMAGE_RENDER = 10;
 	@FXML
 	private Label ll_title;
@@ -75,8 +93,82 @@ public class PhotosBrowserController implements ControllerInitializable<PhotoBro
 		// TODO Auto-generated method stub
 		ContextMenu menu = new ContextMenu();
 		MenuItem rotateClockWiseItem = new MenuItem("顺时针旋转");
-		MenuItem rotateantiClockWiseItem = new MenuItem("逆时针旋转");
-		menu.show(img_scan, Side.RIGHT, 0, 0);
+		MenuItem rotateAntiClockWiseItem = new MenuItem("逆时针旋转");
+		MenuItem brighterItem = new MenuItem("调高色彩度");
+		MenuItem darkerItem = new MenuItem("调低色彩度");
+		MenuItem greyItem = new MenuItem("灰度处理");
+		MenuItem invertItem = new MenuItem("颜色反转");
+		MenuItem recoverItem = new MenuItem("还原");
+		configuRotateClockWiseItem(rotateClockWiseItem);
+		configuRotateAntiClockWiseItem(rotateAntiClockWiseItem);
+		configureBrighterItem(brighterItem);
+		configureDarkerItem(darkerItem);
+		configureGreyItem(greyItem);
+		configureInvertItem(invertItem);
+		configureRecoverItem(recoverItem);
+		menu.getItems().addAll(rotateClockWiseItem, rotateAntiClockWiseItem, brighterItem, darkerItem, greyItem,
+				invertItem, recoverItem);
+		img_scan.setOnMouseClicked(new EventHandler<Event>() {
+
+			@Override
+			public void handle(Event event) {
+				// TODO Auto-generated method stub
+				MouseEvent mouseEvent = (MouseEvent) event;
+				if (mouseEvent.getButton().equals(MouseButton.SECONDARY)) {
+					if (!menu.isShowing()) {
+						menu.show(img_scan, mouseEvent.getScreenX(), mouseEvent.getScreenY());
+
+					}
+				} else if (mouseEvent.getClickCount() >= 2) {
+					gv_photo.setVisible(true);
+				}
+
+			}
+		});
+
+	}
+
+	private void configureRecoverItem(MenuItem recoverItem) {
+		// TODO Auto-generated method stub
+		recoverItem.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent event) {
+				// TODO Auto-generated method stub
+				img_scan.setImage(new Image(gv_photo.getItems().get((int) gv_photo.getUserData()).getUri()));
+			}
+		});
+
+	}
+
+	private void configureInvertItem(MenuItem invertItem) {
+		// TODO Auto-generated method stub
+		invertItem.setOnAction(event -> processImage(INVERT));
+	}
+
+	private void configureGreyItem(MenuItem greyItem) {
+		// TODO Auto-generated method stub
+		greyItem.setOnAction(event -> processImage(GREY));
+	}
+
+	private void configureDarkerItem(MenuItem darkerItem) {
+		// TODO Auto-generated method stub
+		darkerItem.setOnAction(event -> processImage(DARKER));
+	}
+
+	private void configureBrighterItem(MenuItem brighterItem) {
+		// TODO Auto-generated method stub
+		brighterItem.setOnAction(event -> processImage(BRIGHTER));
+	}
+
+	private void configuRotateAntiClockWiseItem(MenuItem rotateAntiClockWiseItem) {
+		// TODO Auto-generated method stub
+		rotateAntiClockWiseItem.setOnAction(event -> img_scan.setRotate((img_scan.getRotate() + 270) % 360));
+	}
+
+	private void configuRotateClockWiseItem(MenuItem rotateClockWiseItem) {
+		// TODO Auto-generated method stub
+		rotateClockWiseItem.setOnAction(event -> img_scan.setRotate((img_scan.getRotate() + 90) % 360));
 	}
 
 	@Override
@@ -125,7 +217,6 @@ public class PhotosBrowserController implements ControllerInitializable<PhotoBro
 					stage = (PhotoBrowserStage) gv_photo.getScene().getWindow();
 				}
 				RenderImageRunnable runnable = new RenderImageRunnable(filesList.subList(startIndex, endIndex));
-
 				executor.execute(runnable);
 
 			}
@@ -215,8 +306,9 @@ public class PhotosBrowserController implements ControllerInitializable<PhotoBro
 		ObservableList<Photo> photos = gv_photo.getItems();
 		int index = (int) gv_photo.getUserData();
 		index = (index + 1) % photos.size();
+		final int current = index;
 		gv_photo.setUserData(index);
-		img_scan.setImage(new Image(photos.get(index).getUri()));
+		playAnimation(photos, current);
 	}
 
 	@FXML
@@ -224,7 +316,67 @@ public class PhotosBrowserController implements ControllerInitializable<PhotoBro
 		ObservableList<Photo> photos = gv_photo.getItems();
 		int index = (int) gv_photo.getUserData();
 		index = (index - 1 + photos.size()) % photos.size();
+		final int current = index;
 		gv_photo.setUserData(index);
-		img_scan.setImage(new Image(photos.get(index).getUri()));
+		playAnimation(photos, current);
+
+	}
+
+	private void playAnimation(ObservableList<Photo> photos, final int current) {
+		RotateTransition rotator = createRotator(img_scan, 0, 90);
+		rotator.play();
+		rotator.setOnFinished(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent event) {
+				// TODO Auto-generated method stub
+				img_scan.setImage(new Image(photos.get(current).getUri()));
+				createRotator(img_scan, 90, 180).play();
+			}
+		});
+	}
+
+	private void processImage(int type) {
+		Image image = img_scan.getImage();
+		PixelReader reader = image.getPixelReader();
+		WritableImage writableImage = new WritableImage((int) (image.getWidth()), (int) (image.getHeight()));
+		PixelWriter pixelWriter = writableImage.getPixelWriter();
+		for (int y = 0; y < image.getHeight(); y++)
+			for (int x = 0; x < image.getWidth(); x++) {
+				Color color = reader.getColor(x, y);
+				color = processPixel(type, color);
+				pixelWriter.setColor(x, y, color);
+			}
+		img_scan.setImage(writableImage);
+
+	}
+
+	private Color processPixel(int type, Color color) {
+		switch (type) {
+		case 1:
+			color = color.brighter();
+			break;
+		case 2:
+			color = color.darker();
+			break;
+		case 3:
+			color = color.grayscale();
+			break;
+		case 4:
+			color = color.invert();
+			break;
+		default:
+			break;
+		}
+		return color;
+	}
+
+	private RotateTransition createRotator(Node card, double from, double to) {
+		RotateTransition rotator = new RotateTransition(Duration.millis(1000), card);
+		rotator.setAxis(Rotate.Y_AXIS);
+		rotator.setFromAngle(from);
+		rotator.setToAngle(to);
+		rotator.setInterpolator(Interpolator.LINEAR);
+		return rotator;
 	}
 }

@@ -65,5 +65,7 @@
     -fx-background-color: #0093ff;
     -fx-text-fill: white;
 }
-
+.root{
+	-fx-background-image: url("/Pic/background.jpeg");	
+}
 

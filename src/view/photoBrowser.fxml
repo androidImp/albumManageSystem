@@ -71,7 +71,7 @@
 								<Insets left="10"></Insets>
 							</padding>
 						</HBox>
-						<HBox alignment="CENTER" HBox.hgrow="ALWAYS">							
+						<HBox alignment="CENTER" HBox.hgrow="ALWAYS">
 							<children>
 								<ImageView fitWidth="500" fx:id="img_scan"
 									preserveRatio="true" />
