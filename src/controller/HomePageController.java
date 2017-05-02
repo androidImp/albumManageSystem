@@ -50,6 +50,7 @@ import javafx.util.Pair;
 import model.Album;
 import model.Photo;
 import model.SearchItemCell;
+import model.User;
 import util.DBUtil;
 import util.ParseUtil;
 import util.DateUtil;
@@ -210,7 +211,7 @@ public class HomePageController implements ControllerInitializable<HomeStage> {
 			Album album = tv_album.getSelectionModel().getSelectedItem();
 			if (album != null) {
 				// new PhotoBrowserStage(album, homeStage.getUsername());
-				new PhotoBrowserStage(album, homeStage.getUsername());
+				new PhotoBrowserStage(album, new User());
 			}
 
 		}

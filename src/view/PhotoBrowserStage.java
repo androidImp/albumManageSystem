@@ -48,6 +48,7 @@ import javafx.stage.WindowEvent;
 import model.Album;
 import model.ImageCell;
 import model.Photo;
+import model.User;
 import util.DBUtil;
 import util.ParseUtil;
 import util.DateUtil;
@@ -64,7 +65,7 @@ public class PhotoBrowserStage extends Stage {
 	}
 
 	private static final int BATCH_OF_IMAGE_RENDER = 10;
-	SimpleStringProperty username = new SimpleStringProperty("name");
+	private User user;
 	private Album album;
 	GridView<Photo> gv_photo;
 	Parent root = null;
@@ -76,10 +77,10 @@ public class PhotoBrowserStage extends Stage {
 	private HBox hb_scan;
 	private ImageView img_scan;
 
-	public PhotoBrowserStage(Album album, String name) {
+	public PhotoBrowserStage(Album album, User user) {
 		// TODO Auto-generated constructor stub
-		setUsername(name);
-		this.album = album;
+		setAlbum(album);
+		setUser(user);
 		initView();
 		lookUpViewById();
 		configurePhotoList();
@@ -112,7 +113,7 @@ public class PhotoBrowserStage extends Stage {
 			@Override
 			public void handle(WindowEvent event) {
 				// TODO Auto-generated method stub
-				// DBUtil.savePhotosData(gv_photo.getItems(), username.get());
+				// DBUtil.savePhotosData(gv_photo.getItems(), getUsername());
 				DBUtil.updateAlbumInfo(getUsername(), album);
 				// Platform.exit();
 			}
@@ -174,23 +175,15 @@ public class PhotoBrowserStage extends Stage {
 
 	}
 
-	public final SimpleStringProperty usernameProperty() {
-		return this.username;
-	}
-
-	public final String getUsername() {
-		return this.usernameProperty().get();
-	}
-
-	public final void setUsername(final String username) {
-		this.usernameProperty().set(username);
+	public String getUsername() {
+		return getUser().getUsername();
 	}
 
 	class RenderImageTask extends Task<Void> {
 		@Override
 		protected Void call() throws Exception {
 			// TODO Auto-generated method stub
-			ObservableList<Photo> photos = DBUtil.getPhotosByAlbum(album.getId(), username.get());
+			ObservableList<Photo> photos = DBUtil.getPhotosByAlbum(album.getId(), getUsername());
 			gv_photo.setItems(photos);
 			// System.out.println("大小: " + gv_photo.getItems().size());
 			return null;
@@ -231,7 +224,7 @@ public class PhotoBrowserStage extends Stage {
 					double[] express = ClusterUtils.distribute(imagePoint);
 					String expression = ParseUtil.doubleArrayToExpression(express);
 
-					DBUtil.addExpression(username.get(), album.getId(), ParseUtil.getMD5(file),
+					DBUtil.addExpression(getUsername(), album.getId(), ParseUtil.getMD5(file),
 							file.getAbsoluteFile().toURI().toString(), expression);
 					KDSearchUtil.insertNode(KDSearchUtil.constructKeyWithAlbumId(express, album.getId()),
 							photos.get(startIndex + i));
@@ -291,14 +284,22 @@ public class PhotoBrowserStage extends Stage {
 		if (photo != null) {
 			album.getPhotosUri().remove(index);
 			gv_photo.getItems().remove(index);
-			DBUtil.deletePhoto(photo.getMd5(), photo.getId(), username.get());
-			DBUtil.deleteExpressionOfPhoto(username.get(), photo.getId(), photo.getMd5());
+			DBUtil.deletePhoto(photo.getMd5(), photo.getId(), getUsername());
+			DBUtil.deleteExpressionOfPhoto(getUsername(), photo.getId(), photo.getMd5());
 			// 数据库中存储的文件路径为 file:(path),所以这里去掉了前5个字符:
 			File file = new File(photo.getUri().substring(5, photo.getUri().length()));
 			album.setSize(album.getSize() - file.length());
-			double[] key = DBUtil.getExpression(username.get(), photo.getMd5(), photo.getId());
+			double[] key = DBUtil.getExpression(getUsername(), photo.getMd5(), photo.getId());
 			KDSearchUtil.deleteNode(KDSearchUtil.constructKeyWithAlbumId(key, photo.getId()));
 		}
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 	class RenderImageRunnable implements Runnable {
@@ -348,7 +349,7 @@ public class PhotoBrowserStage extends Stage {
 						double[] express = ClusterUtils.distribute(imagePoint);
 						String expression = ParseUtil.doubleArrayToExpression(express);
 						expressionToAdd.add(expression);
-						// DBUtil.addExpression(username.get(), album.getId(),
+						// DBUtil.addExpression(getUsername(), album.getId(),
 						// photo.getMd5(), photo.getUri(), expression);
 						KDSearchUtil.insertNode(KDSearchUtil.constructKeyWithAlbumId(express, album.getId()), photo);
 
@@ -359,10 +360,13 @@ public class PhotoBrowserStage extends Stage {
 
 				}
 			}
-			DBUtil.addExpressionBatch(username.get(), album.getId(), photos, expressionToAdd);
+			DBUtil.addExpressionBatch(getUsername(), album.getId(), photos, expressionToAdd);
 			DBUtil.savePhotosData(photos, getUsername());
-			album.setSize(album.getSize() + size);
-			album.setPhotosNumber(album.getPhotosNumber() + files.size());
+			// album.setSize(album.getSize() + size);
+			// album.setPhotosNumber(album.getPhotosNumber() + files.size());
+			getAlbum().addAlbumSize(size);
+			getAlbum().addPhotoNumber(files.size());
+			getUser().addPhotoNumber(files.size());
 			Platform.runLater(new Runnable() {
 
 				@Override

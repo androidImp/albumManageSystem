@@ -187,4 +187,26 @@ public class Album implements Serializable {
 		DBUtil.deletePhotoByAlbum(getId(), username);
 		DBUtil.deleteExpressionsOfAlbum(username, getId());
 	}
+
+	public void addPhotoNumber(int number) {
+		photosNumber.add(number);
+	}
+
+	public void subPhotoNumber(int number) {
+		photosNumber.subtract(number);
+		if (photosNumber.getValue() < 0) {
+			photosNumber.setValue(0);
+		}
+	}
+
+	public void addAlbumSize(double length) {
+		size.add(length);
+	}
+
+	public void subAlbumSize(double length) {
+		size.subtract(length);
+		if (size.getValue() < 0) {
+			size.setValue(0);
+		}
+	}
 }

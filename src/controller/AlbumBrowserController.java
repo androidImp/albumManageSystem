@@ -1,20 +1,32 @@
 package controller;
 
 import java.util.Optional;
+import java.util.concurrent.Callable;
 
 import org.controlsfx.control.GridView;
 
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.geometry.Side;
+import javafx.scene.Node;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.util.Pair;
 import model.Album;
@@ -22,12 +34,7 @@ import model.AlbumInfoCell;
 import util.DBUtil;
 import util.DateUtil;
 import util.DialogUtil;
-import view.HomeStage;
 import view.AlbumBrowser;
-import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
 
 public class AlbumBrowserController implements ControllerInitializable<AlbumBrowser> {
 	@FXML
@@ -71,11 +78,52 @@ public class AlbumBrowserController implements ControllerInitializable<AlbumBrow
 		configureData();
 		configureGridView();
 		configureTitle();
+		configureAlbumInfo();
+	}
+
+	private void configureAlbumInfo() {
+		// TODO Auto-generated method stub
+		ll_albumNumber.textProperty().bind(Bindings.createStringBinding(new Callable<String>() {
+
+			@Override
+			public String call() throws Exception {
+				// TODO Auto-generated method stub
+				return String.valueOf(stage.getUser().getAlbumNumber());
+			}
+		}, stage.getUser().albumNumberProperty()));
+
+		ll_photoNumber.textProperty().bind(Bindings.createStringBinding(new Callable<String>() {
+
+			@Override
+			public String call() throws Exception {
+				// TODO Auto-generated method stub
+				return String.valueOf(stage.getUser().getPhotoNumber());
+			}
+		}, stage.getUser().photoNumberProperty()));
 	}
 
 	private void configureTitle() {
 		// TODO Auto-generated method stub
 		img_userIcon.setImage(new Image("/Pic/pic.jpeg"));
+		ContextMenu menu = new ContextMenu();
+		MenuItem scanItem = new MenuItem("查看信息");
+		menu.getItems().add(scanItem);
+		img_userIcon.setOnMouseClicked(new EventHandler<Event>() {
+
+			@Override
+			public void handle(Event event) {
+				// TODO Auto-generated method stub
+				MouseEvent mouseEvent = (MouseEvent) event;
+				if ((mouseEvent.getButton()).equals(MouseButton.SECONDARY)) {
+					if (!menu.isShowing()) {
+						menu.show(img_userIcon, Side.BOTTOM, 0, 0);
+					}
+
+				}
+
+			}
+		});
+		ll_userName.textProperty().bind(stage.getUser().nicknameProperty());
 	}
 
 	public void addAlbum() {
@@ -139,6 +187,7 @@ public class AlbumBrowserController implements ControllerInitializable<AlbumBrow
 				album.setCoverUri("Pic/emptyCover.png");
 				album.setPhotosUri(FXCollections.observableArrayList());
 				gv_album.getItems().add(album);
+				stage.getUser().albumNumberIncrease();
 				String name = stage.getUsername();
 				album.saveAlbum(name);
 				// DBUtil.saveAlbumInfo(album, name);
@@ -148,6 +197,15 @@ public class AlbumBrowserController implements ControllerInitializable<AlbumBrow
 			}
 
 		});
+	}
+
+	@FXML
+	public void changeUserInfo() {
+		// TO DO 修改用户资料
+		// String[] names = { "小朋友", "大朋友", "你好", "测试" };
+		// int index = new Random().nextInt(4);
+		// stage.getUser().setNickname(names[index]);
+		// stage.getUser().albumNumberIncrease();
 	}
 
 }

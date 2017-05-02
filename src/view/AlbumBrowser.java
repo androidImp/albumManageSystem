@@ -33,6 +33,7 @@ import javafx.scene.control.TextField;
 import javafx.stage.WindowEvent;
 import model.Photo;
 import model.SearchItemCell;
+import model.User;
 import util.DBUtil;
 
 public class AlbumBrowser extends BaseStage {
@@ -41,20 +42,16 @@ public class AlbumBrowser extends BaseStage {
 	private TextField tf_search;
 
 	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
+		return user.getUsername();
 	}
 
 	private FXMLLoader loader;
 	private Parent root;
-	private String username;
+	private User user;
 
-	public AlbumBrowser(String name) {
+	public AlbumBrowser(User user) {
 		// TODO Auto-generated constructor stub
-		setUsername(name);
+		setUser(user);
 		initParameters();
 		loadStageFromFXML();
 		configureController();
@@ -225,5 +222,13 @@ public class AlbumBrowser extends BaseStage {
 			e.printStackTrace();
 		}
 		ClusterUtils.setWords(centers);
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
 	}
 }

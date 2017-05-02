@@ -3,7 +3,10 @@ package model;
 import java.io.Serializable;
 
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.ObservableList;
+import util.DBUtil;
 
 public class User implements Serializable {
 
@@ -17,6 +20,34 @@ public class User implements Serializable {
 	private SimpleStringProperty nickname = new SimpleStringProperty(this, "nickname");
 	private SimpleIntegerProperty photoNumber = new SimpleIntegerProperty(this, "photoNumber");
 	private SimpleIntegerProperty albumNumber = new SimpleIntegerProperty(this, "albumNumber");
+	private SimpleListProperty<String> albumNames = new SimpleListProperty<>(this, "albumNames");
+
+	public User() {
+		super();
+	}
+
+	public User(String username, String password, String nickname, int albumNumber, int photoNumber,
+			ObservableList<String> albumNames) {
+		super();
+		setUsername(username);
+		setPassword(password);
+		setNickname(nickname);
+		setPhotoNumber(photoNumber);
+		setAlbumNumber(albumNumber);
+		setAlbumNames(albumNames);
+	}
+
+	public User(int id, String username, String password, String nickname, int albumNumber, int photoNumber,
+			ObservableList<String> albumNames) {
+		super();
+		setId(id);
+		setUsername(username);
+		setPassword(password);
+		setNickname(nickname);
+		setPhotoNumber(photoNumber);
+		setAlbumNumber(albumNumber);
+		setAlbumNames(albumNames);
+	}
 
 	public final SimpleIntegerProperty idProperty() {
 		return this.id;
@@ -90,4 +121,49 @@ public class User implements Serializable {
 		this.albumNumberProperty().set(albumNumber);
 	}
 
+	public final SimpleListProperty<String> albumNamesProperty() {
+		return this.albumNames;
+	}
+
+	public final ObservableList<java.lang.String> getAlbumNames() {
+		return this.albumNamesProperty().get();
+	}
+
+	public final void setAlbumNames(final javafx.collections.ObservableList<java.lang.String> albumNames) {
+		this.albumNamesProperty().set(albumNames);
+	}
+
+	public void insert() {
+		DBUtil.addUser(this);
+	}
+
+	public void update() {
+		DBUtil.updateUserInfo(this);
+	}
+
+	public void albumNumberIncrease() {
+		albumNumber.set(albumNumber.get() + 1);
+		update();
+	}
+
+	public void albumNumberDecrease() {
+		albumNumber.set(albumNumber.get() - 1);
+		if (albumNumber.getValue() < 0) {
+			albumNumber.set(0);
+		}
+		update();
+	}
+
+	public void addPhotoNumber(int number) {
+		photoNumber.set(photoNumber.get() + number);
+		update();
+	}
+
+	public void subPhotoNumber(int number) {
+		photoNumber.set(photoNumber.get() - number);
+		if (photoNumber.getValue() < 0) {
+			photoNumber.set(0);
+		}
+		update();
+	}
 }

@@ -3,7 +3,10 @@ package controller;
 import java.util.Optional;
 import java.util.prefs.Preferences;
 
+import javax.jws.soap.SOAPBinding.Use;
+
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -17,8 +20,10 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.util.Pair;
+import model.User;
 import util.DBUtil;
 import util.ParseUtil;
+import view.AlbumBrowser;
 import view.HomeStage;
 import view.LoginStage;
 import javafx.scene.control.Hyperlink;
@@ -123,7 +128,9 @@ public class LoginController implements ControllerInitializable<LoginStage> {
 		});
 		Optional<Pair<String, String>> result = dialog.showAndWait();
 		result.ifPresent(albumNamePassword -> {
-			DBUtil.addUser(username.getText(), ParseUtil.getMD5(password.getText()), nickname.getText());
+			User user = new User(username.getText(), ParseUtil.getMD5(password.getText()), nickname.getText(), 0, 0,
+					FXCollections.observableArrayList());
+			DBUtil.addUser(user);
 		});
 	}
 
@@ -158,8 +165,9 @@ public class LoginController implements ControllerInitializable<LoginStage> {
 							DBUtil.createAlbumsTable(username);
 							tf_username.getScene().getWindow().hide();
 							preferences.put("origin", "");
-							new HomeStage(username).show();
-
+							// new HomeStage(username).show();
+							User user = DBUtil.getUser(username);
+							new AlbumBrowser(user);
 						}
 					});
 				} else {

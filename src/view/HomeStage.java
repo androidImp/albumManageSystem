@@ -46,6 +46,7 @@ import javafx.stage.WindowEvent;
 import model.Album;
 import model.Photo;
 import model.SearchItemCell;
+import model.User;
 import util.DBUtil;
 
 public class HomeStage extends BaseStage {
@@ -281,7 +282,7 @@ public class HomeStage extends BaseStage {
 				if (((MouseEvent) event).getClickCount() >= 2) {
 					Album album = tv_album.getSelectionModel().getSelectedItem();
 					if (album != null) {
-						new PhotoBrowserStage(album, getUsername());
+						new PhotoBrowserStage(album, new User());
 
 					}
 

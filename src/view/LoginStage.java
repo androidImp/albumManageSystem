@@ -14,6 +14,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import model.User;
 import util.DBUtil;
 
 public class LoginStage extends Stage {
@@ -69,7 +70,8 @@ public class LoginStage extends Stage {
 							tf_username.getScene().getWindow().hide();
 							preferences.put("origin", "");
 							// new HomeStage(username).show();
-							new AlbumBrowser(username).show();
+							User user = DBUtil.getUser(username);
+							new AlbumBrowser(user).show();
 
 						}
 					});

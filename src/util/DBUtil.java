@@ -15,8 +15,10 @@ import cluster.KDSearchUtil;
 import cluster.Point;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.image.Image;
 import model.Album;
 import model.Photo;
+import model.User;
 
 public class DBUtil {
 
@@ -33,8 +35,8 @@ public class DBUtil {
 	public final static int PHOTOSURI = 8;
 	// photos 表中元素的列号
 	public final static int MD5 = 1;
-	private static final int ALBUMNAME = 2;
-	public final static int PHOTO_ID = 3;
+	public final static int PHOTO_ID = 2;
+	private static final int ALBUMNAME = 3;
 	public final static int PHOTO_NAME = 4;
 	public final static int PHOTO_URI = 5;
 	public final static int PHOTO_CREATEDATE = 6;
@@ -61,7 +63,7 @@ public class DBUtil {
 	}
 
 	public static void createAlbumsTable(String ownerName) {
-		String sql_create = "create table if not exists albums_" + ownerName + "(id integer primary key,"
+		String sql_create = "create table if not exists albums_" + ownerName + "(id integer primary key ,"
 				+ "name text not null," + "profile text,coverUri text,createDate text,"
 				+ "photoNumber integer,size real," + "photosUri text)";
 		getConnection();
@@ -417,7 +419,6 @@ public class DBUtil {
 				photo.setCreateDate(rs.getString(PHOTO_CREATEDATE));
 				photo.setProfile(rs.getString(PHOTO_PROFILE));
 				photo.setSize(rs.getDouble(PHOTO_SIZE));
-
 				photos.add(photo);
 			}
 		} catch (SQLException e) {
@@ -644,7 +645,7 @@ public class DBUtil {
 	 */
 	public static void createUsersTable() {
 		String sql_create = "create table if not exists users(id integer primary key autoincrement,"
-				+ "name text unique not null,password text not null,nickname text not null)";
+				+ "name text unique not null,password text not null,nickname text not null,albumNumber integer,photoNumber integer,albumNames text)";
 		getConnection();
 		try {
 			statement = connection.prepareStatement(sql_create);
@@ -657,14 +658,17 @@ public class DBUtil {
 		}
 	}
 
-	public static void addUser(String name, String password, String nickname) {
-		String sql_insert = "insert into users(name,password,nickname) values(?,?,?)";
+	public static void addUser(User user) {
+		String sql_insert = "insert into users(name,password,nickname,albumNumber,photoNumber,albumNames) values(?,?,?,?,?,?)";
 		getConnection();
 		try {
 			statement = connection.prepareStatement(sql_insert);
-			statement.setString(1, name);
-			statement.setString(2, password);
-			statement.setString(3, nickname);
+			statement.setString(1, user.getUsername());
+			statement.setString(2, user.getPassword());
+			statement.setString(3, user.getNickname());
+			statement.setInt(4, user.getAlbumNumber());
+			statement.setInt(5, user.getPhotoNumber());
+			statement.setString(6, ParseUtil.parseListToString(user.getAlbumNames()));
 			statement.executeUpdate();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -809,14 +813,17 @@ public class DBUtil {
 	public static double[] queryExpression(String name, int dimension, int id, String md5) {
 		String sql_query = "select expression from expressions_" + name + " where id = ? and md5 = ?";
 		getConnection();
+
 		try {
 			statement = connection.prepareStatement(sql_query);
 			statement.setInt(1, id);
 			statement.setString(2, md5);
 			ResultSet rs = statement.executeQuery();
 			rs.next();
+
 			if (rs.getRow() != 0) {
 				String string = rs.getString(1);
+
 				return ParseUtil.expressionTodoubleArray(string, dimension);
 			}
 			return null;
@@ -967,5 +974,46 @@ public class DBUtil {
 		} finally {
 			releaseConnection(getCurrentMethod());
 		}
+	}
+
+	public static User getUser(String username) {
+		// TODO Auto-generated method stub
+		String sql_query = "select * from users where name = ?";
+		getConnection();
+		try {
+			statement = connection.prepareStatement(sql_query);
+			statement.setString(1, username);
+			ResultSet rs = statement.executeQuery();
+			rs.next();
+			return new User(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getInt(5), rs.getInt(6),
+					ParseUtil.parseUrlToList(rs.getString(7)));
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			releaseConnection(getCurrentMethod());
+		}
+		return null;
+	}
+
+	public static void updateUserInfo(User user) {
+		// TODO Auto-generated method stub
+		String sql_update = "update users set nickname = ?,albumNumber = ?, photoNumber = ?, albumNames = ? where id = ?";
+		getConnection();
+		try {
+			statement = connection.prepareStatement(sql_update);
+			statement.setString(1, user.getNickname());
+			statement.setInt(2, user.getAlbumNumber());
+			statement.setInt(3, user.getPhotoNumber());
+			statement.setString(4, ParseUtil.parseListToString(user.getAlbumNames()));
+			statement.setInt(5, user.getId());
+			statement.executeUpdate();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			releaseConnection(getCurrentMethod());
+		}
+
 	}
 }

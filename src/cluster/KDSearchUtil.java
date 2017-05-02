@@ -9,6 +9,7 @@ import edu.wlu.cs.levy.CG.KeySizeException;
 import javafx.scene.Scene;
 import javafx.scene.control.ListView;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.ContentSearchItemCell;
@@ -50,6 +51,7 @@ public class KDSearchUtil {
 	public static void queryNearestPic(String username, Photo photo) {
 		// System.out.println("开始查询相似图片");
 		double[] key = DBUtil.queryExpression(username, DIMENSIONS_OF_KDTREE, photo.getId(), photo.getMd5());
+
 		if (key == null)
 			System.out.println("key is null");
 		if (key != null) {
@@ -69,6 +71,7 @@ public class KDSearchUtil {
 				listView.setUserData(key);
 				listView.setCellFactory(param -> new ContentSearchItemCell());
 				root.getChildren().add(listView);
+				VBox.setVgrow(listView, Priority.ALWAYS);
 				for (int i = photos.size() - 1; i >= 0; i--) {
 					listView.getItems().add(photos.get(i));
 				}

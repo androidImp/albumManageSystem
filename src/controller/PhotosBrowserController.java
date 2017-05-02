@@ -27,6 +27,7 @@ import javafx.geometry.Side;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -69,9 +70,12 @@ public class PhotosBrowserController implements ControllerInitializable<PhotoBro
 		// System.out.println("stage: " + stage);
 	}
 
+	// TO DO 相片过大时,提供一个小的视图用于用户调整当前浏览的部分
 	private void configureScanOption() {
 		// TODO Auto-generated method stub
 		ContextMenu menu = new ContextMenu();
+		MenuItem rotateClockWiseItem = new MenuItem("顺时针旋转");
+		MenuItem rotateantiClockWiseItem = new MenuItem("逆时针旋转");
 		menu.show(img_scan, Side.RIGHT, 0, 0);
 	}
 
@@ -188,8 +192,12 @@ public class PhotosBrowserController implements ControllerInitializable<PhotoBro
 			}
 			DBUtil.addExpressionBatch(stage.getUsername(), stage.getAlbum().getId(), photos, expressionToAdd);
 			DBUtil.savePhotosData(photos, stage.getUsername());
-			stage.getAlbum().setSize(stage.getAlbum().getSize() + size);
-			stage.getAlbum().setPhotosNumber(stage.getAlbum().getPhotosNumber() + files.size());
+			stage.getAlbum().addAlbumSize(size);
+			stage.getAlbum().addPhotoNumber(files.size());
+			stage.getUser().addPhotoNumber(files.size());
+			// stage.getAlbum().setSize(stage.getAlbum().getSize() + size);
+			// stage.getAlbum().setPhotosNumber(stage.getAlbum().getPhotosNumber()
+			// + files.size());
 			uris.addAll(urisToAdd);
 			Platform.runLater(new Runnable() {
 				public void run() {

@@ -13,8 +13,8 @@
 <!-- style="-fx-background-color: rgba(255, 255, 255, 0.5); -fx-effect: dropshadow(gaussian, 
 	orange, 10, 0, 0, 5);" -->
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-	minWidth="-Infinity" spacing="5"
-	xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+	minWidth="-Infinity" spacing="5" xmlns="http://javafx.com/javafx/8"
+	xmlns:fx="http://javafx.com/fxml/1">
 	<children>
 		<HBox>
 			<children>
@@ -36,8 +36,8 @@
 		</HBox>
 		<HBox VBox.vgrow="ALWAYS">
 			<children>
-				<TilePane prefHeight="100" prefWidth="100" 
-					alignment="CENTER" HBox.hgrow="ALWAYS">
+				<TilePane prefHeight="100" prefWidth="100" alignment="CENTER"
+					HBox.hgrow="ALWAYS">
 					<children>
 						<ImageView fx:id="img_first" fitHeight="50.0" fitWidth="50.0" />
 						<ImageView fx:id="img_second" fitHeight="50.0" fitWidth="50.0" />

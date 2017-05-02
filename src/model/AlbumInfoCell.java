@@ -35,15 +35,17 @@ public class AlbumInfoCell extends GridCell<Album> {
 	private ImageView thirdImg;
 	private ImageView foutrhImg;
 	private List<ImageView> imgs;
+	private boolean isRegistered;
 
 	public AlbumInfoCell() {
 		// TODO Auto-generated constructor stub
+		isRegistered = false;
 		configureContextMenu();
 		setOnMouseClicked(event -> {
 			// TODO Auto-generated method stub
 			if (((MouseEvent) event).getClickCount() >= 2) {
 				AlbumBrowser stage = (AlbumBrowser) getGridView().getScene().getWindow();
-				new PhotoBrowserStage(getItem(), stage.getUsername());
+				new PhotoBrowserStage(getItem(), stage.getUser());
 			}
 		});
 
@@ -82,7 +84,7 @@ public class AlbumInfoCell extends GridCell<Album> {
 		open_item.setOnAction(event -> {
 			// TODO Auto-generated method stub
 			AlbumBrowser stage = (AlbumBrowser) getGridView().getScene().getWindow();
-			new PhotoBrowserStage(getItem(), stage.getUsername());
+			new PhotoBrowserStage(getItem(), stage.getUser());
 		});
 	}
 
@@ -93,6 +95,7 @@ public class AlbumInfoCell extends GridCell<Album> {
 			AlbumBrowser stage = (AlbumBrowser) getGridView().getScene().getWindow();
 			getItem().delete(stage.getUsername());
 			getGridView().getItems().remove(getIndex());
+			stage.getUser().albumNumberDecrease();
 		});
 	}
 
@@ -149,14 +152,18 @@ public class AlbumInfoCell extends GridCell<Album> {
 			// "-fx-effect: dropshadow(gaussian, red,10, 0, 0, 0);" +
 			// "-fx-background-insets:10;");
 			setGraphic(parent);
-			getItem().photosUriProperty().addListener(new ListChangeListener<String>() {
+			if (!isRegistered) {
+				getItem().photosUriProperty().addListener(new ListChangeListener<String>() {
 
-				@Override
-				public void onChanged(javafx.collections.ListChangeListener.Change<? extends String> c) {
-					// TODO Auto-generated method stub
-					updateItem(getItem(), false);
-				}
-			});
+					@Override
+					public void onChanged(javafx.collections.ListChangeListener.Change<? extends String> c) {
+						// TODO Auto-generated method stub
+						updateItem(getItem(), false);
+					}
+				});
+				isRegistered = !isRegistered;
+			}
+
 		}
 	}
 }
