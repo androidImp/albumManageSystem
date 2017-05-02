@@ -189,24 +189,24 @@ public class Album implements Serializable {
 	}
 
 	public void addPhotoNumber(int number) {
-		photosNumber.add(number);
+		photosNumber.set(photosNumber.get() + number);
 	}
 
 	public void subPhotoNumber(int number) {
-		photosNumber.subtract(number);
+		photosNumber.set(photosNumber.get() - number);
 		if (photosNumber.getValue() < 0) {
 			photosNumber.setValue(0);
 		}
 	}
 
 	public void addAlbumSize(double length) {
-		size.add(length);
+		size.set(size.get() + length);
 	}
 
 	public void subAlbumSize(double length) {
-		size.subtract(length);
+		size.set(size.get() - length);
 		if (size.getValue() < 0) {
-			size.setValue(0);
+			size.setValue(0.0);
 		}
 	}
 }

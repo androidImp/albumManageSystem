@@ -283,9 +283,15 @@ public class PhotosBrowserController implements ControllerInitializable<PhotoBro
 			}
 			DBUtil.addExpressionBatch(stage.getUsername(), stage.getAlbum().getId(), photos, expressionToAdd);
 			DBUtil.savePhotosData(photos, stage.getUsername());
-			stage.getAlbum().addAlbumSize(size);
-			stage.getAlbum().addPhotoNumber(files.size());
-			stage.getUser().addPhotoNumber(files.size());
+			double s = size;
+			Platform.runLater(new Runnable() {
+				public void run() {
+					stage.getAlbum().addAlbumSize(s);
+					stage.getAlbum().addPhotoNumber(files.size());
+					stage.getUser().addPhotoNumber(files.size());
+				}
+			});
+
 			// stage.getAlbum().setSize(stage.getAlbum().getSize() + size);
 			// stage.getAlbum().setPhotosNumber(stage.getAlbum().getPhotosNumber()
 			// + files.size());

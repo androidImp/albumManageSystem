@@ -55,6 +55,7 @@ import util.ParseUtil;
 import util.DateUtil;
 import util.DialogUtil;
 import util.FileChooserUtil;
+import util.LoadImageThreadPoolExecutor;
 
 public class PhotoBrowserStage extends Stage {
 	public Album getAlbum() {
@@ -252,8 +253,10 @@ public class PhotoBrowserStage extends Stage {
 		if (filesList != null) {
 			fileChooser.setInitialFileName(filesList.get(0).getAbsolutePath());
 			// ExecutorService threadPool = Executors.newCachedThreadPool();
-			ThreadPoolExecutor executor = new ThreadPoolExecutor(8, Runtime.getRuntime().availableProcessors() * 4, 2,
-					TimeUnit.MINUTES, new LinkedBlockingQueue<>());
+//			ThreadPoolExecutor executor = new ThreadPoolExecutor(8, Runtime.getRuntime().availableProcessors() * 4, 2,
+//					TimeUnit.MINUTES, new LinkedBlockingQueue<>());
+			LoadImageThreadPoolExecutor executor = new LoadImageThreadPoolExecutor(8, Runtime.getRuntime().availableProcessors() * 4, 2,
+					TimeUnit.MINUTES, new LinkedBlockingQueue<>(),this);
 			int size = filesList.size() / BATCH_OF_IMAGE_RENDER + 1;
 			for (int i = 0; i < size; i++) {
 				int startIndex = 10 * i;
@@ -263,11 +266,8 @@ public class PhotoBrowserStage extends Stage {
 				}
 				RenderImageRunnable runnable = new RenderImageRunnable(filesList.subList(startIndex, endIndex), album);
 				executor.execute(runnable);
-
 			}
-
 		}
-
 	}
 
 	public void deletePhoto(int index) {
@@ -353,21 +353,15 @@ public class PhotoBrowserStage extends Stage {
 			}
 			DBUtil.addExpressionBatch(getUsername(), album.getId(), photos, expressionToAdd);
 			DBUtil.savePhotosData(photos, getUsername());
+			DBUtil.updateAlbumInfo(getUsername(), album);
 			// album.setSize(album.getSize() + size);
 			// album.setPhotosNumber(album.getPhotosNumber() + files.size());
-			getAlbum().addAlbumSize(size);
-			getAlbum().addPhotoNumber(files.size());
+			double s = size;
 			Platform.runLater(new Runnable() {
 				public void run() {
+					getAlbum().addAlbumSize(s);
+					getAlbum().addPhotoNumber(files.size());
 					getUser().addPhotoNumber(files.size());
-				}
-			});
-
-			Platform.runLater(new Runnable() {
-
-				@Override
-				public void run() {
-					// TODO Auto-generated method stub
 					uris.addAll(urisToAdd);
 					gv_photo.getItems().addAll(photos);
 				}

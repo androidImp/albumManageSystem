@@ -3,10 +3,12 @@ package model;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.controlsfx.control.GridCell;
 
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
@@ -146,8 +148,17 @@ public class AlbumInfoCell extends GridCell<Album> {
 			// setStyle("-fx-background-color: rgba(255, 255, 255, 0.5);
 			// -fx-effect: dropshadow(gaussian,"
 			// +"orange, 10, 0, 0, 5);");
-			nameLabel.setText(item.getAlbumName());
-			photoNumberLabel.setText(String.valueOf(item.getPhotosNumber()));
+			// nameLabel.setText(item.getAlbumName());
+			nameLabel.textProperty().bind(item.albumNameProperty());
+			photoNumberLabel.textProperty().bind(Bindings.createStringBinding(new Callable<String>() {
+
+				@Override
+				public String call() throws Exception {
+					// TODO Auto-generated method stub
+					return String.valueOf(item.getPhotosNumber());
+				}
+			}, item.photosNumberProperty()));
+			// photoNumberLabel.setText(String.valueOf(item.getPhotosNumber()));
 			// parent.setStyle("-fx-background-color: white;" +
 			// "-fx-effect: dropshadow(gaussian, red,10, 0, 0, 0);" +
 			// "-fx-background-insets:10;");
