@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
+<?import javafx.collections.FXCollections ?>
 <?import javafx.scene.layout.*?>
 <?import java.lang.*?>
 <?import javafx.scene.control.*?>
@@ -14,11 +14,12 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.image.Image?>
+<?import javafx.scene.control.ChoiceBox?>
 
 
 <VBox fx:controller="controller.PhotosBrowserController" maxHeight="-Infinity"
 	maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-	prefHeight="600.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8"
+	prefHeight="600.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/8"
 	xmlns:fx="http://javafx.com/fxml/1">
 	<children>
 		<GridPane>
@@ -45,7 +46,17 @@
 				</HBox>
 				<HBox spacing="20.0" GridPane.columnIndex="1">
 					<children>
-						<Button fx:id="btn_add" mnemonicParsing="false" text="添加" />
+						<ChoiceBox fx:id="cb_sortType">
+							<items>
+								<FXCollections fx:factory="observableArrayList">
+									<String fx:value="相片名" />
+									<String fx:value="相册创建时间" />
+								</FXCollections>
+
+							</items>
+						</ChoiceBox>
+						<Button fx:id="btn_add" HBox.hgrow="ALWAYS"
+							mnemonicParsing="false" text="添加" />
 						<TextField fx:id="tf_search" promptText="输入查询内容"
 							GridPane.columnIndex="1" HBox.hgrow="ALWAYS" />
 					</children>

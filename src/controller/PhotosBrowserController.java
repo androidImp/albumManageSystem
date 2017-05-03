@@ -19,9 +19,13 @@ import com.alibaba.simpleimage.analyze.sift.render.RenderImage;
 import cluster.ClusterUtils;
 import cluster.ImagePoint;
 import cluster.KDSearchUtil;
+import comparator.PhotoDateComparator;
+import comparator.PhotoNameComparator;
 import javafx.animation.Interpolator;
 import javafx.animation.RotateTransition;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
@@ -35,6 +39,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
@@ -54,6 +59,7 @@ import util.DateUtil;
 import util.FileChooserUtil;
 import util.ParseUtil;
 import view.PhotoBrowserStage;
+import javafx.scene.control.ChoiceBox;
 
 public class PhotosBrowserController implements ControllerInitializable<PhotoBrowserStage> {
 	private static final int BRIGHTER = 1;
@@ -78,6 +84,8 @@ public class PhotosBrowserController implements ControllerInitializable<PhotoBro
 	@FXML
 	private PhotoBrowserStage stage;
 	private FileChooser fileChooser;
+	@FXML
+	ChoiceBox<String> cb_sortType;
 
 	@Override
 	public void initialize() {
@@ -85,7 +93,25 @@ public class PhotosBrowserController implements ControllerInitializable<PhotoBro
 		configurePhotoList();
 		fileChooser = new FileChooser();
 		configureScanOption();
+		configurePhotoSortType();
 		// System.out.println("stage: " + stage);
+	}
+
+	private void configurePhotoSortType() {
+		// TODO Auto-generated method stub
+		cb_sortType.setTooltip(new Tooltip("选择图片的排序方式"));
+		cb_sortType.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
+
+			@Override
+			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+				// TODO Auto-generated method stub
+				if (newValue.intValue() == 0) {
+					gv_photo.getItems().sort(new PhotoNameComparator());
+				} else if (newValue.intValue() == 1) {
+					gv_photo.getItems().sort(new PhotoDateComparator());
+				}
+			}
+		});
 	}
 
 	// TO DO 相片过大时,提供一个小的视图用于用户调整当前浏览的部分

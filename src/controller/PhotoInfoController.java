@@ -24,7 +24,7 @@ public class PhotoInfoController implements ControllerInitializable<PhotoInfoSta
 	@Override
 	public void initialize() {
 		// TODO Auto-generated method stub
-
+		
 	}
 
 	@Override
