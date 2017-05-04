@@ -128,7 +128,8 @@ public class Photo implements Serializable {
 			return false;
 		}
 		Photo photo = (Photo) obj;
-		return getId() == photo.getId() && getName().equals(photo.getName()) && getProfile().equals(photo.getProfile())
+		return getId() == photo.getId() && getAlbumName().equals(photo.getAlbumName())
+				&& getName().equals(photo.getName()) && getProfile().equals(photo.getProfile())
 				&& getUri().equals(photo.getUri()) && getCreateDate().equals(photo.getCreateDate())
 				&& getMd5() == photo.getMd5()
 				&& Double.doubleToLongBits(getSize()) == Double.doubleToLongBits(photo.getSize());
@@ -140,6 +141,7 @@ public class Photo implements Serializable {
 		// TODO Auto-generated method stub
 		int result = 17;
 		result = result * 37 + getId();
+		result = result * 37 + getAlbumName().hashCode();
 		result = result * 37 + getName().hashCode();
 		result = result * 37 + getProfile().hashCode();
 		result = result * 37 + getUri().hashCode();

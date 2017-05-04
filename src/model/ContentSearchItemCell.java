@@ -44,7 +44,7 @@ public class ContentSearchItemCell extends ListCell<Photo> {
 			hBox.getChildren().addAll(vBox_img, vBox_info);
 			Label ll_name = new Label("相片名: " + item.getName());
 			// TO DO 改成相册名而不是相册 ID;
-			Label ll_album_name = new Label("相册名: " + item.getId() + "");
+			Label ll_album_name = new Label("相册名: " + item.getAlbumName());
 			Label ll_resemblance = new Label();
 
 			double[] key = (double[]) getListView().getUserData();

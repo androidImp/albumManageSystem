@@ -57,6 +57,7 @@ import model.Photo;
 import util.DBUtil;
 import util.DateUtil;
 import util.FileChooserUtil;
+import util.LogUtil;
 import util.ParseUtil;
 import view.PhotoBrowserStage;
 import javafx.scene.control.ChoiceBox;
@@ -291,7 +292,6 @@ public class PhotosBrowserController implements ControllerInitializable<PhotoBro
 					sift.detectFeatures(ri.toPixelFloatArray(null));
 					ImagePoint imagePoint = new ImagePoint(sift.getGlobalFeaturePoints());
 					try {
-
 						double[] express = ClusterUtils.distribute(imagePoint);
 						String expression = ParseUtil.doubleArrayToExpression(express);
 						expressionToAdd.add(expression);
@@ -302,7 +302,10 @@ public class PhotosBrowserController implements ControllerInitializable<PhotoBro
 
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
-						e.printStackTrace();
+						// e.printStackTrace();
+						LogUtil.e("PhotosBrowserController.RenderImageRunnable.run", "该图片在添加时出错,删除该图片");
+						photo.deletePhoto(stage.getUsername());
+						DBUtil.deleteExpressionOfPhoto(stage.getUsername(), photo.getId(), photo.getMd5());
 					}
 
 				}

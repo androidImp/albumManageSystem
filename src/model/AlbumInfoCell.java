@@ -96,8 +96,11 @@ public class AlbumInfoCell extends GridCell<Album> {
 			// TODO Auto-generated method stub
 			AlbumBrowser stage = (AlbumBrowser) getGridView().getScene().getWindow();
 			getItem().delete(stage.getUsername());
-			getGridView().getItems().remove(getIndex());
+			ObservableList<Album> albums = getGridView().getItems();
+			stage.getUser().subPhotoNumber(albums.get(getIndex()).getPhotosNumber());
 			stage.getUser().albumNumberDecrease();
+			albums.remove(getIndex());
+
 		});
 	}
 

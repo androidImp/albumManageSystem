@@ -15,6 +15,7 @@ import javafx.stage.Stage;
 import model.ContentSearchItemCell;
 import model.Photo;
 import util.DBUtil;
+import view.PhotoBrowserStage;
 
 public class KDSearchUtil {
 	public static final int DIMENSIONS_OF_KDTREE = 100;
@@ -51,7 +52,6 @@ public class KDSearchUtil {
 	public static void queryNearestPic(String username, Photo photo) {
 		// System.out.println("开始查询相似图片");
 		double[] key = DBUtil.queryExpression(username, DIMENSIONS_OF_KDTREE, photo.getId(), photo.getMd5());
-
 		if (key == null)
 			System.out.println("key is null");
 		if (key != null) {
@@ -65,6 +65,7 @@ public class KDSearchUtil {
 				Stage stage = new Stage();
 				VBox root = new VBox();
 				Scene scene = new Scene(root, 400, 400);
+				scene.getStylesheets().add(PhotoBrowserStage.class.getResource("application.css").toExternalForm());
 				stage.setScene(scene);
 				// 构造新的界面;
 				ListView<Photo> listView = new ListView<Photo>();

@@ -445,6 +445,7 @@ public class DBUtil {
 				Photo photo = new Photo();
 				photo.setMd5(rs.getString(MD5));
 				photo.setId(rs.getInt(PHOTO_ID));
+				photo.setAlbumName(rs.getString(ALBUMNAME));
 				photo.setName(rs.getString(PHOTO_NAME));
 				photo.setUri(rs.getString(PHOTO_URI));
 				photo.setCreateDate(rs.getString(PHOTO_CREATEDATE));
