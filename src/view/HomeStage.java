@@ -13,7 +13,6 @@ import java.util.prefs.Preferences;
 import org.apache.commons.math3.ml.clustering.CentroidCluster;
 
 import cluster.ClusterUtils;
-import cluster.KDSearchUtil;
 import cluster.Point;
 import controller.HomePageController;
 import javafx.application.Platform;
@@ -47,6 +46,7 @@ import model.Album;
 import model.Photo;
 import model.SearchItemCell;
 import model.User;
+import search.KDSearchUtil;
 import util.DBUtil;
 
 public class HomeStage extends BaseStage {
@@ -88,49 +88,7 @@ public class HomeStage extends BaseStage {
 
 	private void configureCluster() {
 		// TODO Auto-generated method stub
-		FileInputStream fileInputStream = null;
-		try {
-			fileInputStream = new FileInputStream("/Users/niuniumei/Documents/Java/MyAlbum/album.txt");
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		ObjectInputStream objectInputStream = null;
-		try {
-			objectInputStream = new ObjectInputStream(fileInputStream);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		if (objectInputStream != null) {
-
-			try {
-				Object object = null;
-				while ((object = objectInputStream.readObject()) != null) {
-					Point point = (Point) object;
-					CentroidCluster<Point> centroidCluster = new CentroidCluster<>(point);
-					centers.add(centroidCluster);
-				}
-
-			} catch (EOFException e) {
-				// TODO: handle exception
-			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-		}
-
-		try {
-			objectInputStream.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		ClusterUtils.setWords(centers);
+		ClusterUtils.readClusterPoints();
 	}
 
 	private void initParameters() {

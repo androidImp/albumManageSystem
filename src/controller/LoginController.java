@@ -23,7 +23,7 @@ import javafx.util.Pair;
 import model.User;
 import util.DBUtil;
 import util.ParseUtil;
-import view.AlbumBrowser;
+import view.AlbumBrowserStage;
 import view.HomeStage;
 import view.LoginStage;
 import javafx.scene.control.Hyperlink;
@@ -167,7 +167,7 @@ public class LoginController implements ControllerInitializable<LoginStage> {
 							preferences.put("origin", "");
 							// new HomeStage(username).show();
 							User user = DBUtil.getUser(username);
-							new AlbumBrowser(user);
+							new AlbumBrowserStage(user);
 						}
 					});
 				} else {

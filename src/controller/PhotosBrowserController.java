@@ -18,7 +18,6 @@ import com.alibaba.simpleimage.analyze.sift.render.RenderImage;
 
 import cluster.ClusterUtils;
 import cluster.ImagePoint;
-import cluster.KDSearchUtil;
 import comparator.PhotoDateComparator;
 import comparator.PhotoNameComparator;
 import javafx.animation.Interpolator;
@@ -54,6 +53,7 @@ import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import model.ImageCell;
 import model.Photo;
+import search.KDSearchUtil;
 import util.DBUtil;
 import util.DateUtil;
 import util.FileChooserUtil;
@@ -215,9 +215,9 @@ public class PhotosBrowserController implements ControllerInitializable<PhotoBro
 
 	@FXML
 	public void addPhoto() {
-		FileChooserUtil.configureFileChooser(fileChooser);
-		List<File> filesList = fileChooser.showOpenMultipleDialog(stage);
-		importPicFromFiles(filesList);
+		// FileChooserUtil.configureFileChooser(fileChooser);
+		// List<File> filesList = fileChooser.showOpenMultipleDialog(stage);
+		// importPicFromFiles(filesList);
 	}
 
 	/**

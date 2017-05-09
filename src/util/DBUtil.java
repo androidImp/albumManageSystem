@@ -11,7 +11,6 @@ import java.util.List;
 
 import javax.swing.text.rtf.RTFEditorKit;
 
-import cluster.KDSearchUtil;
 import cluster.Point;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -19,6 +18,7 @@ import javafx.scene.image.Image;
 import model.Album;
 import model.Photo;
 import model.User;
+import search.KDSearchUtil;
 
 public class DBUtil {
 

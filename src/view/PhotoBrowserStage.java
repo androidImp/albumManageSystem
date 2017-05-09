@@ -5,10 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
@@ -20,28 +17,23 @@ import com.alibaba.simpleimage.analyze.sift.render.RenderImage;
 
 import cluster.ClusterUtils;
 import cluster.ImagePoint;
-import cluster.KDSearchUtil;
 import javafx.application.Platform;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -50,12 +42,12 @@ import model.Album;
 import model.ImageCell;
 import model.Photo;
 import model.User;
+import search.KDSearchUtil;
 import util.DBUtil;
-import util.ParseUtil;
 import util.DateUtil;
-import util.DialogUtil;
 import util.FileChooserUtil;
 import util.LoadImageThreadPoolExecutor;
+import util.ParseUtil;
 
 public class PhotoBrowserStage extends Stage {
 	public Album getAlbum() {
@@ -90,7 +82,28 @@ public class PhotoBrowserStage extends Stage {
 		configureButtonAdd();
 		configureCloseProperty();
 		show();
+		// calculateAccuracy();
+	}
 
+	private void calculateAccuracy() {
+		// TODO Auto-generated method stub
+		int success = 0, fail = 0;
+		ObservableList<Photo> observableList = gv_photo.getItems();
+		for (int i = 0; i < observableList.size(); i++) {
+			Photo photo = observableList.get(i);
+			List<Photo> photos = KDSearchUtil.queryNearestPhoto(getUsername(), observableList.get(i));
+			if (photos != null) {
+				for (int j = 0; j < photos.size(); j++) {
+					if (photos.get(j).getAlbumName().equals(photo.getAlbumName())) {
+						success++;
+					} else {
+						fail++;
+					}
+				}
+			}
+		}
+		System.out.println("album name:" + album.getAlbumName() + " total: " + observableList.size() * 10);
+		System.out.println("success: " + success + "  fail: " + fail);
 	}
 
 	private void initView() {
@@ -253,10 +266,12 @@ public class PhotoBrowserStage extends Stage {
 		if (filesList != null) {
 			fileChooser.setInitialFileName(filesList.get(0).getAbsolutePath());
 			// ExecutorService threadPool = Executors.newCachedThreadPool();
-//			ThreadPoolExecutor executor = new ThreadPoolExecutor(8, Runtime.getRuntime().availableProcessors() * 4, 2,
-//					TimeUnit.MINUTES, new LinkedBlockingQueue<>());
-			LoadImageThreadPoolExecutor executor = new LoadImageThreadPoolExecutor(8, Runtime.getRuntime().availableProcessors() * 4, 2,
-					TimeUnit.MINUTES, new LinkedBlockingQueue<>(),this);
+			// ThreadPoolExecutor executor = new ThreadPoolExecutor(8,
+			// Runtime.getRuntime().availableProcessors() * 4, 2,
+			// TimeUnit.MINUTES, new LinkedBlockingQueue<>());
+			LoadImageThreadPoolExecutor executor = new LoadImageThreadPoolExecutor(8,
+					Runtime.getRuntime().availableProcessors() * 4, 2, TimeUnit.MINUTES, new LinkedBlockingQueue<>(),
+					this);
 			int size = filesList.size() / BATCH_OF_IMAGE_RENDER + 1;
 			for (int i = 0; i < size; i++) {
 				int startIndex = 10 * i;
@@ -325,30 +340,7 @@ public class PhotoBrowserStage extends Stage {
 					photo.setModified(true);
 					photos.add(photo);
 					urisToAdd.add(path);
-					BufferedImage image = null;
-					try {
-						image = ImageIO.read(file);
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-					RenderImage ri = new RenderImage(image);
-					sift.detectFeatures(ri.toPixelFloatArray(null));
-					ImagePoint imagePoint = new ImagePoint(sift.getGlobalFeaturePoints());
-					try {
-
-						double[] express = ClusterUtils.distribute(imagePoint);
-						String expression = ParseUtil.doubleArrayToExpression(express);
-						expressionToAdd.add(expression);
-						// DBUtil.addExpression(getUsername(), album.getId(),
-						// photo.getMd5(), photo.getUri(), expression);
-						KDSearchUtil.insertNode(KDSearchUtil.constructKeyWithAlbumId(express, album.getId()), photo);
-
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
+					insertNode(expressionToAdd, sift, file, photo);
 				}
 			}
 			DBUtil.addExpressionBatch(getUsername(), album.getId(), photos, expressionToAdd);
@@ -366,6 +358,37 @@ public class PhotoBrowserStage extends Stage {
 					gv_photo.getItems().addAll(photos);
 				}
 			});
+		}
+
+		private void insertNode(List<String> expressionToAdd, SIFT sift, File file, Photo photo) {
+			ImagePoint imagePoint = extracteImagePoint(sift, file);
+			try {
+
+				double[] express = ClusterUtils.distribute(imagePoint);
+				String expression = ParseUtil.doubleArrayToExpression(express);
+				expressionToAdd.add(expression);
+				// DBUtil.addExpression(getUsername(), album.getId(),
+				// photo.getMd5(), photo.getUri(), expression);
+				KDSearchUtil.insertNode(KDSearchUtil.constructKeyWithAlbumId(express, album.getId()), photo);
+
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		private ImagePoint extracteImagePoint(SIFT sift, File file) {
+			BufferedImage image = null;
+			try {
+				image = ImageIO.read(file);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			RenderImage ri = new RenderImage(image);
+			sift.detectFeatures(ri.toPixelFloatArray(null));
+			ImagePoint imagePoint = new ImagePoint(sift.getGlobalFeaturePoints());
+			return imagePoint;
 		}
 
 	}

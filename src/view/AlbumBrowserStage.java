@@ -1,21 +1,10 @@
 package view;
 
-import java.io.EOFException;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.prefs.Preferences;
 
-import org.apache.commons.math3.ml.clustering.CentroidCluster;
-
 import cluster.ClusterUtils;
-import cluster.KDSearchUtil;
-import cluster.Point;
 import controller.AlbumBrowserController;
-import controller.ShowAlbumInfoController;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -34,11 +23,11 @@ import javafx.stage.WindowEvent;
 import model.Photo;
 import model.SearchItemCell;
 import model.User;
+import search.KDSearchUtil;
 import util.DBUtil;
 
-public class AlbumBrowser extends BaseStage {
+public class AlbumBrowserStage extends BaseStage {
 	public static int index;
-	List<CentroidCluster<Point>> centers = new ArrayList<>();
 	private TextField tf_search;
 
 	public String getUsername() {
@@ -49,7 +38,7 @@ public class AlbumBrowser extends BaseStage {
 	private Parent root;
 	private User user;
 
-	public AlbumBrowser(User user) {
+	public AlbumBrowserStage(User user) {
 		// TODO Auto-generated constructor stub
 		setUser(user);
 		initParameters();
@@ -110,7 +99,7 @@ public class AlbumBrowser extends BaseStage {
 	protected void configureController() {
 		// TODO Auto-generated method stub
 		AlbumBrowserController controller = loader.getController();
-		controller.configureStage(AlbumBrowser.this);
+		controller.configureStage(AlbumBrowserStage.this);
 	}
 
 	private void initParameters() {
@@ -174,54 +163,11 @@ public class AlbumBrowser extends BaseStage {
 	private void configureKDTree() {
 		// TODO Auto-generated method stub
 		KDSearchUtil.configureKDTree(getUsername());
-
 	}
 
 	private void configureCluster() {
 		// TODO Auto-generated method stub
-		FileInputStream fileInputStream = null;
-		try {
-			fileInputStream = new FileInputStream("/Users/niuniumei/Documents/Java/MyAlbum/album.txt");
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		ObjectInputStream objectInputStream = null;
-		try {
-			objectInputStream = new ObjectInputStream(fileInputStream);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		if (objectInputStream != null) {
-
-			try {
-				Object object = null;
-				while ((object = objectInputStream.readObject()) != null) {
-					Point point = (Point) object;
-					CentroidCluster<Point> centroidCluster = new CentroidCluster<>(point);
-					centers.add(centroidCluster);
-				}
-
-			} catch (EOFException e) {
-				// TODO: handle exception
-			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-		}
-
-		try {
-			objectInputStream.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		ClusterUtils.setWords(centers);
+		ClusterUtils.readClusterPoints();
 	}
 
 	public User getUser() {

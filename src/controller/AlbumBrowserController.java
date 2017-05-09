@@ -34,9 +34,10 @@ import model.AlbumInfoCell;
 import util.DBUtil;
 import util.DateUtil;
 import util.DialogUtil;
-import view.AlbumBrowser;
+import view.AlbumBrowserStage;
+import view.ChangeUsernameStage;
 
-public class AlbumBrowserController implements ControllerInitializable<AlbumBrowser> {
+public class AlbumBrowserController implements ControllerInitializable<AlbumBrowserStage> {
 	@FXML
 	private ImageView img_userIcon;
 	@FXML
@@ -45,7 +46,7 @@ public class AlbumBrowserController implements ControllerInitializable<AlbumBrow
 	private Label ll_photoNumber;
 	@FXML
 	private Label ll_albumNumber;
-	private AlbumBrowser stage;
+	private AlbumBrowserStage stage;
 	@FXML
 	private GridView<Album> gv_album;
 	@FXML
@@ -64,7 +65,7 @@ public class AlbumBrowserController implements ControllerInitializable<AlbumBrow
 	}
 
 	@Override
-	public void configureStage(AlbumBrowser stage) {
+	public void configureStage(AlbumBrowserStage stage) {
 		// TODO Auto-generated method stub
 		this.stage = stage;
 	}
@@ -107,6 +108,7 @@ public class AlbumBrowserController implements ControllerInitializable<AlbumBrow
 		img_userIcon.setImage(new Image("/Pic/pic.jpeg"));
 		ContextMenu menu = new ContextMenu();
 		MenuItem scanItem = new MenuItem("查看信息");
+		configureItemScan(scanItem);
 		menu.getItems().add(scanItem);
 		img_userIcon.setOnMouseClicked(new EventHandler<Event>() {
 
@@ -124,6 +126,12 @@ public class AlbumBrowserController implements ControllerInitializable<AlbumBrow
 			}
 		});
 		ll_userName.textProperty().bind(stage.getUser().nicknameProperty());
+	}
+
+	private void configureItemScan(MenuItem scanItem) {
+		// TODO Auto-generated method stub
+		scanItem.setOnAction(event -> new ChangeUsernameStage(stage.getUser()));
+
 	}
 
 	public void addAlbum() {
@@ -178,7 +186,7 @@ public class AlbumBrowserController implements ControllerInitializable<AlbumBrow
 		result.ifPresent(albumNamePassword -> {
 			if (DBUtil.queryAlbum(stage.getUsername(), albumNamePassword.getKey())) {
 				Album album = new Album();
-				album.setId(AlbumBrowser.index++);
+				album.setId(AlbumBrowserStage.index++);
 				album.setAlbumName(albumNamePassword.getKey());
 				album.setAlbumProfile(albumNamePassword.getValue());
 				album.setCreateDate(DateUtil.getFormatDate());

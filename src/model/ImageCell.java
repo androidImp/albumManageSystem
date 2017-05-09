@@ -3,7 +3,6 @@ package model;
 import org.controlsfx.control.GridCell;
 import org.controlsfx.control.GridView;
 
-import cluster.KDSearchUtil;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -16,6 +15,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
+import search.KDSearchUtil;
 import view.PhotoBrowserStage;
 import view.PhotoInfoStage;
 

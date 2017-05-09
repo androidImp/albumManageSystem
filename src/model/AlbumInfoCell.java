@@ -26,7 +26,7 @@ import javafx.scene.input.MouseEvent;
 import util.DBUtil;
 import view.AlbumInfoStage;
 import view.PhotoBrowserStage;
-import view.AlbumBrowser;
+import view.AlbumBrowserStage;
 
 public class AlbumInfoCell extends GridCell<Album> {
 	private Parent parent;
@@ -46,7 +46,7 @@ public class AlbumInfoCell extends GridCell<Album> {
 		setOnMouseClicked(event -> {
 			// TODO Auto-generated method stub
 			if (((MouseEvent) event).getClickCount() >= 2) {
-				AlbumBrowser stage = (AlbumBrowser) getGridView().getScene().getWindow();
+				AlbumBrowserStage stage = (AlbumBrowserStage) getGridView().getScene().getWindow();
 				new PhotoBrowserStage(getItem(), stage.getUser());
 			}
 		});
@@ -85,7 +85,7 @@ public class AlbumInfoCell extends GridCell<Album> {
 		// TODO Auto-generated method stub
 		open_item.setOnAction(event -> {
 			// TODO Auto-generated method stub
-			AlbumBrowser stage = (AlbumBrowser) getGridView().getScene().getWindow();
+			AlbumBrowserStage stage = (AlbumBrowserStage) getGridView().getScene().getWindow();
 			new PhotoBrowserStage(getItem(), stage.getUser());
 		});
 	}
@@ -94,7 +94,7 @@ public class AlbumInfoCell extends GridCell<Album> {
 		// TODO Auto-generated method stub
 		delete_item.setOnAction(event -> {
 			// TODO Auto-generated method stub
-			AlbumBrowser stage = (AlbumBrowser) getGridView().getScene().getWindow();
+			AlbumBrowserStage stage = (AlbumBrowserStage) getGridView().getScene().getWindow();
 			getItem().delete(stage.getUsername());
 			ObservableList<Album> albums = getGridView().getItems();
 			stage.getUser().subPhotoNumber(albums.get(getIndex()).getPhotosNumber());

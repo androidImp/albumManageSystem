@@ -1,7 +1,13 @@
 package view;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.prefs.Preferences;
+
+import javax.imageio.ImageIO;
 
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -9,21 +15,30 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
-import javafx.scene.control.PasswordField;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import model.User;
+import surf.IDescriptor;
+import surf.IDetector;
+import surf.ISURFfactory;
+import surf.InterestPoint;
+import surf.SURF;
 import util.DBUtil;
 
 public class LoginStage extends Stage {
+
+	static ArrayList<InterestPoint> interest_points;
+	static float threshold = 800;
+	static float balanceValue = (float) 0.9;
+	static int octaves = 5;
 	private RadioButton rb_login_free;
 	private Parent root;
 	private TextField tf_username;
 
 	public LoginStage() {
 		// TODO Auto-generated method stub
+
 		try {
 			root = FXMLLoader.load(getClass().getResource("login.fxml"));
 		} catch (IOException e) {
@@ -38,6 +53,7 @@ public class LoginStage extends Stage {
 		configureBtnLoginFree();
 		setResizable(false);
 		show();
+
 	}
 
 	private void initViews() {
@@ -71,7 +87,7 @@ public class LoginStage extends Stage {
 							preferences.put("origin", "");
 							// new HomeStage(username).show();
 							User user = DBUtil.getUser(username);
-							new AlbumBrowser(user).show();
+							new AlbumBrowserStage(user).show();
 
 						}
 					});

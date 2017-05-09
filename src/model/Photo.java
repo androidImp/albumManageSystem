@@ -2,11 +2,11 @@ package model;
 
 import java.io.Serializable;
 
-import cluster.KDSearchUtil;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
+import search.KDSearchUtil;
 import util.DBUtil;
 
 public class Photo implements Serializable {

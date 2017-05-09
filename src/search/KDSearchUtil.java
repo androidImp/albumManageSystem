@@ -1,14 +1,14 @@
-package cluster;
+package search;
 
 import java.util.List;
 
+import cluster.Point;
 import edu.wlu.cs.levy.CG.KDTree;
 import edu.wlu.cs.levy.CG.KeyDuplicateException;
 import edu.wlu.cs.levy.CG.KeyMissingException;
 import edu.wlu.cs.levy.CG.KeySizeException;
 import javafx.scene.Scene;
 import javafx.scene.control.ListView;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -47,6 +47,26 @@ public class KDSearchUtil {
 			}
 		}
 		// System.out.println("配置 KD 树结束");
+	}
+
+	public static List<Photo> queryNearestPhoto(String username, Photo photo) {
+		double[] key = DBUtil.queryExpression(username, DIMENSIONS_OF_KDTREE, photo.getId(), photo.getMd5());
+		if (key == null)
+			System.out.println("key is null");
+		if (key != null) {
+			double[] query = new double[key.length + 1];
+			for (int i = 0; i < key.length; i++) {
+				query[i] = key[i];
+			}
+			query[key.length] = (photo.getId() + 0.0) / 1000;
+			try {
+				return kdTree.nearest(query, 10);
+			} catch (KeySizeException | IllegalArgumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return null;
 	}
 
 	public static void queryNearestPic(String username, Photo photo) {

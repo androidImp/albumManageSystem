@@ -1,5 +1,11 @@
 package cluster;
 
+import java.io.EOFException;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.math3.ml.clustering.CentroidCluster;
@@ -18,8 +24,50 @@ public class ClusterUtils {
 	 * @return
 	 * @throws Exception
 	 */
-	public static void setWords(List<CentroidCluster<Point>> words) {
-		ClusterUtils.words = words;
+	public static void readClusterPoints() {
+		words = new ArrayList<>();
+		FileInputStream fileInputStream = null;
+		try {
+			fileInputStream = new FileInputStream("album.txt");
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		ObjectInputStream objectInputStream = null;
+		try {
+			objectInputStream = new ObjectInputStream(fileInputStream);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if (objectInputStream != null) {
+
+			try {
+				Object object = null;
+				while ((object = objectInputStream.readObject()) != null) {
+					Point point = (Point) object;
+					CentroidCluster<Point> centroidCluster = new CentroidCluster<>(point);
+					words.add(centroidCluster);
+				}
+
+			} catch (EOFException e) {
+				// TODO: handle exception
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+
+		try {
+			objectInputStream.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public static double[] distribute(ImagePoint imagePoint) throws Exception {
@@ -36,17 +84,17 @@ public class ClusterUtils {
 				}
 			}
 			if (minIndex != -1) {
-				expression[minIndex] ++;
+				expression[minIndex]++;
 			}
 		}
 		double ex[] = new double[words.size()];
-		for(int i = 0; i < words.size(); i++){
+		for (int i = 0; i < words.size(); i++) {
 			ex[i] = (expression[i] + 0.0) / points.size();
 		}
-//		for(int i = 0; i < words.size(); i++){
-//			System.out.print(ex[i] + ",");
-//		}
-//		System.out.println();
+		// for(int i = 0; i < words.size(); i++){
+		// System.out.print(ex[i] + ",");
+		// }
+		// System.out.println();
 		return ex;
 	}
 
@@ -59,7 +107,7 @@ public class ClusterUtils {
 	 * @throws Exception
 	 */
 	public static double getDistance(double[] a, double[] b) throws Exception {
-		if(a == null ||  b == null){
+		if (a == null || b == null) {
 			throw new Exception("Point cann't be null");
 		}
 		if (a.length != b.length) {
@@ -75,7 +123,7 @@ public class ClusterUtils {
 	public static double getSum(double[] key) {
 		// TODO Auto-generated method stub
 		double sum = 0.0;
-		for(int i = 0; i < key.length; i++){
+		for (int i = 0; i < key.length; i++) {
 			sum += key[i] * key[i];
 		}
 		return Math.sqrt(sum);

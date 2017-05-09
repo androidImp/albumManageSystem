@@ -4,7 +4,6 @@ import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.prefs.Preferences;
 
-import cluster.KDSearchUtil;
 import javafx.application.Platform;
 import javafx.beans.binding.Binding;
 import javafx.beans.binding.Bindings;
@@ -51,6 +50,7 @@ import model.Album;
 import model.Photo;
 import model.SearchItemCell;
 import model.User;
+import search.KDSearchUtil;
 import util.DBUtil;
 import util.ParseUtil;
 import util.DateUtil;
