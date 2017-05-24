@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
 
+import org.apache.commons.math3.analysis.function.Log;
 import org.controlsfx.control.GridView;
 
 import com.alibaba.simpleimage.analyze.sift.SIFT;
@@ -26,6 +27,7 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -87,6 +89,7 @@ public class PhotosBrowserController implements ControllerInitializable<PhotoBro
 	private FileChooser fileChooser;
 	@FXML
 	ChoiceBox<String> cb_sortType;
+	private boolean modified;
 
 	@Override
 	public void initialize() {
@@ -95,6 +98,7 @@ public class PhotosBrowserController implements ControllerInitializable<PhotoBro
 		fileChooser = new FileChooser();
 		configureScanOption();
 		configurePhotoSortType();
+		modified = false;
 		// System.out.println("stage: " + stage);
 	}
 
@@ -340,20 +344,46 @@ public class PhotosBrowserController implements ControllerInitializable<PhotoBro
 	public void previous() {
 		ObservableList<Photo> photos = gv_photo.getItems();
 		int index = (int) gv_photo.getUserData();
+		saveChange(index);
 		index = (index + 1) % photos.size();
 		final int current = index;
 		gv_photo.setUserData(index);
 		playAnimation(photos, current);
+
 	}
 
 	@FXML
 	public void next() {
 		ObservableList<Photo> photos = gv_photo.getItems();
 		int index = (int) gv_photo.getUserData();
+		saveChange(index);
 		index = (index - 1 + photos.size()) % photos.size();
 		final int current = index;
 		gv_photo.setUserData(index);
 		playAnimation(photos, current);
+
+	}
+
+	private void saveChange(int index) {
+		// TODO Auto-generated method stub
+		if (modified) {
+			Photo photo = gv_photo.getItems().get(index);
+			String uri = photo.getUri().substring(5);
+			String format = photo.getUri().substring(photo.getUri().lastIndexOf(".") + 1);
+			File file = new File(uri);
+			System.out.println(uri);
+			System.out.println("format: " + format);
+			try {
+				if(ImageIO.write(SwingFXUtils.fromFXImage(img_scan.getImage(), null), format, file)){
+					LogUtil.i("PhotoBrowser", "保存图像成功");
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				LogUtil.e("PhotoBrowser", "保存图像成功");
+			}
+			modified = false;
+		}
 
 	}
 
@@ -373,6 +403,7 @@ public class PhotosBrowserController implements ControllerInitializable<PhotoBro
 
 	private void processImage(int type) {
 		Image image = img_scan.getImage();
+		modified = true;
 		PixelReader reader = image.getPixelReader();
 		WritableImage writableImage = new WritableImage((int) (image.getWidth()), (int) (image.getHeight()));
 		PixelWriter pixelWriter = writableImage.getPixelWriter();

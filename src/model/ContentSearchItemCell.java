@@ -52,7 +52,7 @@ public class ContentSearchItemCell extends ListCell<Photo> {
 			double expression[] = DBUtil.getExpression("123", getItem().getMd5(), getItem().getId());
 
 			try {
-				resemblance = (1 - ClusterUtils.getDistance(key, expression) / ClusterUtils.getSum(key)) * 100;
+				resemblance = (1 - ClusterUtils.getDistance(key, expression)/ ClusterUtils.getSum(key)) * 100;
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
